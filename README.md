@@ -39,9 +39,6 @@ Ejemplo:
   pedirle al ciudadano en el momento, en vez de mandarlo a averiguar y volver.
 -->
 
-> _¿Quién es el usuario concreto? ¿Qué decisión concreta toma distinto gracias
-> a tu sistema?_
-
 ---
 
 ## 3. Tarea del modelo (M1)
