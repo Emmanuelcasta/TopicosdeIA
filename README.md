@@ -16,7 +16,7 @@ comentarios HTML y no se renderizan.
 
 <!-- Ejemplo: Atención al ciudadano en una alcaldía municipal. -->
 
-> _Escribe aquí el dominio concreto de tu proyecto._
+> Tutor de matemáticas para estudiantes de secundaria (grados 9° a 11°), enfocado en álgebra y geometría básica. El sistema no reemplaza al docente: revisa el ejercicio que el estudiante ya resolvió (a mano o digitado) y da retroalimentación sobre el paso específico donde se equivocó, en lugar de solo decir si el resultado final está bien o mal.
 
 ---
 
