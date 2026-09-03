@@ -1,0 +1,104 @@
+{
+  "notebook": "S04_Lab_Fine_tuning_Qwen",
+  "arquitectura": "decoder-only",
+  "modelo": "Qwen/Qwen2.5-1.5B-Instruct",
+  "metodo": "LoRA",
+  "n_train": 132,
+  "n_val": 33,
+  "epocas": 8.0,
+  "learning_rate": 0.0002,
+  "tiempo_entrenamiento_s": 129.406,
+  "train_loss_final": 0.16806790023110807,
+  "eval_loss_mejor": 0.19135455787181854,
+  "mejor_epoca": 4.0,
+  "parametros_entrenables": 4358144,
+  "parametros_totales": 1543714304,
+  "baseline": {
+    "n": 33,
+    "exactitud": 0.9090909090909091,
+    "formato_valido": 0.12121212121212122,
+    "rouge_l": 0.26967417306359875,
+    "long_media": 82.51515151515152
+  },
+  "finetuned": {
+    "n": 33,
+    "exactitud": 0.9393939393939394,
+    "formato_valido": 1.0,
+    "rouge_l": 0.8243428751628432,
+    "long_media": 23.515151515151516
+  },
+  "por_categoria": {
+    "suma": {
+      "n": 3,
+      "baseline": 1.0,
+      "finetuned": 1.0
+    },
+    "resta": {
+      "n": 3,
+      "baseline": 1.0,
+      "finetuned": 1.0
+    },
+    "multiplicacion": {
+      "n": 3,
+      "baseline": 0.6666666666666666,
+      "finetuned": 1.0
+    },
+    "division": {
+      "n": 3,
+      "baseline": 1.0,
+      "finetuned": 1.0
+    },
+    "operaciones_combinadas": {
+      "n": 3,
+      "baseline": 1.0,
+      "finetuned": 1.0
+    },
+    "potencias_raices": {
+      "n": 3,
+      "baseline": 1.0,
+      "finetuned": 1.0
+    },
+    "fracciones": {
+      "n": 3,
+      "baseline": 1.0,
+      "finetuned": 0.6666666666666666
+    },
+    "porcentajes": {
+      "n": 3,
+      "baseline": 1.0,
+      "finetuned": 1.0
+    },
+    "ecuaciones": {
+      "n": 3,
+      "baseline": 1.0,
+      "finetuned": 1.0
+    },
+    "geometria": {
+      "n": 3,
+      "baseline": 0.6666666666666666,
+      "finetuned": 1.0
+    },
+    "estadistica_probabilidad": {
+      "n": 3,
+      "baseline": 0.6666666666666666,
+      "finetuned": 0.6666666666666666
+    }
+  },
+  "tokenizador": {
+    "modelo": "Qwen/Qwen2.5-1.5B-Instruct",
+    "tokenizador": "Qwen2Tokenizer",
+    "vocabulario": 151643,
+    "fertilidad_media": 2.229089993989726,
+    "tokens_media": 124.56363636363636,
+    "tokens_max": 186
+  },
+  "mejoraron": [
+    "mul-08",
+    "geo-06",
+    "est-07"
+  ],
+  "empeoraron": [
+    "fra-12",
+    "est-01"
+  ]
+}

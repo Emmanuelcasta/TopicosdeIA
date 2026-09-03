@@ -1,0 +1,276 @@
+{
+  "notebook": "S04_Lab_Fine_tuning_BERT",
+  "arquitectura": "encoder-only",
+  "modelo": "dccuchile/bert-base-spanish-wwm-cased",
+  "metodo": "fine-tuning completo",
+  "n_train": 132,
+  "n_val": 33,
+  "n_clases": 11,
+  "epocas": 15.0,
+  "learning_rate": 3e-05,
+  "tiempo_entrenamiento_s": 299.5388,
+  "eval_loss_final": 1.1144293546676636,
+  "mejor_epoca": 8.0,
+  "parametros_entrenables": 109859339,
+  "parametros_totales": 109859339,
+  "baseline_mayoritaria": {
+    "accuracy": 0.09090909090909091,
+    "precision_macro": 0.008264462809917356,
+    "recall_macro": 0.09090909090909091,
+    "f1_macro": 0.01515151515151515,
+    "precision_ponderada": 0.008264462809917356,
+    "recall_ponderado": 0.09090909090909091,
+    "f1_ponderado": 0.015151515151515152
+  },
+  "baseline_tfidf": {
+    "accuracy": 0.48484848484848486,
+    "precision_macro": 0.5845959595959596,
+    "recall_macro": 0.4848484848484849,
+    "f1_macro": 0.4478551751279023,
+    "precision_ponderada": 0.5845959595959596,
+    "recall_ponderado": 0.48484848484848486,
+    "f1_ponderado": 0.4478551751279024
+  },
+  "baseline_tfidf_cv_f1_macro": 0.41338055883510433,
+  "baseline_tfidf_cv_std": 0.028040079537618307,
+  "baseline_sin_finetuning": {
+    "accuracy": 0.09090909090909091,
+    "precision_macro": 0.016377005347593582,
+    "recall_macro": 0.09090909090909091,
+    "f1_macro": 0.027751196172248804,
+    "precision_ponderada": 0.016377005347593582,
+    "recall_ponderado": 0.09090909090909091,
+    "f1_ponderado": 0.027751196172248804
+  },
+  "finetuned": {
+    "accuracy": 0.7272727272727273,
+    "precision_macro": 0.7742424242424242,
+    "recall_macro": 0.7272727272727272,
+    "f1_macro": 0.7222943722943723,
+    "precision_ponderada": 0.7742424242424243,
+    "recall_ponderado": 0.7272727272727273,
+    "f1_ponderado": 0.7222943722943723
+  },
+  "matriz_confusion": [
+    [
+      2,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      1,
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      1,
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      1,
+      0,
+      0,
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      3,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      2,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      3,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      2
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      3,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      3
+    ]
+  ],
+  "categorias": [
+    "suma",
+    "resta",
+    "multiplicacion",
+    "division",
+    "operaciones_combinadas",
+    "potencias_raices",
+    "fracciones",
+    "porcentajes",
+    "ecuaciones",
+    "geometria",
+    "estadistica_probabilidad"
+  ],
+  "errores": [
+    {
+      "id": "sum-08",
+      "entrada": "Camila ahorró 15000 pesos el lunes y 22500 pesos el martes. ¿Cuánto ahorró en total?",
+      "real": "suma",
+      "predicho": "division"
+    },
+    {
+      "id": "res-13",
+      "entrada": "Un teatro tiene 500 asientos y 372 están ocupados. ¿Cuántos asientos quedan libres?",
+      "real": "resta",
+      "predicho": "suma"
+    },
+    {
+      "id": "mul-04",
+      "entrada": "Pedro ahorra 12000 pesos cada semana. ¿Cuánto dinero habrá ahorrado después de 8 semanas?",
+      "real": "multiplicacion",
+      "predicho": "division"
+    },
+    {
+      "id": "mul-09",
+      "entrada": "La entrada a un museo cuesta 8500 pesos por persona. ¿Cuánto pagan 6 personas?",
+      "real": "multiplicacion",
+      "predicho": "porcentajes"
+    },
+    {
+      "id": "div-09",
+      "entrada": "Se empacan 240 galletas en 16 paquetes iguales. ¿Cuántas galletas lleva cada paquete?",
+      "real": "division",
+      "predicho": "multiplicacion"
+    },
+    {
+      "id": "com-06",
+      "entrada": "Resuelve la siguiente operación: 500 - 175 + 89.",
+      "real": "operaciones_combinadas",
+      "predicho": "resta"
+    },
+    {
+      "id": "fra-12",
+      "entrada": "En un curso de 60 estudiantes, 2/5 practican natación. ¿Cuántos estudiantes practican natación?",
+      "real": "fracciones",
+      "predicho": "multiplicacion"
+    },
+    {
+      "id": "ecu-01",
+      "entrada": "La suma de un número y 15 es igual a 42. ¿Cuál es ese número?",
+      "real": "ecuaciones",
+      "predicho": "estadistica_probabilidad"
+    },
+    {
+      "id": "ecu-08",
+      "entrada": "El doble de un número menos 6 es igual a 18. ¿Cuál es el número?",
+      "real": "ecuaciones",
+      "predicho": "estadistica_probabilidad"
+    }
+  ],
+  "tokenizador": {
+    "modelo": "dccuchile/bert-base-spanish-wwm-cased",
+    "tokenizador": "BertTokenizer",
+    "vocabulario": 31002,
+    "fertilidad_media": 1.487825494552963,
+    "tokens_media": 19.084848484848486,
+    "tokens_max": 40
+  }
+}

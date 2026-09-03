@@ -1,0 +1,47 @@
+{
+  "config": {
+    "chunk_size": 400,
+    "overlap": 60,
+    "k": 3,
+    "n_documentos": 6,
+    "n_chunks": 17,
+    "modelo_embeddings": "paraphrase-multilingual-MiniLM-L12-v2",
+    "generador": "Qwen/Qwen2.5-1.5B-Instruct + LoRA (M1)"
+  },
+  "sin_rag": {
+    "nombre": "sin RAG",
+    "n": 21,
+    "exactitud_calculo": 0.8333333333333334,
+    "sim_embeddings": 0.7508571428571428,
+    "juez_promedio": 3.380952380952381,
+    "aciertos": 13,
+    "aciertos_calculo": 10,
+    "aciertos_conocimiento": 0,
+    "aciertos_adversarial": 3,
+    "n_calculo": 12,
+    "n_conocimiento": 4,
+    "n_adversarial": 5,
+    "alucinaciones": 8,
+    "abstenciones": 0,
+    "formato_valido": 1.0,
+    "palabras_media": 33.42857142857143
+  },
+  "con_rag": {
+    "nombre": "con RAG",
+    "n": 21,
+    "exactitud_calculo": 0.5,
+    "sim_embeddings": 0.710047619047619,
+    "juez_promedio": 3.142857142857143,
+    "aciertos": 13,
+    "aciertos_calculo": 6,
+    "aciertos_conocimiento": 3,
+    "aciertos_adversarial": 4,
+    "n_calculo": 12,
+    "n_conocimiento": 4,
+    "n_adversarial": 5,
+    "alucinaciones": 7,
+    "abstenciones": 2,
+    "formato_valido": 0.9523809523809523,
+    "palabras_media": 28.428571428571427
+  }
+}

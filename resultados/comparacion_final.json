@@ -1,0 +1,52 @@
+{
+  "notebooks_disponibles": [
+    "qwen",
+    "bert",
+    "pipeline_qwen_bert",
+    "flan_t5"
+  ],
+  "n_validacion": {
+    "qwen": 33,
+    "bert": 33,
+    "pipeline_qwen_bert": 33,
+    "flan_t5": 33
+  },
+  "generacion_exactitud": {
+    "qwen": 0.9393939393939394,
+    "pipeline": 0.8787878787878788,
+    "flan_t5": 0.030303030303030304
+  },
+  "clasificacion_accuracy": {
+    "bert": 0.7272727272727273,
+    "bert_baseline_tfidf": 0.48484848484848486,
+    "flan_t5_implicita": 0.21212121212121213
+  },
+  "tokenizadores": [
+    {
+      "Tokenizador": "Qwen2.5 (BPE)",
+      "Vocabulario": 151643,
+      "Tokens/palabra": 2.189,
+      "Tokens/ejemplo": 79.6,
+      "Tasa <unk>": "0.000%"
+    },
+    {
+      "Tokenizador": "BETO (WordPiece)",
+      "Vocabulario": 31002,
+      "Tokens/palabra": 1.489,
+      "Tokens/ejemplo": 54.1,
+      "Tasa <unk>": "2.553%"
+    },
+    {
+      "Tokenizador": "FLAN-T5 (SentencePiece)",
+      "Vocabulario": 32100,
+      "Tokens/palabra": 2.298,
+      "Tokens/ejemplo": 83.5,
+      "Tasa <unk>": "2.764%"
+    }
+  ],
+  "tiempos_entrenamiento_s": {
+    "qwen": 129.406,
+    "bert": 299.5388,
+    "flan_t5": 105.6707
+  }
+}

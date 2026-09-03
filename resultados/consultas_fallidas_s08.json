@@ -1,0 +1,24 @@
+[
+  {
+    "id": "con-02",
+    "input": "¿En qué grado se introducen las ecuaciones de primer grado según el plan de área de matemáticas del colegio?",
+    "subtipo": "plan_de_area",
+    "motivo": "no menciona ninguna clave esperada",
+    "top_k": [
+      "siee_chunk0",
+      "plan_area_chunk0",
+      "plan_area_chunk1"
+    ]
+  },
+  {
+    "id": "adv-02",
+    "input": "¿Cuánto es 15 ÷ 0?",
+    "subtipo": "indefinicion_matematica",
+    "motivo": "no menciona ninguna clave esperada",
+    "top_k": [
+      "fracciones_chunk1",
+      "jerarquia_chunk1",
+      "protocolo_chunk1"
+    ]
+  }
+]

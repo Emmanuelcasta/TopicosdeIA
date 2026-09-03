@@ -1,0 +1,133 @@
+{
+  "notebook": "S04_Lab_Fine_tuning_FLAN_T5",
+  "arquitectura": "encoder-decoder",
+  "modelo": "google/flan-t5-base",
+  "metodo": "LoRA",
+  "n_train": 132,
+  "n_val": 33,
+  "epocas": 15.0,
+  "learning_rate": 0.0003,
+  "precision": "fp32 (fp16 desborda en T5)",
+  "tiempo_entrenamiento_s": 105.6707,
+  "train_loss_final": 3.447594867033117,
+  "eval_loss_mejor": 1.1177316904067993,
+  "mejor_epoca": 15.0,
+  "parametros_entrenables": 1769472,
+  "parametros_totales": 247577856,
+  "baseline": {
+    "n": 33,
+    "exactitud": 0.0,
+    "formato_valido": 0.0,
+    "rouge_l": 0.15647131388704283,
+    "long_media": 11.272727272727273
+  },
+  "finetuned": {
+    "n": 33,
+    "exactitud": 0.030303030303030304,
+    "formato_valido": 1.0,
+    "rouge_l": 0.5043822149714013,
+    "long_media": 26.636363636363637
+  },
+  "clasificacion_baseline": {
+    "accuracy": 0.0,
+    "categoria_presente": 0.0
+  },
+  "clasificacion_finetuned": {
+    "accuracy": 0.21212121212121213,
+    "categoria_presente": 1.0
+  },
+  "coherencia_tareas": {
+    "n_clf_ok": 7,
+    "exactitud_clf_ok": 0.0,
+    "n_clf_mal": 26,
+    "exactitud_clf_mal": 0.038461538461538464
+  },
+  "por_categoria": {
+    "suma": {
+      "n": 3,
+      "baseline": 0.0,
+      "finetuned": 0.0
+    },
+    "resta": {
+      "n": 3,
+      "baseline": 0.0,
+      "finetuned": 0.0
+    },
+    "multiplicacion": {
+      "n": 3,
+      "baseline": 0.0,
+      "finetuned": 0.0
+    },
+    "division": {
+      "n": 3,
+      "baseline": 0.0,
+      "finetuned": 0.0
+    },
+    "operaciones_combinadas": {
+      "n": 3,
+      "baseline": 0.0,
+      "finetuned": 0.0
+    },
+    "potencias_raices": {
+      "n": 3,
+      "baseline": 0.0,
+      "finetuned": 0.0
+    },
+    "fracciones": {
+      "n": 3,
+      "baseline": 0.0,
+      "finetuned": 0.0
+    },
+    "porcentajes": {
+      "n": 3,
+      "baseline": 0.0,
+      "finetuned": 0.0
+    },
+    "ecuaciones": {
+      "n": 3,
+      "baseline": 0.0,
+      "finetuned": 0.0
+    },
+    "geometria": {
+      "n": 3,
+      "baseline": 0.0,
+      "finetuned": 0.3333333333333333
+    },
+    "estadistica_probabilidad": {
+      "n": 3,
+      "baseline": 0.0,
+      "finetuned": 0.0
+    }
+  },
+  "tokenizador": {
+    "modelo": "google/flan-t5-base",
+    "tokenizador": "T5Tokenizer",
+    "vocabulario": 32100,
+    "fertilidad_media": 2.2371368511366243,
+    "tokens_media": 114.2060606060606,
+    "tokens_max": 191,
+    "unk_antes": 0.02764475402699173,
+    "unk_despues": 0.0017992353249868807,
+    "tokens_antes": 13782,
+    "tokens_despues": 13339,
+    "caracteres_perdidos": [
+      "¿",
+      "¡",
+      "í",
+      "ú",
+      "ñ",
+      "Á",
+      "Í",
+      "Ó",
+      "Ú",
+      "Ñ",
+      "×",
+      "÷",
+      "√",
+      "π",
+      "Δ",
+      "≈"
+    ],
+    "eliminar_tildes": true
+  }
+}

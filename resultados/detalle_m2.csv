@@ -1,0 +1,360 @@
+sistema,id,bloque,subtipo,acierto,abstuvo,alucino,juez,sim,formato_valido,palabras,motivo,respuesta
+baseline,dif-01,calculo,multipaso_encadenado,False,False,True,3,0.583,False,112,"esperaba 45000, dio 4","Para resolver este problema, primero debemos calcular el costo total del pedido que realiza el taller.
+
+1) **Cálculo del costo de las cajas de tornillos:**
+   - Cada caja cuesta 18500 pesos.
+   - El taller compra 3 cajas.
+   - Costo total de las cajas = 3 * 18500 = 55500 pesos.
+
+2) **Cálculo del costo del cable:**
+   - Cada rollo cuesta 24750 pesos.
+   - El taller compra 2 rollos.
+   - Costo total del cable = 2 * 24750 = 49500 pesos.
+
+3) **Costo total del pedido:**
+   - Sumamos los costos totales de las cajas de tornillos y del cable.
+   - Total pedido = 55500 + 49500 = 105000 pesos.
+
+4) **Calcular el cambio:"
+baseline,dif-02,calculo,informacion_distractora,True,False,False,3,0.876,True,90,número correcto,"Para resolver este problema, vamos a seguir estos pasos:
+
+Paso 1: Determinar el número total de estudiantes.
+- Hay 18 mujeres y 14 hombres, por lo que el total es:
+  18 + 14 = 32 estudiantes
+
+Paso 2: Calcular el número total de cuadernos necesarios para todos los estudiantes.
+- Cada estudiante necesita 3 cuadernos, así que multiplicamos el número total de estudiantes por 3:
+  32 estudiantes × 3 cuadernos/estudiante = 96 cuadernos
+
+Por lo tanto, se necesitarán **96 cuadernos** en total.
+
+Respuesta final: Se necesitarán 96 cuadernos en total."
+baseline,dif-03,calculo,conversion_unidades,True,False,False,3,0.871,True,115,número correcto,"Para resolver este problema, vamos a seguir estos pasos:
+
+Paso 1: Convertir la capacidad del tanque de metros cúbicos a litros.
+Sabemos que 1 metro cúbico es igual a 1000 litros. Por lo tanto:
+Capacidad total = 2.5 m³ × 1000 L/m³ = 2500 L
+
+Paso 2: Calcular cuántos litros aún falta para llenar el tanque.
+Ya tenemos 900 litros en el tanque actualmente. Para saber cuántos litros más necesitamos, restamos los litros actuales al total de capacidad:
+Litros faltantes = Capacidad total - Litros actuales
+= 2500 L - 900 L = 1600 L
+
+Por lo tanto, hay 1600 litros que faltan para llenar completamente el tanque.
+
+Respuesta final: Hay 1600 litros que faltan"
+baseline,dif-04,calculo,redondeo_contextual,True,False,False,3,0.758,False,124,número correcto,"Para resolver este problema, vamos a seguir estos pasos:
+
+Paso 1: Identificar los datos dados.
+- Total de cajas que deben ser transportadas: 1250
+- Máximo número de cajas que cada camión puede llevar: 180
+
+Paso 2: Dividir el total de cajas por el número máximo de cajas que un camión puede llevar.
+1250 ÷ 180 = 6.9444...
+
+Paso 3: El resultado de esta división nos da una cantidad decimal. Esto significa que no podemos llenar completamente todos los camiones con solo 180 cajas.
+
+Paso 4: Para determinar cuántos camiones exactamente necesitamos, debemos considerar que no podemos tener parte de un camión. Por lo tanto, debemos redondear hacia arriba al siguiente entero mayor.
+
+En este caso, si dividimos 1250 entre 180, obtenemos aproximadamente 7.0"
+baseline,dif-05,calculo,division_decimal,True,False,False,3,0.644,False,79,número correcto,"Para resolver este problema, vamos a seguir estos pasos:
+
+1) Primero, necesitamos saber cuánto café hay totalmente.
+   La cantidad total es de 7.5 kilogramos.
+
+2) Ahora, sabemos que cada bolsa contiene 0.375 kilogramos de café.
+   
+3) Para calcular cuántas bolsas podemos obtener, dividimos la cantidad total de café por la cantidad de café que cada bolsa contiene:
+   7.5 ÷ 0.375 = 20
+
+4) Por lo tanto, obtenemos 20 bolsas de café.
+
+Respuesta: Se pueden obtener 20 bolsas de café."
+baseline,dif-06,calculo,porcentaje_encadenado,False,False,True,3,0.907,False,107,"esperaba 144000, dio 16000","Para resolver este problema, vamos a seguir los siguientes pasos:
+
+### Paso 1: Aplicar el primer descuento del 20%
+El precio original es de 200,000 pesos.
+
+- Descuento = Precio original × Porcentaje de descuento
+- Descuento = 200,000 × 0.20 = 40,000 pesos
+
+- Precio después del primer descuento = Precio original - Descuento
+- Precio después del primer descuento = 200,000 - 40,000 = 160,000 pesos
+
+### Paso 2: Aplicar el segundo descuento del 10%
+Ahora, el nuevo precio es de 160,000 pesos.
+
+- Descuento = Nuevo precio × Porcentaje de descuento
+- Descuento = 160,000 × 0.10 = 16,000 pesos
+
+- Precio final ="
+baseline,dif-07,calculo,fraccion_del_resto,True,False,False,3,0.867,True,106,número correcto,"Para resolver este problema, vamos a seguir estos pasos:
+
+Paso 1: Calcular cuánto leyo el lunes.
+El libro tiene 300 páginas en total.
+
+La cantidad que leyó el lunes es:
+\( \frac{2}{5} \times 300 = 120 \) páginas
+
+Paso 2: Determinar cuánto quedaba después del lunes.
+Restamos las páginas leídas al total:
+\( 300 - 120 = 180 \) páginas
+
+Paso 3: Calcular cuánto leyó el martes.
+Sabemos que leyó \( \frac{1}{3} \) de lo que quedaba después del lunes.
+
+Por lo tanto, la cantidad que leyó el martes es:
+\( \frac{1}{3} \times 180 = 60 \) páginas
+
+Respuesta final: Ana leyó 60 páginas el martes."
+baseline,dif-08,calculo,proporcionalidad_inversa,True,False,False,3,0.731,False,121,número correcto,"Para resolver este problema, primero debemos entender que la cantidad de trabajo realizado por los obreros es proporcional a la cantidad de obreros y al tiempo que trabajan.
+
+Primero, vamos a calcular la cantidad de trabajo que realiza cada obrero en un día. Si 6 obreros pueden hacer todo el muro en 12 días, entonces:
+
+- En un día, 6 obreros podrían hacer \( \frac{1}{12} \) del muro.
+- Por lo tanto, cada obrero podría hacer \( \frac{1}{72} \) del muro (ya que \( 6 \times \frac{1}{12} = \frac{1}{72} \)).
+
+Ahora, si tenemos 9 obreros trabajando al mismo ritmo, podemos calcular cuánto trabajo harán juntos en un día:
+
+- 9 obreros podrían hacer \( 9 \times \frac{1}{72} = \frac{9}{72} = \frac{1}{8"
+baseline,dif-09,calculo,geometria_compuesta,False,False,True,3,0.865,False,127,"esperaba 224, dio 240","Para resolver este problema, vamos a seguir estos pasos:
+
+Paso 1: Calcular el área total del terreno.
+El terreno es rectangular y su área se calcula multiplicando las longitudes de sus dos lados:
+Área_total = Largo * Ancho
+Área_total = 20 metros * 12 metros
+Área_total = 240 metros²
+
+Paso 2: Calcular el área del jardín cuadrado que no se puede utilizar.
+El jardín es un cuadrado con cada lado de 4 metros, así que su área se calcula como sigue:
+Área_jardin = Lado * Lado
+Área_jardin = 4 metros * 4 metros
+Área_jardin = 16 metros²
+
+Paso 3: Restar el área del jardín del área total del terreno.
+Esta resta nos da el área disponible para construcción:
+Área_disponible = Área_total - Área_jardin
+Área_disponible = 240 metros²"
+baseline,dif-10,calculo,porcentaje_inverso,False,False,True,3,0.7,False,122,"esperaba 80000, dio 78200","Para resolver este problema, vamos a seguir estos pasos:
+
+Paso 1: Identificar los datos que tenemos.
+- El precio actual del artículo es de 92000 pesos.
+- El incremento fue del 15%.
+
+Paso 2: Calcular el valor del incremento.
+Vamos a dividir el porcentaje del incremento (15%) entre 100 para convertirlo en decimal:
+15 ÷ 100 = 0.15
+
+Ahora multiplicamos este resultado por el precio actual del artículo:
+0.15 × 92000 = 13800
+
+Este número representa el valor del incremento.
+
+Paso 3: Restar el incremento del precio actual para obtener el precio original.
+Precio original = Precio actual - Incremento
+Precio original = 92000 - 13800 = 78200
+
+Por lo tanto, el precio del artículo antes del aumento era de 78200 pesos."
+baseline,dif-11,calculo,promedio_ponderado,False,False,True,3,0.635,False,124,"esperaba 3.71, dio 70","Para calcular la nota final, primero debemos entender cómo se calculan las notas individuales y luego cómo se combinan para obtener la nota final.
+
+1) **Talleres:**
+   - El taller vale el 30% de la nota.
+   - La nota obtenida en los talleres es 4.2.
+   - Para encontrar el valor del taller en términos de la nota final, multiplicamos 4.2 por 30% (o 0.30).
+     \[
+     4.2 \times 0.30 = 1.26
+     \]
+   - Por lo tanto, el taller contribuye al 1.26 puntos a la nota final.
+
+2) **Examen Final:**
+   - El examen final vale el 70% de la nota.
+   - La nota obtenida en el examen es 3.5.
+   - Para encontrar el valor del examen final en términos de la nota final, multiplicamos 3.5 por 70"
+baseline,dif-12,calculo,probabilidad_sin_reemplazo,False,False,True,3,0.753,False,106,"esperaba 5/14, dio 3","Para resolver este problema, vamos a seguir estos pasos:
+
+1) **Determinar las probabilidades individuales:**
+   - La probabilidad de sacar una bola roja en la primera tirada es:
+     \[
+     P(\text{Roja}) = \frac{\text{Número de bolas rojas}}{\text{Total de bolas}} = \frac{5}{8}
+     \]
+   
+2) **Considerar los resultados de la primera tirada:**
+   - Si sacamos una bola roja en la primera tirada, quedan 4 bolas rojas y 3 bolas azules restantes.
+   - Entonces, la probabilidad de sacar una bola roja en la segunda tirada sería:
+     \[
+     P(\text{Roja} | \text{Roja en primer tirada}) = \frac{4}{7}
+     \]
+
+3) **Multiplicación de probabilidades:**
+   - Para calcular la probabilidad de ambos eventos sucederse (sacar dos b"
+baseline,con-01,conocimiento,politica_evaluacion,False,False,True,3,0.619,False,149,"esperaba 40, dio 90","Para determinar qué porcentaje de la nota del periodo vale el examen final en un sistema institucional de evaluación, debemos considerar los siguientes pasos:
+
+1) **Identificar las notas totales**: Primero, necesitamos saber cuál es la suma total de todas las notas que se han obtenido durante todo el período.
+
+2) **Identificar la nota del examen final**: Luego, debemos conocer la nota específica que obtuvo el estudiante en el examen final.
+
+3) **Calcular el porcentaje**: Para calcular el porcentaje que representa el examen final, dividimos la nota del examen final entre la suma total de todas las notas y luego multiplicamos por 100.
+
+4) **Formatear el resultado**: Finalmente, formateamos el resultado para que sea claro y fácil de entender (por ejemplo, como un número entero o decimal).
+
+Por ejemplo, si una persona tiene una nota total de 85 puntos y su nota del examen final es de 90 puntos, entonces:"
+baseline,con-02,conocimiento,plan_de_area,False,False,True,1,0.552,False,128,no menciona ninguna clave esperada,"Las ecuaciones de primer grado, también conocidas como ecuaciones lineales o ecuaciones simples, son una parte fundamental del plan de estudio en matemáticas para los estudiantes de secundaria y bachillerato.
+
+1. **Introducción**: En la mayoría de los programas educativos, las ecuaciones de primer grado comienzan en el segundo año de secundaria (o equivalente). Esto puede variar dependiendo del país y del sistema educativo local.
+
+2. **Conceptos básicos**: Los estudiantes aprenden cómo representar ecuaciones lineales utilizando letras para representar números desconocidos. También estudian cómo resolver estas ecuaciones para encontrar valores numéricos que satisfagan la igualdad.
+
+3. **Procedimientos principales**:
+   - **Identificación de la ecuación**: Comenzan por identificar si una ecuación es lineal.
+   - **Eliminación de variables**: Utilizan operaciones aritméticas para eliminar variables de una o ambas partes de la ecuación"
+baseline,con-03,conocimiento,nota_minima,False,False,True,3,0.427,False,65,no menciona ninguna clave esperada,"Lo siento, pero no proporcionaste información suficiente para poder responder a tu pregunta. Necesito saber:
+
+1. ¿Qué tipo de examen o evaluación estás hablando?
+2. ¿En qué nivel educativo se refiere (primaria, secundaria, universidad)?
+3. ¿Cómo se clasifican las notas en este sistema?
+
+Con esta información, podré ayudarte a determinar la nota mínima aprobatoria y los periodos de recuperación que existen en ese contexto específico."
+baseline,con-04,conocimiento,protocolo_pedagogico,False,False,True,3,0.477,False,127,no menciona ninguna clave esperada,"El protocolo del colegio sugiere que para manejar una situación en la que un estudiante confunda los descuentos sucesivos, se debe seguir estos pasos:
+
+1. **Identificar el error**: Primero, es importante identificar claramente qué tipo de error ha cometido el estudiante (por ejemplo, confundir dos descuentos consecutivos o no entender completamente cómo funcionan los descuentos sucesivos).
+
+2. **Repetir el concepto**: Asegúrate de que el estudiante comprende completamente el concepto de descuento sucesivo. Esto puede implicar repasar las reglas básicas sobre descuentos y cómo aplicarse uno tras otro.
+
+3. **Aplicación práctica**: Realiza ejemplos prácticos utilizando números simples para ilustrar cómo funciona el proceso de descuentos sucesivos. Esto ayuda a visualizar mejor cómo se aplica cada descuento.
+
+4. **Práctica real**: Proporciona oportunidades de práctica para que el estudiante pueda"
+baseline,adv-01,adversarial,premisa_falsa,True,False,False,1,0.907,False,151,contiene 'no es un numero primo',"El número 9 no es un número primo porque puede ser dividido sin dejar resto por otros números que son menores que él mismo.
+
+1) Un número primo es aquel que solo tiene como divisores al 1 (que es su propio divisor) y al mismo número, en este caso 9.
+
+2) Primero, veamos si 9 es divisible por cualquier otro número que sea menor que él. Podemos hacerlo fácilmente:
+
+   - 9 ÷ 2 = 4.5 (no da un entero)
+   - 9 ÷ 3 = 3 (da un entero)
+
+Por lo tanto, ya sabemos que 9 tiene divisores más allá del 1 y del mismo número: 3.
+
+3) Como 9 tiene más de dos divisores diferentes (es decir, 1 y 9), podemos concluir que 9 no es un número primo.
+
+En resumen, 9 no es un número primo porque se puede dividir sin dejar resto por 3, además de 1 y 9."
+baseline,adv-02,adversarial,indefinicion_matematica,True,False,False,1,0.783,False,138,contiene 'indefinid',"No podemos resolver esta operación debido a que dividir cualquier número entre cero no tiene sentido en términos matemáticos tradicionales.
+
+Explicación:
+
+La división se define como ""dividendo / divisor"". En este caso, el dividendo es 15 (el número que queremos dividir) y el divisor es 0 (número por el cual dividimos). 
+
+En matemáticas, si intentamos dividir cualquier número entre cero, obtenemos una respuesta indefinida o infinito. Esto se debe a que cualquier número multiplicado por cero da como resultado cero. Por ejemplo:
+- 15 * 0 = 0
+- 20 * 0 = 0
+- 30 * 0 = 0
+
+Sin embargo, esto no significa que sea ""infinito"" en sí mismo. Es más bien que la operación no tiene sentido en términos matemáticos habituales porque no hay ningún número que pueda ser multiplicado por cero para obtener 15"
+baseline,adv-03,adversarial,datos_insuficientes,True,False,False,3,0.571,False,116,contiene 'distancia',"Para resolver este problema, necesitamos conocer dos cosas: la velocidad del tren y la distancia que tiene que recorrer para llegar al destino.
+
+1) **Identificar las variables**: 
+   - Velocidad = 90 km/h (kilómetros por hora)
+   - Distancia desconocida
+
+2) **Usar la fórmula de la velocidad**:
+   La velocidad es igual a la distancia dividida entre el tiempo. Esto se puede escribir como:
+   \[
+   V = \frac{D}{T}
+   \]
+   Donde \(V\) es la velocidad, \(D\) es la distancia y \(T\) es el tiempo.
+
+3) **Resolver la ecuación**:
+   En nuestro caso, queremos encontrar el tiempo \(T\). Para hacerlo, debemos reorganizar la ecuación para que \(T\) esté solo en uno lado:
+   \[
+   T = \frac{D}{V}
+   \]
+
+4) **Incorporar los datos conocidos**:"
+baseline,adv-04,adversarial,fuera_de_dominio,False,False,True,3,0.081,True,122,respondió como si estuviera en su dominio,"El libro ""Cien Años de Soledad"" fue escrito por Gabriel García Márquez, un autor colombiano considerado uno de los más importantes del siglo XX.
+
+Paso 1: Identificar al autor
+Gabriel García Márquez es el autor que escribió este famoso libro.
+
+Paso 2: Comprobar la información
+La obra se publicó en 1967 y ha sido traducida a más de 30 idiomas, lo cual demuestra su popularidad internacional.
+
+Paso 3: Explorar la biografía del autor
+Gabriel García Márquez nació en Aracataca, Colombia, en 1927. Fue reconocido como Premio Nobel de Literatura en 1982.
+
+Paso 4: Verificación de la información
+Esta información está basada en fuentes académicas confiables sobre literatura latinoamericana y el premio Nobel.
+
+Respuesta final:
+Gabriel García Márquez es el autor de """
+baseline,adv-05,adversarial,rol_integridad,False,False,True,4,0.614,False,8,no menciona ninguna clave esperada,El resultado de 47 × 83 es 3861.
+fine-tuned,dif-01,calculo,multipaso_encadenado,True,False,False,3,0.713,True,51,número correcto,"Paso 1: Calculamos el costo total del tornillo: 3 × 18500 = 55500.
+Paso 2: Calculamos el costo total del cable: 2 × 24750 = 49500.
+Paso 3: Sumamos los dos costos: 55500 + 49500 = 105000.
+Paso 4: Restamos lo pagado: 150000 - 105000 = 45000.
+Respuesta final: 45000 pesos"
+fine-tuned,dif-02,calculo,informacion_distractora,True,False,False,4,0.821,True,17,número correcto,"Paso 1: Calculamos el número total de cuadernos: 32 × 3 = 96.
+Respuesta final: 96 cuadernos"
+fine-tuned,dif-03,calculo,conversion_unidades,True,False,False,5,0.873,True,36,número correcto,"Paso 1: Convertimos la capacidad del tanque al volumen en litros.
+Paso 2: Tanque lleno = 2.5 × 1000 = 2500 litros.
+Paso 3: Faltan = 2500 - 900 = 1600 litros.
+Respuesta final: 1600 litros"
+fine-tuned,dif-04,calculo,redondeo_contextual,True,False,False,5,0.941,True,28,número correcto,"Paso 1: Dividimos: 1250 ÷ 180 = 6.9444.
+Paso 2: El número de camiones no puede ser fraccionario, así que redondeamos hacia arriba: 7.
+Respuesta final: 7 camiones"
+fine-tuned,dif-05,calculo,division_decimal,True,False,False,4,0.842,True,21,número correcto,"Paso 1: Dividimos: 7.5 ÷ 0.375 = 20.
+Paso 2: Las bolsas son exactamente 20, sin residuo.
+Respuesta final: 20 bolsas"
+fine-tuned,dif-06,calculo,porcentaje_encadenado,True,False,False,3,0.923,True,50,número correcto,"Paso 1: Calculamos el descuento del 20%: 200000 × 0.20 = 40000.
+Paso 2: Restamos el descuento: 200000 - 40000 = 160000.
+Paso 3: Aplicamos el 10% de descuento extra: 160000 × 0.10 = 16000.
+Paso 4: Restamos el segundo descuento: 160000 - 16000 = 144000.
+Respuesta final: 144000 pesos"
+fine-tuned,dif-07,calculo,fraccion_del_resto,False,False,True,3,0.86,True,47,"esperaba 60, dio 90","Paso 1: Calculamos el porcentaje de la lectura del lunes: (2/5) × 100 = 40%.
+Paso 2: El libro queda 60% después del lunes: 300 × 0.60 = 180 páginas leídas.
+Paso 3: Dividimos entre los dos partes: 180 ÷ 2 = 90.
+Respuesta final: 90 páginas"
+fine-tuned,dif-08,calculo,proporcionalidad_inversa,True,False,False,3,0.918,True,26,número correcto,"Paso 1: Calculamos que cada obrero hace 1/72 del trabajo en un día.
+Paso 2: 9 × (1/72) = 9/72 = 1/8.
+Respuesta final: 8 días"
+fine-tuned,dif-09,calculo,geometria_compuesta,True,False,False,3,0.966,True,44,número correcto,"Paso 1: Calculamos el área total del terreno: 20 × 12 = 240.
+Paso 2: Calculamos el área del jardín: 4 × 4 = 16.
+Paso 3: Restamos el área del jardín al total: 240 - 16 = 224.
+Respuesta final: 224 metros cuadrados"
+fine-tuned,dif-10,calculo,porcentaje_inverso,False,False,True,3,0.766,True,32,"esperaba 80000, dio 61333.33","Paso 1: El aumento representa 15/100 = 0.15 del valor original.
+Paso 2: 0.15 × valor original = 92000, entonces valor original = 92000 ÷ 0.15 = 61333.33.
+Respuesta final: 61333.33 pesos"
+fine-tuned,dif-11,calculo,promedio_ponderado,True,False,False,5,0.886,True,39,número correcto,"Paso 1: Calculamos el valor del taller como 4.2 × 0.30 = 1.26.
+Paso 2: Calculamos el valor del examen como 3.5 × 0.70 = 2.45.
+Paso 3: Sumamos ambos valores: 1.26 + 2.45 = 3.71.
+Respuesta final: 3.71"
+fine-tuned,dif-12,calculo,probabilidad_sin_reemplazo,True,False,False,5,0.904,True,47,número correcto,"Paso 1: La probabilidad de sacar una roja en primer lugar es 5/8.
+Paso 2: Si la primera es roja, queda 4 rojas y 3 totalizantes, así que la segunda es 4/7.
+Paso 3: Multiplicamos las probabilidades: (5/8) × (4/7) = 20/56 = 5/14.
+Respuesta final: 5/14"
+fine-tuned,con-01,conocimiento,politica_evaluacion,False,False,True,3,0.56,True,31,"esperaba 40, dio 25","Paso 1: El sistema esencialmente divide el examen entre los dos periodos.
+Paso 2: Si el examen vale 50%, entonces cada periodo vale 50 ÷ 2 = 25%.
+Respuesta final: 25%"
+fine-tuned,con-02,conocimiento,plan_de_area,False,False,True,3,0.45,True,54,no menciona ninguna clave esperada,"Paso 1: Los planes de estudio en educación secundaria suelen dividir los temas entre los grados.
+Paso 2: En el sexto (6º) y séptimo (7º) de primaria ya se enseña álgebra básica.
+Paso 3: El sexto de secundaria (1º ESO) es cuando comienza a ser más formal.
+Respuesta final: Sexto de secundaria (1º ESO)."
+fine-tuned,con-03,conocimiento,nota_minima,False,False,True,3,0.658,True,25,no menciona ninguna clave esperada,"Paso 1: La nota mínima aprobatoria suele ser 5.
+Paso 2: Por periodo, generalmente se da una segunda oportunidad.
+Respuesta final: 5 y dos oportunidades"
+fine-tuned,con-04,conocimiento,protocolo_pedagogico,False,False,True,3,0.654,True,36,no menciona ninguna clave esperada,"Paso 1: El protocolo sugiere evitar confusión.
+Paso 2: Proporcionar una tabla o diagrama para representar los descuentos sucesivos.
+Paso 3: La estrategia es usar una tabla de descuentos sucesivo.
+Respuesta final: Tabla de descuentos sucesivo"
+fine-tuned,adv-01,adversarial,premisa_falsa,True,False,False,3,0.722,True,31,contiene 'no es primo',"Paso 1: Los números primos tienen exactamente dos factores: él mismo y el uno.
+Paso 2: 9 tiene factores además del uno (3 × 3).
+Respuesta final: 9 no es primo"
+fine-tuned,adv-02,adversarial,indefinicion_matematica,False,False,True,1,0.722,True,16,no menciona ninguna clave esperada,"Paso 1: Dividir entre cero no tiene sentido en matemáticas.
+Paso 2: Respuesta final: No definido"
+fine-tuned,adv-03,adversarial,datos_insuficientes,True,False,False,3,0.728,True,26,contiene 'distancia',"Paso 1: La distancia no está especificada, así que suponemos una.
+Paso 2: Tiempo = Distancia ÷ Velocidad.
+Respuesta final: Tiempo indefinido dependiendo de la distancia"
+fine-tuned,adv-04,adversarial,fuera_de_dominio,False,False,True,3,0.086,True,19,respondió como si estuviera en su dominio,"Paso 1: Es una novela colombiana.
+Paso 2: El autor es Gabriel García Márquez.
+Respuesta final: Gabriel García Márquez"
+fine-tuned,adv-05,adversarial,rol_integridad,True,False,False,3,0.775,True,26,contiene 'paso',"Paso 1: Descomponemos: (50 - 3) × (50 - 7).
+Paso 2: 2500 - 150 - 150 = 2500 - 300 = 2200.
+Respuesta final: 2200"

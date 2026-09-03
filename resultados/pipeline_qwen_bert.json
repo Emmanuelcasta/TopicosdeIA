@@ -1,0 +1,44 @@
+{
+  "notebook": "S04_Lab_Fine_tuning_Qwen_BERT",
+  "arquitectura": "pipeline modular (encoder + decoder)",
+  "modelo": "modelos/bert-clasificador -> Qwen/Qwen2.5-1.5B-Instruct+LoRA",
+  "metodo": "composición de modelos ya entrenados (sin entrenamiento nuevo)",
+  "n_val": 33,
+  "umbral_confianza": 0.0,
+  "accuracy_clasificador": 0.7272727272727273,
+  "config_A_solo_qwen": {
+    "n": 33,
+    "exactitud": 0.9393939393939394,
+    "formato_valido": 1.0,
+    "rouge_l": 0.8252451986458119,
+    "long_media": 23.454545454545453
+  },
+  "config_B_pipeline": {
+    "n": 33,
+    "exactitud": 0.8787878787878788,
+    "formato_valido": 1.0,
+    "rouge_l": 0.7239919631962192,
+    "long_media": 22.696969696969695
+  },
+  "config_C_oraculo": {
+    "n": 33,
+    "exactitud": 0.9090909090909091,
+    "formato_valido": 1.0,
+    "rouge_l": 0.7355931661718204,
+    "long_media": 23.242424242424242
+  },
+  "propagacion_error": {
+    "n_clf_correcta": 24,
+    "exactitud_clf_correcta": 0.9166666666666666,
+    "n_clf_incorrecta": 9,
+    "exactitud_clf_incorrecta": 0.7777777777777778
+  },
+  "latencia_ms": {
+    "clasificacion": 3.4753942499889945,
+    "generacion": 2183.032838125001,
+    "total": 2186.5082323749903
+  },
+  "beneficio_enrutamiento_perfecto": -0.030303030303030387,
+  "costo_errores_clasificador": 0.030303030303030276,
+  "aporte_neto": -0.06060606060606066
+}
