@@ -1,0 +1,10 @@
+dimension,sin RAG,A · ingenuo,B · +hybrid,C · +rerank,D · +router,E · +cita
+exactitud_calculo,0.833,0.5,0.583,0.583,0.833,0.833
+sim_embeddings_prom,0.751,0.71,0.749,0.727,0.775,0.757
+llm_juez_prom,3.381,3.143,3.19,3.0,3.286,3.238
+aciertos_total,14/21,14/21,14/21,13/21,18/21,18/21
+aciertos_calculo,10/12,6/12,7/12,7/12,10/12,10/12
+aciertos_conocimiento,0/4,3/4,4/4,3/4,3/4,3/4
+aciertos_adversarial,4/5,5/5,3/5,3/5,5/5,5/5
+alucinaciones,7,7,6,5,2,3
+abstenciones,0,2,2,4,2,0

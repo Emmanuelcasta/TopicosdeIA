@@ -1,0 +1,216 @@
+{
+  "config": {
+    "chunk_size": 400,
+    "overlap": 60,
+    "k": 3,
+    "k_recuperar": 10,
+    "n_documentos": 6,
+    "n_chunks": 17,
+    "modelo_embeddings": "paraphrase-multilingual-MiniLM-L12-v2",
+    "reranker": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+    "fusion": "RRF (k=60)",
+    "enrutador": "regresión logística [margen centroides, nº números, rerank máx.]",
+    "generador": "Qwen/Qwen2.5-1.5B-Instruct + LoRA (M1)"
+  },
+  "retrieval": [
+    {
+      "retriever": "A · densa",
+      "n": 18,
+      "hit1": 0.722,
+      "hit3": 0.944,
+      "mrr3": 0.815,
+      "ms": 12.337
+    },
+    {
+      "retriever": "B · híbrida",
+      "n": 18,
+      "hit1": 0.833,
+      "hit3": 0.944,
+      "mrr3": 0.88,
+      "ms": 13.282
+    },
+    {
+      "retriever": "C · +rerank",
+      "n": 18,
+      "hit1": 0.889,
+      "hit3": 1.0,
+      "mrr3": 0.944,
+      "ms": 42.551
+    }
+  ],
+  "enrutador": {
+    "loo_dev": 0.9696969696969697,
+    "loo_dev_solo_centroides": 0.7878787878787878,
+    "n_dev": 33,
+    "pesos": {
+      "margen": 1.7976777149474787,
+      "numeros": -1.338355865240827,
+      "rerank": 0.5681625893049224
+    },
+    "rutas_eval": {
+      "dif-01": "problema",
+      "dif-02": "problema",
+      "dif-03": "problema",
+      "dif-04": "problema",
+      "dif-05": "problema",
+      "dif-06": "problema",
+      "dif-07": "problema",
+      "dif-08": "problema",
+      "dif-09": "problema",
+      "dif-10": "problema",
+      "dif-11": "problema",
+      "dif-12": "problema",
+      "con-01": "consulta",
+      "con-02": "consulta",
+      "con-03": "consulta",
+      "con-04": "consulta",
+      "adv-01": "problema",
+      "adv-02": "problema",
+      "adv-03": "problema",
+      "adv-04": "consulta",
+      "adv-05": "problema"
+    }
+  },
+  "sistemas": {
+    "sin RAG": {
+      "nombre": "sin RAG",
+      "n": 21,
+      "exactitud_calculo": 0.8333333333333334,
+      "sim_embeddings": 0.7508571428571428,
+      "juez_promedio": 3.380952380952381,
+      "aciertos": 13,
+      "aciertos_calculo": 10,
+      "aciertos_conocimiento": 0,
+      "aciertos_adversarial": 3,
+      "n_calculo": 12,
+      "n_conocimiento": 4,
+      "n_adversarial": 5,
+      "alucinaciones": 8,
+      "abstenciones": 0,
+      "formato_valido": 1.0,
+      "palabras_media": 33.42857142857143
+    },
+    "A · ingenuo": {
+      "nombre": "A · ingenuo",
+      "n": 21,
+      "exactitud_calculo": 0.5,
+      "sim_embeddings": 0.710047619047619,
+      "juez_promedio": 3.142857142857143,
+      "aciertos": 13,
+      "aciertos_calculo": 6,
+      "aciertos_conocimiento": 3,
+      "aciertos_adversarial": 4,
+      "n_calculo": 12,
+      "n_conocimiento": 4,
+      "n_adversarial": 5,
+      "alucinaciones": 7,
+      "abstenciones": 2,
+      "formato_valido": 0.9523809523809523,
+      "palabras_media": 28.428571428571427
+    },
+    "B · +hybrid": {
+      "nombre": "B · +hybrid",
+      "n": 21,
+      "exactitud_calculo": 0.5833333333333334,
+      "sim_embeddings": 0.7491428571428571,
+      "juez_promedio": 3.1904761904761907,
+      "aciertos": 14,
+      "aciertos_calculo": 7,
+      "aciertos_conocimiento": 4,
+      "aciertos_adversarial": 3,
+      "n_calculo": 12,
+      "n_conocimiento": 4,
+      "n_adversarial": 5,
+      "alucinaciones": 6,
+      "abstenciones": 2,
+      "formato_valido": 0.9047619047619048,
+      "palabras_media": 27.19047619047619
+    },
+    "C · +rerank": {
+      "nombre": "C · +rerank",
+      "n": 21,
+      "exactitud_calculo": 0.5833333333333334,
+      "sim_embeddings": 0.7271428571428572,
+      "juez_promedio": 3.0,
+      "aciertos": 13,
+      "aciertos_calculo": 7,
+      "aciertos_conocimiento": 3,
+      "aciertos_adversarial": 3,
+      "n_calculo": 12,
+      "n_conocimiento": 4,
+      "n_adversarial": 5,
+      "alucinaciones": 5,
+      "abstenciones": 4,
+      "formato_valido": 0.8571428571428571,
+      "palabras_media": 28.523809523809526
+    },
+    "D · +router": {
+      "nombre": "D · +router",
+      "n": 21,
+      "exactitud_calculo": 0.8333333333333334,
+      "sim_embeddings": 0.7749523809523808,
+      "juez_promedio": 3.2857142857142856,
+      "aciertos": 17,
+      "aciertos_calculo": 10,
+      "aciertos_conocimiento": 3,
+      "aciertos_adversarial": 4,
+      "n_calculo": 12,
+      "n_conocimiento": 4,
+      "n_adversarial": 5,
+      "alucinaciones": 3,
+      "abstenciones": 2,
+      "formato_valido": 0.9523809523809523,
+      "palabras_media": 32.285714285714285
+    },
+    "E · +cita": {
+      "nombre": "E · +cita",
+      "n": 21,
+      "exactitud_calculo": 0.8333333333333334,
+      "sim_embeddings": 0.7567619047619047,
+      "juez_promedio": 3.238095238095238,
+      "aciertos": 17,
+      "aciertos_calculo": 10,
+      "aciertos_conocimiento": 3,
+      "aciertos_adversarial": 4,
+      "n_calculo": 12,
+      "n_conocimiento": 4,
+      "n_adversarial": 5,
+      "alucinaciones": 4,
+      "abstenciones": 0,
+      "formato_valido": 0.7619047619047619,
+      "palabras_media": 33.57142857142857
+    }
+  },
+  "coste": {
+    "sin RAG": {
+      "ms_retrieval_mediana": 0.00026600014280120376,
+      "tokens_prompt_media": 81.33333333333333,
+      "frac_via_rag": 0.0
+    },
+    "A · ingenuo": {
+      "ms_retrieval_mediana": 11.610065000013492,
+      "tokens_prompt_media": 568.3809523809524,
+      "frac_via_rag": 1.0
+    },
+    "B · +hybrid": {
+      "ms_retrieval_mediana": 13.033812000003309,
+      "tokens_prompt_media": 589.8571428571429,
+      "frac_via_rag": 1.0
+    },
+    "C · +rerank": {
+      "ms_retrieval_mediana": 42.90551700000833,
+      "tokens_prompt_media": 541.047619047619,
+      "frac_via_rag": 1.0
+    },
+    "D · +router": {
+      "ms_retrieval_mediana": 54.95937700015929,
+      "tokens_prompt_media": 192.85714285714286,
+      "frac_via_rag": 0.23809523809523808
+    },
+    "E · +cita": {
+      "ms_retrieval_mediana": 56.390684999996665,
+      "tokens_prompt_media": 181.1904761904762,
+      "frac_via_rag": 0.23809523809523808
+    }
+  }
+}

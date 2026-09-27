@@ -1,0 +1,47 @@
+{
+  "modelo_base": "Qwen/Qwen2.5-1.5B-Instruct",
+  "lora": {
+    "r": 16,
+    "alpha": 32,
+    "target_modules": [
+      "down_proj",
+      "gate_proj",
+      "k_proj",
+      "o_proj",
+      "q_proj",
+      "up_proj",
+      "v_proj"
+    ]
+  },
+  "entrenamiento": {
+    "epocas": 3.0,
+    "lr": 0.0002,
+    "lote_efectivo": 8,
+    "n_train": 157,
+    "n_val": 42,
+    "eval_loss_final": 0.19583046436309814
+  },
+  "decisiones_validacion": {
+    "antes": {
+      "sistema": "base (sin entrenar)",
+      "n": 42,
+      "decision": 0.14285714285714285,
+      "herramienta": 0.025,
+      "llamada_valida": 0.075,
+      "resultado": 0.05
+    },
+    "despues": {
+      "sistema": "C5-FT (entrenado)",
+      "n": 42,
+      "decision": 0.9523809523809523,
+      "herramienta": 0.875,
+      "llamada_valida": 1.0,
+      "resultado": 0.65
+    }
+  },
+  "punta_a_punta_validacion": {
+    "n": 36,
+    "antes": 0.8611111111111112,
+    "despues": 0.8888888888888888
+  }
+}

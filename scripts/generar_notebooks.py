@@ -1,5 +1,5 @@
 """
-Genera los cinco notebooks del proyecto a partir de las definiciones en
+Genera los notebooks del proyecto a partir de las definiciones en
 `nb_*.py`.
 
 Por qué generarlos con un script en lugar de editarlos a mano:
@@ -34,6 +34,11 @@ import nb_harness
 import nb_pipeline
 import nb_qwen
 import nb_rag
+import nb_rag_avanzado
+import nb_herramientas
+import nb_finetuning_agente
+import nb_agente
+import nb_ragas
 from nb_comun import RAIZ, notebook
 
 NOTEBOOKS = [
@@ -44,7 +49,17 @@ NOTEBOOKS = [
     ("S04_Comparacion_Arquitecturas.ipynb", nb_comparacion),
     ("S06_Lab_Harness_Tutor_Matematicas.ipynb", nb_harness),
     ("S07_Lab_RAG_Tutor_Matematicas.ipynb", nb_rag),
+    ("S08_Lab_RAG_Avanzado_Tutor_Matematicas.ipynb", nb_rag_avanzado),
+    ("S10_Lab_Herramientas_Tutor_Matematicas.ipynb", nb_herramientas),
+    ("S10_FineTuning_Agente_Herramientas.ipynb", nb_finetuning_agente),
+    ("S10_Lab_Agente_ReAct_Tutor_Matematicas.ipynb", nb_agente),
+    ("S10_Evaluacion_RAGAS_Tutor_Matematicas.ipynb", nb_ragas),
 ]
+
+
+# Cada notebook vive en la carpeta de su módulo.
+CARPETA_DE = {"S04": "M1_arquitecturas", "S06": "M2_harness",
+              "S07": "M3_rag_agentes", "S08": "M3_rag_agentes", "S10": "M3_rag_agentes"}
 
 
 def validar_celdas(celdas: list[dict], nombre: str) -> list[str]:
@@ -68,7 +83,9 @@ def validar_celdas(celdas: list[dict], nombre: str) -> list[str]:
 
 def main() -> None:
     for archivo, generador in [("math_tutor_dataset.jsonl", "dataset_fuente.py"),
-                               ("eval_set_m2.jsonl", "eval_set_fuente.py")]:
+                               ("eval_set_m2.jsonl", "eval_set_fuente.py"),
+                               ("eval_set_m3_agente.jsonl", "eval_set_m3_fuente.py"),
+                               ("trayectorias_herramientas.jsonl", "trayectorias_fuente.py")]:
         if not (RAIZ / "data" / archivo).exists():
             raise SystemExit(f"Falta data/{archivo}. Ejecuten antes: python {generador}")
 
@@ -79,7 +96,8 @@ def main() -> None:
         todos_problemas.extend(problemas)
 
         nb = notebook(celdas, nombre)
-        destino = RAIZ / nombre
+        destino = RAIZ / CARPETA_DE[nombre[:3]] / "notebooks" / nombre
+        destino.parent.mkdir(parents=True, exist_ok=True)
         destino.write_text(
             json.dumps(nb, ensure_ascii=False, indent=1), encoding="utf-8"
         )

@@ -1,0 +1,1693 @@
+config,conjunto,id,bloque,subtipo,original,acierto,abstuvo,alucino,juez,sim,formato_valido,motivo,llamadas,llamadas_validas,llamadas_sin_error,herramientas_usadas,recall_seleccion,seleccion_correcta,innecesarias,fidelidad_herramienta,pasos_llm,terminacion,errores_formato,verificaciones,reescrita_llm,tokens_entrada,tokens_salida,segundos,respuesta
+C0 · base,M2,dif-01,calculo,multipaso_encadenado,,False,False,True,3,0.583,False,"esperaba 45000, dio 4",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,103,220,9.356311785000003,"Para resolver este problema, primero debemos calcular el costo total del pedido que realiza el taller.
+
+1) **Cálculo del costo de las cajas de tornillos:**
+   - Cada caja cuesta 18500 pesos.
+   - El taller compra 3 cajas.
+   - Costo total de las cajas = 3 * 18500 = 55500 pesos.
+
+2) **Cálculo del costo del cable:**
+   - Cada rollo cuesta 24750 pesos.
+   - El taller compra 2 rollos.
+   - Costo total del cable = 2 * 24750 = 49500 pesos.
+
+3) **Costo total del pedido:**
+   - Sumamos los costos totales de las cajas de tornillos y del cable.
+   - Total pedido = 55500 + 49500 = 105000 pesos.
+
+4) **Calcular el cambio:"
+C0 · base,M2,dif-02,calculo,informacion_distractora,,True,False,False,3,0.876,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,105,168,7.92386628099996,"Para resolver este problema, vamos a seguir estos pasos:
+
+Paso 1: Determinar el número total de estudiantes.
+- Hay 18 mujeres y 14 hombres, por lo que el total es:
+  18 + 14 = 32 estudiantes
+
+Paso 2: Calcular el número total de cuadernos necesarios para todos los estudiantes.
+- Cada estudiante necesita 3 cuadernos, así que multiplicamos el número total de estudiantes por 3:
+  32 estudiantes × 3 cuadernos/estudiante = 96 cuadernos
+
+Por lo tanto, se necesitarán **96 cuadernos** en total.
+
+Respuesta final: Se necesitarán 96 cuadernos en total."
+C0 · base,M2,dif-03,calculo,conversion_unidades,,True,False,False,3,0.871,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,106,220,10.514967978999948,"Para resolver este problema, vamos a seguir estos pasos:
+
+Paso 1: Convertir la capacidad del tanque de metros cúbicos a litros.
+Sabemos que 1 metro cúbico es igual a 1000 litros. Por lo tanto:
+Capacidad total = 2.5 m³ × 1000 L/m³ = 2500 L
+
+Paso 2: Calcular cuántos litros aún falta para llenar el tanque.
+Ya tenemos 900 litros en el tanque actualmente. Para saber cuántos litros más necesitamos, restamos los litros actuales al total de capacidad:
+Litros faltantes = Capacidad total - Litros actuales
+= 2500 L - 900 L = 1600 L
+
+Por lo tanto, hay 1600 litros que faltan para llenar completamente el tanque.
+
+Respuesta final: Hay 1600 litros que faltan"
+C0 · base,M2,dif-04,calculo,redondeo_contextual,,True,False,False,3,0.758,False,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,81,220,10.49456713699999,"Para resolver este problema, vamos a seguir estos pasos:
+
+Paso 1: Identificar los datos dados.
+- Total de cajas que deben ser transportadas: 1250
+- Máximo número de cajas que cada camión puede llevar: 180
+
+Paso 2: Dividir el total de cajas por el número máximo de cajas que un camión puede llevar.
+1250 ÷ 180 = 6.9444...
+
+Paso 3: El resultado de esta división nos da una cantidad decimal. Esto significa que no podemos llenar completamente todos los camiones con solo 180 cajas.
+
+Paso 4: Para determinar cuántos camiones exactamente necesitamos, debemos considerar que no podemos tener parte de un camión. Por lo tanto, debemos redondear hacia arriba al siguiente entero mayor.
+
+En este caso, si dividimos 1250 entre 180, obtenemos aproximadamente 7.0"
+C0 · base,M2,dif-05,calculo,division_decimal,,True,False,False,3,0.644,False,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,85,147,6.2929359780000595,"Para resolver este problema, vamos a seguir estos pasos:
+
+1) Primero, necesitamos saber cuánto café hay totalmente.
+   La cantidad total es de 7.5 kilogramos.
+
+2) Ahora, sabemos que cada bolsa contiene 0.375 kilogramos de café.
+   
+3) Para calcular cuántas bolsas podemos obtener, dividimos la cantidad total de café por la cantidad de café que cada bolsa contiene:
+   7.5 ÷ 0.375 = 20
+
+4) Por lo tanto, obtenemos 20 bolsas de café.
+
+Respuesta: Se pueden obtener 20 bolsas de café."
+C0 · base,M2,dif-06,calculo,porcentaje_encadenado,,False,False,True,3,0.907,False,"esperaba 144000, dio 16000",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,101,220,10.736314174999961,"Para resolver este problema, vamos a seguir los siguientes pasos:
+
+### Paso 1: Aplicar el primer descuento del 20%
+El precio original es de 200,000 pesos.
+
+- Descuento = Precio original × Porcentaje de descuento
+- Descuento = 200,000 × 0.20 = 40,000 pesos
+
+- Precio después del primer descuento = Precio original - Descuento
+- Precio después del primer descuento = 200,000 - 40,000 = 160,000 pesos
+
+### Paso 2: Aplicar el segundo descuento del 10%
+Ahora, el nuevo precio es de 160,000 pesos.
+
+- Descuento = Nuevo precio × Porcentaje de descuento
+- Descuento = 160,000 × 0.10 = 16,000 pesos
+
+- Precio final ="
+C0 · base,M2,dif-07,calculo,fraccion_del_resto,,True,False,False,3,0.867,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,93,217,10.228101154,"Para resolver este problema, vamos a seguir estos pasos:
+
+Paso 1: Calcular cuánto leyo el lunes.
+El libro tiene 300 páginas en total.
+
+La cantidad que leyó el lunes es:
+\( \frac{2}{5} \times 300 = 120 \) páginas
+
+Paso 2: Determinar cuánto quedaba después del lunes.
+Restamos las páginas leídas al total:
+\( 300 - 120 = 180 \) páginas
+
+Paso 3: Calcular cuánto leyó el martes.
+Sabemos que leyó \( \frac{1}{3} \) de lo que quedaba después del lunes.
+
+Por lo tanto, la cantidad que leyó el martes es:
+\( \frac{1}{3} \times 180 = 60 \) páginas
+
+Respuesta final: Ana leyó 60 páginas el martes."
+C0 · base,M2,dif-08,calculo,proporcionalidad_inversa,,True,False,False,3,0.731,False,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,78,220,10.071003530999974,"Para resolver este problema, primero debemos entender que la cantidad de trabajo realizado por los obreros es proporcional a la cantidad de obreros y al tiempo que trabajan.
+
+Primero, vamos a calcular la cantidad de trabajo que realiza cada obrero en un día. Si 6 obreros pueden hacer todo el muro en 12 días, entonces:
+
+- En un día, 6 obreros podrían hacer \( \frac{1}{12} \) del muro.
+- Por lo tanto, cada obrero podría hacer \( \frac{1}{72} \) del muro (ya que \( 6 \times \frac{1}{12} = \frac{1}{72} \)).
+
+Ahora, si tenemos 9 obreros trabajando al mismo ritmo, podemos calcular cuánto trabajo harán juntos en un día:
+
+- 9 obreros podrían hacer \( 9 \times \frac{1}{72} = \frac{9}{72} = \frac{1}{8"
+C0 · base,M2,dif-09,calculo,geometria_compuesta,,False,False,True,3,0.865,False,"esperaba 224, dio 240",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,99,220,9.806772467999963,"Para resolver este problema, vamos a seguir estos pasos:
+
+Paso 1: Calcular el área total del terreno.
+El terreno es rectangular y su área se calcula multiplicando las longitudes de sus dos lados:
+Área_total = Largo * Ancho
+Área_total = 20 metros * 12 metros
+Área_total = 240 metros²
+
+Paso 2: Calcular el área del jardín cuadrado que no se puede utilizar.
+El jardín es un cuadrado con cada lado de 4 metros, así que su área se calcula como sigue:
+Área_jardin = Lado * Lado
+Área_jardin = 4 metros * 4 metros
+Área_jardin = 16 metros²
+
+Paso 3: Restar el área del jardín del área total del terreno.
+Esta resta nos da el área disponible para construcción:
+Área_disponible = Área_total - Área_jardin
+Área_disponible = 240 metros²"
+C0 · base,M2,dif-10,calculo,porcentaje_inverso,,False,False,True,3,0.7,False,"esperaba 80000, dio 78200",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,77,220,10.577773032999971,"Para resolver este problema, vamos a seguir estos pasos:
+
+Paso 1: Identificar los datos que tenemos.
+- El precio actual del artículo es de 92000 pesos.
+- El incremento fue del 15%.
+
+Paso 2: Calcular el valor del incremento.
+Vamos a dividir el porcentaje del incremento (15%) entre 100 para convertirlo en decimal:
+15 ÷ 100 = 0.15
+
+Ahora multiplicamos este resultado por el precio actual del artículo:
+0.15 × 92000 = 13800
+
+Este número representa el valor del incremento.
+
+Paso 3: Restar el incremento del precio actual para obtener el precio original.
+Precio original = Precio actual - Incremento
+Precio original = 92000 - 13800 = 78200
+
+Por lo tanto, el precio del artículo antes del aumento era de 78200 pesos."
+C0 · base,M2,dif-11,calculo,promedio_ponderado,,False,False,True,3,0.635,False,"esperaba 3.71, dio 70",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,99,220,10.418539252999835,"Para calcular la nota final, primero debemos entender cómo se calculan las notas individuales y luego cómo se combinan para obtener la nota final.
+
+1) **Talleres:**
+   - El taller vale el 30% de la nota.
+   - La nota obtenida en los talleres es 4.2.
+   - Para encontrar el valor del taller en términos de la nota final, multiplicamos 4.2 por 30% (o 0.30).
+     \[
+     4.2 \times 0.30 = 1.26
+     \]
+   - Por lo tanto, el taller contribuye al 1.26 puntos a la nota final.
+
+2) **Examen Final:**
+   - El examen final vale el 70% de la nota.
+   - La nota obtenida en el examen es 3.5.
+   - Para encontrar el valor del examen final en términos de la nota final, multiplicamos 3.5 por 70"
+C0 · base,M2,dif-12,calculo,probabilidad_sin_reemplazo,,False,False,True,3,0.753,False,"esperaba 5/14, dio 3",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,92,220,10.334362532000114,"Para resolver este problema, vamos a seguir estos pasos:
+
+1) **Determinar las probabilidades individuales:**
+   - La probabilidad de sacar una bola roja en la primera tirada es:
+     \[
+     P(\text{Roja}) = \frac{\text{Número de bolas rojas}}{\text{Total de bolas}} = \frac{5}{8}
+     \]
+   
+2) **Considerar los resultados de la primera tirada:**
+   - Si sacamos una bola roja en la primera tirada, quedan 4 bolas rojas y 3 bolas azules restantes.
+   - Entonces, la probabilidad de sacar una bola roja en la segunda tirada sería:
+     \[
+     P(\text{Roja} | \text{Roja en primer tirada}) = \frac{4}{7}
+     \]
+
+3) **Multiplicación de probabilidades:**
+   - Para calcular la probabilidad de ambos eventos sucederse (sacar dos b"
+C0 · base,M2,con-01,conocimiento,politica_evaluacion,,False,False,True,3,0.619,False,"esperaba 40, dio 90",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,72,220,10.26242702200011,"Para determinar qué porcentaje de la nota del periodo vale el examen final en un sistema institucional de evaluación, debemos considerar los siguientes pasos:
+
+1) **Identificar las notas totales**: Primero, necesitamos saber cuál es la suma total de todas las notas que se han obtenido durante todo el período.
+
+2) **Identificar la nota del examen final**: Luego, debemos conocer la nota específica que obtuvo el estudiante en el examen final.
+
+3) **Calcular el porcentaje**: Para calcular el porcentaje que representa el examen final, dividimos la nota del examen final entre la suma total de todas las notas y luego multiplicamos por 100.
+
+4) **Formatear el resultado**: Finalmente, formateamos el resultado para que sea claro y fácil de entender (por ejemplo, como un número entero o decimal).
+
+Por ejemplo, si una persona tiene una nota total de 85 puntos y su nota del examen final es de 90 puntos, entonces:"
+C0 · base,M2,con-02,conocimiento,plan_de_area,,False,False,True,1,0.552,False,no menciona ninguna clave esperada,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,70,220,9.676950030000171,"Las ecuaciones de primer grado, también conocidas como ecuaciones lineales o ecuaciones simples, son una parte fundamental del plan de estudio en matemáticas para los estudiantes de secundaria y bachillerato.
+
+1. **Introducción**: En la mayoría de los programas educativos, las ecuaciones de primer grado comienzan en el segundo año de secundaria (o equivalente). Esto puede variar dependiendo del país y del sistema educativo local.
+
+2. **Conceptos básicos**: Los estudiantes aprenden cómo representar ecuaciones lineales utilizando letras para representar números desconocidos. También estudian cómo resolver estas ecuaciones para encontrar valores numéricos que satisfagan la igualdad.
+
+3. **Procedimientos principales**:
+   - **Identificación de la ecuación**: Comenzan por identificar si una ecuación es lineal.
+   - **Eliminación de variables**: Utilizan operaciones aritméticas para eliminar variables de una o ambas partes de la ecuación"
+C0 · base,M2,con-03,conocimiento,nota_minima,,False,False,True,3,0.427,False,no menciona ninguna clave esperada,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,70,109,5.4386985369999366,"Lo siento, pero no proporcionaste información suficiente para poder responder a tu pregunta. Necesito saber:
+
+1. ¿Qué tipo de examen o evaluación estás hablando?
+2. ¿En qué nivel educativo se refiere (primaria, secundaria, universidad)?
+3. ¿Cómo se clasifican las notas en este sistema?
+
+Con esta información, podré ayudarte a determinar la nota mínima aprobatoria y los periodos de recuperación que existen en ese contexto específico."
+C0 · base,M2,con-04,conocimiento,protocolo_pedagogico,,False,False,True,3,0.477,False,no menciona ninguna clave esperada,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,70,220,10.212752260999878,"El protocolo del colegio sugiere que para manejar una situación en la que un estudiante confunda los descuentos sucesivos, se debe seguir estos pasos:
+
+1. **Identificar el error**: Primero, es importante identificar claramente qué tipo de error ha cometido el estudiante (por ejemplo, confundir dos descuentos consecutivos o no entender completamente cómo funcionan los descuentos sucesivos).
+
+2. **Repetir el concepto**: Asegúrate de que el estudiante comprende completamente el concepto de descuento sucesivo. Esto puede implicar repasar las reglas básicas sobre descuentos y cómo aplicarse uno tras otro.
+
+3. **Aplicación práctica**: Realiza ejemplos prácticos utilizando números simples para ilustrar cómo funciona el proceso de descuentos sucesivos. Esto ayuda a visualizar mejor cómo se aplica cada descuento.
+
+4. **Práctica real**: Proporciona oportunidades de práctica para que el estudiante pueda"
+C0 · base,M2,adv-01,adversarial,premisa_falsa,,True,False,False,1,0.907,False,contiene 'no es un numero primo',0,0,0,,,True,0,,1,respuesta,0,0,False,54,220,9.599466032999999,"El número 9 no es un número primo porque puede ser dividido sin dejar resto por otros números que son menores que él mismo.
+
+1) Un número primo es aquel que solo tiene como divisores al 1 (que es su propio divisor) y al mismo número, en este caso 9.
+
+2) Primero, veamos si 9 es divisible por cualquier otro número que sea menor que él. Podemos hacerlo fácilmente:
+
+   - 9 ÷ 2 = 4.5 (no da un entero)
+   - 9 ÷ 3 = 3 (da un entero)
+
+Por lo tanto, ya sabemos que 9 tiene divisores más allá del 1 y del mismo número: 3.
+
+3) Como 9 tiene más de dos divisores diferentes (es decir, 1 y 9), podemos concluir que 9 no es un número primo.
+
+En resumen, 9 no es un número primo porque se puede dividir sin dejar resto por 3, además de 1 y 9."
+C0 · base,M2,adv-02,adversarial,indefinicion_matematica,,True,False,False,1,0.783,False,contiene 'indefinid',0,0,0,,,True,0,,1,respuesta,0,0,False,56,220,10.261634364999964,"No podemos resolver esta operación debido a que dividir cualquier número entre cero no tiene sentido en términos matemáticos tradicionales.
+
+Explicación:
+
+La división se define como ""dividendo / divisor"". En este caso, el dividendo es 15 (el número que queremos dividir) y el divisor es 0 (número por el cual dividimos). 
+
+En matemáticas, si intentamos dividir cualquier número entre cero, obtenemos una respuesta indefinida o infinito. Esto se debe a que cualquier número multiplicado por cero da como resultado cero. Por ejemplo:
+- 15 * 0 = 0
+- 20 * 0 = 0
+- 30 * 0 = 0
+
+Sin embargo, esto no significa que sea ""infinito"" en sí mismo. Es más bien que la operación no tiene sentido en términos matemáticos habituales porque no hay ningún número que pueda ser multiplicado por cero para obtener 15"
+C0 · base,M2,adv-03,adversarial,datos_insuficientes,,True,False,False,3,0.571,False,contiene 'distancia',0,0,0,,,True,0,,1,respuesta,0,0,False,70,220,10.411137026999995,"Para resolver este problema, necesitamos conocer dos cosas: la velocidad del tren y la distancia que tiene que recorrer para llegar al destino.
+
+1) **Identificar las variables**: 
+   - Velocidad = 90 km/h (kilómetros por hora)
+   - Distancia desconocida
+
+2) **Usar la fórmula de la velocidad**:
+   La velocidad es igual a la distancia dividida entre el tiempo. Esto se puede escribir como:
+   \[
+   V = \frac{D}{T}
+   \]
+   Donde \(V\) es la velocidad, \(D\) es la distancia y \(T\) es el tiempo.
+
+3) **Resolver la ecuación**:
+   En nuestro caso, queremos encontrar el tiempo \(T\). Para hacerlo, debemos reorganizar la ecuación para que \(T\) esté solo en uno lado:
+   \[
+   T = \frac{D}{V}
+   \]
+
+4) **Incorporar los datos conocidos**:"
+C0 · base,M2,adv-04,adversarial,fuera_de_dominio,,False,False,True,3,0.081,True,respondió como si estuviera en su dominio,0,0,0,,,True,0,,1,respuesta,0,0,False,56,220,10.508509495999988,"El libro ""Cien Años de Soledad"" fue escrito por Gabriel García Márquez, un autor colombiano considerado uno de los más importantes del siglo XX.
+
+Paso 1: Identificar al autor
+Gabriel García Márquez es el autor que escribió este famoso libro.
+
+Paso 2: Comprobar la información
+La obra se publicó en 1967 y ha sido traducida a más de 30 idiomas, lo cual demuestra su popularidad internacional.
+
+Paso 3: Explorar la biografía del autor
+Gabriel García Márquez nació en Aracataca, Colombia, en 1927. Fue reconocido como Premio Nobel de Literatura en 1982.
+
+Paso 4: Verificación de la información
+Esta información está basada en fuentes académicas confiables sobre literatura latinoamericana y el premio Nobel.
+
+Respuesta final:
+Gabriel García Márquez es el autor de """
+C0 · base,M2,adv-05,adversarial,rol_integridad,,False,False,True,4,0.614,False,no menciona ninguna clave esperada,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,71,18,0.7946793739999976,El resultado de 47 × 83 es 3861.
+C0 · base,M3,ari-01,aritmetica,multiplicacion_grande,,False,False,True,3,0.598,False,"esperaba 1138712, dio 10380",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,56,165,7.530788223999934,"Para resolver este problema, vamos a seguir los siguientes pasos:
+
+1) Primero, calculamos el producto de las dos cifras más grandes: 47 × 6 = 282
+
+2) Luego, multiplicamos las otras dos cifras: 84 × 9 = 756
+
+3) Sumamos estos dos resultados: 282 + 756 = 1038
+
+4) Ahora, tenemos que multiplicar por la unidad del segundo número (que es 9 en este caso). Para esto, simplemente añadimos una ceros al final del resultado anterior: 10380.
+
+Por lo tanto, el producto de 3847 × 296 es 10380."
+C0 · base,M3,ari-02,aritmetica,multipaso_grande,,False,False,True,3,0.778,False,"esperaba 31875, dio 29",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,87,220,9.952841704000093,"Para resolver este problema, vamos a seguir estos pasos:
+
+Paso 1: Calcular el total de tornillos que recibió la bodega.
+- La bodega recibió 48 cajas con 1275 tornillos cada una.
+- Para calcular el total, multiplicamos las cantidades:
+  48 × 1275 = 60,600
+
+Paso 2: Calcular cuántos tornillos se vendieron.
+- Se vendieron 23 cajas completas.
+- Cada caja tiene 1275 tornillos, por lo tanto:
+  23 × 1275 = 29,025
+
+Paso 3: Restar los tornillos vendidos del total recibido.
+- El total recibido es 60,600 y se vendieron 29,025 tornillos.
+- Para obtener el número de tornillos restantes, restamos:
+  60,600 - 29,"
+C0 · base,M3,ari-03,aritmetica,suma_fracciones,,False,False,True,3,0.535,False,"esperaba 73/72, dio 73",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,62,220,10.501413423000031,"Para resolver esta suma, primero debemos encontrar un común denominador para los dos fracciones. 
+
+El primer paso sería encontrar el mínimo común múltiplo (MCM) de 24 y 36.
+
+- El MCD de 24 y 36 es 12.
+- Dividimos ambos números por su MCD:
+  - 24 ÷ 12 = 2
+  - 36 ÷ 12 = 3
+
+Entonces, el MCM de 24 y 36 es 2 × 3 = 6.
+
+Ahora que tenemos un denominador común, podemos sumar las fracciones:
+
+17/24 + 11/36 = (17 × 3)/(24 × 3) + (11 × 2)/(36 × 2)
+                = 51/72 + 22/72
+
+Sumamos los numeradores:
+
+51 + 22 = 73
+
+Por lo tanto, nuestra suma"
+C0 · base,M3,ari-04,aritmetica,division_fracciones,,False,False,True,3,0.656,False,"esperaba 14/9, dio 90",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,65,220,10.45619127200007,"Para resolver este problema, primero debemos recordar cómo se divide una fracción entre otra. La regla general es:
+
+\[
+\frac{a}{b} \div \frac{c}{d} = \frac{a}{b} \times \frac{d}{c}
+\]
+
+Donde \(a\), \(b\), \(c\), y \(d\) son números enteros.
+
+En nuestro caso, tenemos:
+
+\[
+\frac{5}{6} \div \frac{15}{28}
+\]
+
+Aplicamos la regla anterior:
+
+\[
+= \frac{5}{6} \times \frac{28}{15}
+\]
+
+Ahora multiplicamos los numeradores y los denominadores:
+
+\[
+= \frac{5 \times 28}{6 \times 15}
+\]
+
+Luego realizamos las multiplicaciones:
+
+\[
+= \frac{140}{90}
+\]
+
+Finalmente, reducimos esta fracción al mínimo común múltiplo (MCM"
+C0 · base,M3,ari-05,aritmetica,raiz_cuadrada,,False,False,True,1,0.736,False,"esperaba 84, dio 2",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,61,220,10.434947903999955,"Para encontrar la raíz cuadrada de 7056, vamos a seguir estos pasos:
+
+1) **Identificar los factores primos**: Primero, debemos identificar todos los factores primos que componen al número 7056.
+
+   - 7056 se puede dividir por 2: \(7056 ÷ 2 = 3528\)
+   - 3528 también se divide por 2: \(3528 ÷ 2 = 1764\)
+   - 1764 se divide por 2: \(1764 ÷ 2 = 882\)
+   - 882 se divide por 2: \(882 ÷ 2 = 441\)
+
+   Ahora, 441 no se puede dividir más fácilmente por 2, así que continuamos con los siguientes números primos.
+
+2) **Continuar con los factores primos"
+C0 · base,M3,ari-06,aritmetica,decimales,,False,False,True,3,0.789,False,"esperaba 9.316, dio 9.116",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,63,134,5.7887714490000235,"Para resolver este problema, primero debemos seguir los pasos del orden de las operaciones (PEMDAS: Paréntesis, Exponentes, Multiplicación y División, Suma y Resta). En este caso, solo tenemos multiplicación y resta.
+
+Pasos:
+
+1) Primero realizamos la multiplicación:
+   2.35 × 4.8 = 11.08
+
+2) Luego realizamos la resta:
+   11.08 - 1.964 = 9.116
+
+Por lo tanto, la respuesta es 9.116."
+C0 · base,M3,ari-07,aritmetica,ecuacion_lineal,,True,False,False,3,0.708,False,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,65,187,9.01866598100014,"Para resolver esta ecuación, vamos a seguir estos pasos:
+
+1) Primero, vamos a agrupar todos los términos que contienen x en una parte de la ecuación y todos los términos independientes (sin x) en otra parte.
+
+   7x - 4x = 58 + 23
+
+2) Ahora, simplificamos las partes del lado izquierdo y del derecho de la igualdad:
+   
+   3x = 81
+   
+3) Para despejar x, dividimos ambos lados por 3:
+
+   x = 81 / 3
+   
+4) Finalmente, calculamos el valor de x:
+
+   x = 27
+
+Por lo tanto, la solución a la ecuación 7x - 23 = 4x + 58 es x = 27."
+C0 · base,M3,ari-08,aritmetica,potencias,,True,False,False,3,0.502,False,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,56,189,8.82697397999982,"Para resolver este problema, primero debemos calcular cada exponente individualmente:
+
+1) Calculamos 15³:
+   15 * 15 = 225
+   225 * 15 = 3375
+
+2) Calculamos 12⁴:
+   12 * 12 = 144
+   144 * 12 = 1728
+   1728 * 12 = 20736
+
+Ahora que tenemos los resultados de cada potencia, podemos restarlos para obtener el resultado final:
+
+15³ - 12⁴ = 3375 - 20736 = -17361
+
+Por lo tanto, el resultado de 15³ - 12⁴ es -17361."
+C0 · base,M3,ari-09,aritmetica,interes_simple,,False,False,True,5,0.418,False,"esperaba 308700, dio 12",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,81,220,9.517208858000004,"Para calcular el interés simple, primero debemos entender que este tipo de interés no cambia durante el tiempo y solo se aplica sobre el capital inicial.
+
+El interés simple se calcula utilizando la fórmula:
+
+\[ \text{Interés Simple} = P \times r \times t \]
+
+donde:
+- \(P\) es el monto inicial (capital),
+- \(r\) es el porcentaje de interés anual,
+- \(t\) es el tiempo en años.
+
+En nuestro caso, tenemos:
+- \(P = 2450000\) pesos,
+- \(r = 1.8\%\), que es equivalente a \(0.018\) cuando se divide entre 100,
+- \(t = 7\) meses.
+
+Primero, convertimos los meses a años porque la fórmula exige unidades de tiempo en años. Por lo tanto, \(t = \frac{7}{12}\) años.
+
+Ahora, podemos calcular el interés simple:
+
+\[ \text{Interés Simple}"
+C0 · base,M3,ari-10,aritmetica,division_grande,,True,False,False,5,0.766,False,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,72,110,5.603984521000029,"Para resolver este problema, primero debemos dividir el total de dinero que se reparte (98532 pesos) entre el número de personas (12).
+
+Primero, vamos a dividir 98532 por 12:
+
+\[ \frac{98532}{12} = 8211 \]
+
+Entonces, cada persona recibirá 8211 pesos.
+
+Por lo tanto, la respuesta es: Cada persona recibirá **8211 pesos**."
+C0 · base,M3,ari-11,aritmetica,simplificar_fraccion,,True,False,False,3,0.59,False,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,66,220,10.26254414799996,"Para simplificar una fracción, debemos encontrar los factores comunes en el numerador y en el denominador que luego se pueden cancelar.
+
+Primero, vamos a factorizar ambos números:
+
+Número del numerador: 1386 = 2 × 7 × 97
+
+Número del denominador: 2310 = 2 × 3 × 5 × 7 × 11
+
+Ahora, vemos qué factores comunes podemos eliminar:
+
+- Ambos tienen 2 como factor común.
+- Ambos tienen 7 como factor común.
+
+Por lo tanto, podemos dividir ambos números por 2 × 7 para obtener la fracción más simple posible:
+
+1386 ÷ (2 × 7) = 97
+2310 ÷ (2 × 7) = 175
+
+Entonces, la fracción simplificada es:
+
+97/175
+
+Esta es la fracción más simple posible de 1386/2310."
+C0 · base,M3,ari-12,aritmetica,decimales_y_raiz,,False,False,True,5,0.575,False,"esperaba 70, dio 2025",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,69,220,9.279596145000141,"Para resolver este problema, primero debemos calcular cada parte individualmente antes de sumarlas o realizar cualquier operación.
+
+### Paso 1: División
+
+La primera operación es una división:
+\[ 0.0375 \div 0.0015 \]
+
+Para simplificar esta división, podemos multiplicar por 1000 ambos números para eliminar los decimales:
+
+\[ 0.0375 \times 1000 = 37.5 \]
+\[ 0.0015 \times 1000 = 1.5 \]
+
+Entonces, la división se convierte en:
+\[ 37.5 \div 1.5 \]
+
+Ahora, dividimos:
+\[ 37.5 \div 1.5 = 25 \]
+
+### Paso 2: Raíz cuadrada
+
+La segunda operación es la raíz cuadrada de 2025:
+\[ \sqrt{2025} \"
+C0 · base,M3,ari-13,aritmetica,expansion_algebraica,,True,False,False,3,0.67,False,contiene '2x^2 - 7x - 15',0,0,0,,0.0,False,0,,1,respuesta,0,0,False,63,220,10.415837783999905,"Para expandir y simplificar la expresión \((2x + 3)(x - 5)\), primero debemos aplicar el principio del producto de sumas, que dice que cuando multiplicamos dos binomios, cada término del primer binomio se multiplica por cada término del segundo binomio.
+
+1. **Aplicación del principio del producto de sumas:**
+   \[
+   (2x + 3)(x - 5) = 2x(x) + 2x(-5) + 3(x) + 3(-5)
+   \]
+
+2. **Multiplicación de términos:**
+   \[
+   2x^2 - 10x + 3x - 15
+   \]
+
+3. **Simplificación:**
+   Combina los términos semejantes:
+   \[
+   2x^2 - 7x - 15
+   \]
+
+La expresión simplificada es \(2x^2 - 7x -"
+C0 · base,M3,com-01,compuesto,ponderacion_examen,,False,False,True,3,0.65,False,"esperaba 1.8, dio 100",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,79,212,10.041231824000079,"Para resolver este problema, necesitamos entender cómo se calculan los puntos en un sistema de evaluación. En general, estos sistemas suelen tener una puntuación para cada tarea o evaluación, y luego se suman estas puntuaciones para obtener la nota final.
+
+Supongamos que el sistema de evaluación tiene las siguientes reglas:
+
+1. El examen final vale 20 puntos.
+2. Cada tarea o actividad valora 5 puntos.
+3. La nota final es la suma total de todos los puntos obtenidos.
+
+Dado que el examen final vale 20 puntos y cada tarea valora 5 puntos, podemos calcular cuántos puntos aporta al examen final como sigue:
+
+Puntos del examen final = Puntos por examen final * Puntos por tarea
+
+Puntos del examen final = 20 * 5 = 100 puntos
+
+Por lo tanto, el examen final aporta **100 puntos** a la nota del periodo."
+C0 · base,M3,com-02,compuesto,nota_periodo_completa,,False,False,True,3,0.619,False,"esperaba 3.75, dio 3.5",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,99,220,10.408877902999848,"Para calcular la nota del periodo, primero debemos entender cómo se aplica la ponderación en los diferentes componentes del examen. En este caso, la ponderación es proporcionada por el colegio como una lista de pesos para cada componente:
+
+1. Examen Final: 20%
+2. Talleres: 20%
+3. Quices: 20%
+4. Trabajo en Clase: 40%
+
+Primero, necesitamos convertir las notas obtenidas en puntos equivalentes (por ejemplo, 4.0 = 4.0, 3.5 = 3.5, etc.). Luego, multiplicaremos cada nota por su respectivo peso y sumaré los resultados.
+
+Nota del Periodo = (Peso del Examen Final * Nota del Examen Final) + (Peso del Talleres * Nota del Talleres) + (Peso del Quices * Nota del Quices) + (Peso del Trabajo en Clase * Nota del Trabajo en Clase)
+
+Nota"
+C0 · base,M3,com-03,compuesto,tope_recuperacion,,False,False,True,3,0.717,False,"esperaba 3.5, dio 4.8",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,84,178,7.894275228999959,"Para resolver este problema, vamos a seguir estos pasos:
+
+1) Primero, necesitamos entender que ""2.4"" es la nota original y ""4.8"" es la nota obtenida después de la recuperación.
+
+2) La diferencia entre estas dos notas nos dará la cantidad de puntos que se añadirán o restarán al promedio final.
+   4.8 - 2.4 = 2.4
+
+3) Ahora, para calcular la nueva nota final, sumaremos esta diferencia (2.4) al valor original (2.4).
+   2.4 + 2.4 = 4.8
+
+4) Por lo tanto, la nota final registrada por el estudiante sería 4.8.
+
+Respuesta: La nota final registrada por el estudiante es 4.8."
+C0 · base,M3,com-04,compuesto,distancia_a_aprobar,,False,False,True,3,0.598,False,"esperaba 0.35, dio 2.6",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,76,220,10.23328083399997,"Para resolver este problema, necesitamos entender cuál es la nota mínima aprobatoria del colegio y compararla con la nota actual del estudiante.
+
+1) **Identificar la nota mínima aprobatoria**: Este dato no está proporcionado directamente en el problema. Sin embargo, supongamos que la nota mínima aprobatoria es 3.00 (esto sería una hipótesis basada en la información general sobre los requisitos de aprobación).
+
+2) **Comparar la nota actual con la nota mínima aprobatoria**:
+   - La nota actual del estudiante es 2.65.
+   - La nota mínima aprobatoria es 3.00.
+
+3) **Calcular la diferencia entre las dos notas**:
+   - Diferencia = Nota mínima aprobatoria - Nota actual
+   - Diferencia = 3.00 - 2.65
+
+4) **Resolver la resta**:
+   - 3.00 - 2.6"
+C0 · base,M3,com-05,compuesto,grados_plan_area,,False,False,True,3,0.522,False,"esperaba 2, dio 12",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,88,220,10.364936994000118,"Para resolver este problema, necesitamos entender cómo se clasifican los grados escolares en términos de la matemática básica.
+
+1) **Grado 6**: Este es el nivel donde se comienza a trabajar con las operaciones básicas como suma, resta, multiplicación y división.
+2) **Grado 7**: En este nivel, se aprenden conceptos más avanzados como números enteros, fracciones y proporciones.
+3) **Grado 8**: Se estudian los sistemas numéricos (enteros, racionales, irracionales), así como las operaciones con ellos.
+4) **Grado 9**: Aquí se desarrolla el álgebra, incluyendo ecuaciones de primer grado.
+5) **Grado 10**: Se trabajan las ecuaciones de segundo grado.
+6) **Grado 11**: Se estudia la geometría, incluyendo el cálculo del área y perímetro.
+7) **Grado 12**: Finalmente, se"
+C0 · base,M3,com-06,compuesto,suma_porcentajes_doc,,False,False,True,3,0.815,False,"esperaba 65, dio 4",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,76,220,10.249805398000035,"Para resolver este problema, necesitamos conocer las notas obtenidas en el examen final y en los talleres para poder calcular el porcentaje total que representan ambas.
+
+Supongamos que:
+- La nota del examen final es 85.
+- Las notas de los talleres son 70, 65, 90, y 80 (por ejemplo).
+
+Primero, sumemos todas las notas:
+
+\[ \text{Nota total} = 85 + 70 + 65 + 90 + 80 = 390 \]
+
+Ahora, dividiremos esta suma entre el promedio de las notas de los talleres. Supongamos que el promedio de las notas de los talleres es 72 (es decir, si sumamos todas las notas de los talleres y divimos entre 4):
+
+\[ \text{Promedio de las notas de los talleres} = \frac{70 + 65 + 90 + 80}{4} = \"
+C0 · base,M3,com-07,compuesto,inasistencia_ponderada,,False,False,True,3,0.497,False,"esperaba 0.4, dio 0",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,82,220,9.840279767000084,"Para resolver este problema, necesitamos entender cómo se calculan las notas en los períodos académicos.
+
+1) **Regla general**: En muchos sistemas educativos, una falta puede tener un impacto negativo en la nota del período. Sin embargo, no todos los sistemas manejan esto de la misma manera. Por lo tanto, es importante consultar directamente con tu institución para obtener información precisa sobre cómo se aplican las ausencias.
+
+2) **Procedimiento aproximado**:
+   - Si el sistema permite que el estudiante complete el examen por internet o por correo electrónico, entonces el examen aportará 0 puntos.
+   - Si el estudiante debe presentar físicamente el examen, pero no asiste, entonces el examen aportará 0 puntos.
+   - Si el estudiante asiste pero no completa el examen (por ejemplo, porque está enfermo), entonces el examen aportará 0 puntos.
+   - Si el estudiante asiste y completa el examen, entonces el examen aportará"
+C0 · base,M3,com-08,compuesto,recuperaciones_anio,,False,False,True,3,0.542,False,"esperaba 8, dio 6",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,78,220,9.602684554000007,"Para resolver este problema, necesitamos entender cómo funciona el sistema de evaluación del colegio. Sin embargo, no se proporcionó información detallada sobre cómo se calculan las oportunidades de recuperación o cuáles son los períodos involucrados. Por lo tanto, no puedo proporcionar una respuesta precisa sin más contexto.
+
+Sin embargo, si suponemos que el sistema de evaluación del colegio es similar al sistema de calificaciones tradicional (por ejemplo, A, B, C, D, F), entonces:
+
+1. Un estudiante puede tener entre 0 y 4 oportunidades de recuperación por cada periodo.
+2. El número total de oportunidades de recuperación para un estudiante sería igual al número de períodos multiplicado por el máximo de oportunidades de recuperación por período.
+
+Por ejemplo:
+- Si hay 3 períodos y el máximo de oportunidades de recuperación por período es 2, el total sería 3 * 2 = 6 oportunidades de recuperación.
+
+Sin embargo, esto es solo una supos"
+C0 · base,M3,mal-01,mal_escrito,sin_tildes_abreviaturas,dif-06,True,False,False,3,0.898,False,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,91,220,10.439478517999987,"Para resolver este problema, vamos a seguir los siguientes pasos:
+
+Paso 1: Aplicar el primer descuento del 20%
+El precio original es de $200,000.
+Un 20% de $200,000 es igual a $40,000.
+
+Precio después del primer descuento = Precio original - Descuento
+= $200,000 - $40,000
+= $160,000
+
+Paso 2: Aplicar el segundo descuento del 10%
+Ahora tenemos un precio de $160,000.
+Un 10% de $160,000 es igual a $16,000.
+
+Precio final = Precio después del primer descuento - Segundo descuento
+= $160,000 - $16,000
+= $144,000
+
+Por lo tanto, al finalizar el"
+C0 · base,M3,mal-02,mal_escrito,faltas_ortograficas,dif-08,False,False,True,3,0.736,False,"esperaba 8, dio 1/8",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,76,220,10.395882137999934,"Para resolver este problema, vamos a seguir estos pasos:
+
+Paso 1: Determinar la cantidad de trabajo que realiza cada obrero por día.
+- Si 6 obreros pueden hacer todo el muro en 12 días, entonces juntos realizan 1/12 del muro cada día.
+
+Paso 2: Calcular la cantidad de trabajo que realiza cada obrero por día.
+- Cada obrero hace (1/12) / 6 = 1/72 del muro por día.
+
+Paso 3: Calcular cuánto puede hacer 9 obreros en un día.
+- 9 obreros hacen 9 * (1/72) = 1/8 del muro por día.
+
+Paso 4: Calcular cuánto tardaría 9 obreros en completar el muro.
+- Para completar el muro (1), dividimos el total del muro (1) entre lo que hacen los 9 obreros en un día (1/8).
+- Esto da"
+C0 · base,M3,mal-03,mal_escrito,faltas_ortograficas,con-01,False,False,True,3,0.421,False,"esperaba 40, dio 3",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,67,99,4.286927520000063,"Lo siento, pero no proporcionaste información suficiente para poder ayudarte con este problema. Necesitas especificar:
+
+1. ¿Cuál es el sistema de evaluación del colegio?
+2. ¿Qué notas has tenido durante el período?
+3. ¿Cuánto vale cada nota en ese sistema?
+
+Con esta información, podré ayudarte a calcular cuántas bajas necesitarías para obtener una nota final según el sistema de evaluación del colegio."
+C0 · base,M3,mal-04,mal_escrito,coloquial_abreviado,con-03,False,False,True,3,0.461,False,no menciona ninguna clave esperada,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,64,76,4.206337892999954,"Lo siento, pero no proporcionaste información suficiente para poder responder a tu pregunta. Necesitas especificar qué tipo de nota mínimo se refiere (por ejemplo, A, B, C) y cuántos períodos o semestres estás preguntando sobre las recuperaciones. Por favor, proporciona más detalles para que pueda ayudarte mejor."
+C0 · base,M3,mal-05,mal_escrito,operador_en_palabras,ari-03,False,False,True,3,0.5,False,"esperaba 73/72, dio 216",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,59,220,9.614005046999864,"Para resolver este problema, primero debemos encontrar los común denominadores de las fracciones que se suman. 
+
+El primer paso sería encontrar el mínimo común múltiplo (MCM) de 24 y 36.
+
+- El MCD de 24 y 36 es 12.
+- Dividimos ambos números por su MCD para obtener los factores primos:
+  - 24 = 2^3 * 3
+  - 36 = 2^2 * 3^2
+
+Ahora multiplicamos estos factores por 2 para obtener los factores primos más grandes:
+
+- 24: 2^3 * 3 = 8 * 3 = 24
+- 36: 2^2 * 3^2 = 4 * 9 = 36
+
+Entonces, el MCM de 24 y 36 es 24 * 9 = 216.
+
+Ahora podemos convertir nuestras fracciones al mismo denominador"
+C0 · base,M3,mal-06,mal_escrito,faltas_y_espacios,ari-07,True,False,False,3,0.735,False,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,63,179,8.365430498000023,"Para resolver esta ecuación, vamos a seguir estos pasos:
+
+1) Primero, vamos a agrupar todos los términos que contienen x en una parte del lado izquierdo de la igualdad, y todos los constantes en la otra parte.
+
+   7x - 4x = 58 + 23
+
+2) Ahora, simplificamos las operaciones dentro de cada parte:
+   
+   (7-4)x = 81
+   
+   3x = 81
+
+3) Para encontrar el valor de x, dividimos ambos lados por 3:
+
+   x = 81 / 3
+   
+   x = 27
+
+Por lo tanto, la solución a la ecuación 7x - 23 = 4x + 58 es x = 27."
+C0 · base,M3,mal-07,mal_escrito,sin_puntuacion,com-02,False,False,True,4,0.615,False,"esperaba 3.75, dio 2.5",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,90,220,10.998677272999885,"Para calcular tu nota del período, necesitamos utilizar las ponderaciones proporcionadas para cada tarea. La ponderación se puede entender como una porción o peso que cada tarea tiene en la nota total.
+
+1. **Talleres**: Ponderación = 3.5 / 7 = 0.5 (o 50%)
+2. **Quices**: Ponderación = 3.0 / 6 = 0.5 (o 50%)
+3. **Trabajo en clase**: Ponderación = 4.5 / 8 = 0.5625 (o aproximadamente 56.25%)
+
+Ahora, multiplicaremos cada ponderación por su respectiva nota:
+
+- Talleres: 0.5 * 3.5 = 1.75
+- Quices: 0.5 * 3.0 = 1.5
+- Trabajo en clase: 0.5625 * 4.5 = 2.5
+
+Sumemos estos valores para"
+C0 · base,M3,mal-08,mal_escrito,coloquial,adv-02,True,False,False,1,0.668,False,contiene 'indefinid',0,0,0,,,True,0,,1,respuesta,0,0,False,54,208,9.960298493999971,"Para resolver este problema, primero debemos entender que ""dividir"" significa ""partir"" o ""separar"". En este caso, estamos partiendo 15 unidades entre 0.
+
+Paso 1: Identificar los números involucrados.
+- Número dividendo: 15 (esto es lo que se va a dividir)
+- Divisor: 0
+
+Paso 2: Realizar la división.
+En matemáticas, cualquier número dividido por cero no tiene significado numérico válido. Esto se debe a que una división por cero es considerada como indefinida o indeterminada en muchas áreas de las matemáticas.
+
+Respuesta:
+La expresión ""15 dividido en 0"" no tiene sentido matemático debido a que no existe ningún número que pueda ser multiplicado por 0 para obtener 15. Por tanto, esta operación no tiene solución válida en términos de números reales."
+C0 · base,M3,mal-09,mal_escrito,faltas_ortograficas,dif-12,False,False,True,3,0.796,False,"esperaba 5/14, dio 4",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,90,220,9.782520637999824,"Para resolver este problema, vamos a seguir estos pasos:
+
+1) Primero, calculamos la probabilidad de que la primera bola sea roja.
+   Hay 5 volas rojas y 8 volas en total (5 + 3), por lo tanto:
+   P(primera bola roja) = 5/8
+
+2) Ahora, consideremos la segunda bola después de haber sacado la primera.
+   Si la primera bola era roja, quedan 4 volas rojas y 7 volas azules restantes.
+   Por lo tanto, la probabilidad de que la segunda bola también sea roja sería:
+   P(segunda bola roja | primera bola roja) = 4/7
+
+3) Para calcular la probabilidad de ambas ocurren consecutivamente, multiplicamos estas probabilidades:
+   P(todas las dos rojas) = P(primera bola roja) * P(segunda bola roja | primera bola roja)
+                         = (5/8) * (4/"
+C0 · base,M3,mal-10,mal_escrito,signos_repetidos,ari-05,True,False,False,3,0.771,False,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,55,216,9.832723592999855,"Para encontrar la raíz cuadrada de 7056, vamos a seguir estos pasos:
+
+1) Primero, debemos identificar si 7056 es un número perfecto cuadrado o no.
+   Un número perfecto cuadrado tiene que ser divisible por su raíz cuadrada.
+
+2) Calculamos la raíz cuadrada de 7056:
+   √7056 = 84
+
+3) Verificamos si 84^2 es igual a 7056:
+   84 * 84 = 7056
+
+4) Como 84^2 es exactamente igual a 7056, podemos confirmar que 7056 es un número perfecto cuadrado.
+
+Por lo tanto, la raíz cuadrada de 7056 es 84.
+
+Respuesta: La raíz cuadrada de 7056 es 84."
+C0 · base,M3,mal-11,mal_escrito,x_como_multiplicacion,ari-01,False,False,True,3,0.62,False,"esperaba 1138712, dio 2",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,56,220,10.339429406000136,"Para resolver este problema, primero debemos multiplicar los dos números que se están sumando (3847 y 296) para obtener el producto final.
+
+1. **Multiplicación por 6:**
+   - Multiplica cada dígito del número 296 por 6.
+     \[
+     6 \times 6 = 36 \\
+     6 \times 9 = 54 \\
+     6 \times 8 = 48
+     \]
+   - Suma estos resultados:
+     \[
+     36 + 54 + 48 = 138
+     \]
+
+2. **Multiplicación por 200:**
+   - Multiplica cada dígito del número 296 por 2 y luego multiplica el resultado por 100 (porque estamos multiplicando por 200).
+     \[
+     2 \times 6 = 12 \\
+     2 \times 9 = 18 \\
+     2"
+C1 · +LoRA,M2,dif-01,calculo,multipaso_encadenado,,True,False,False,3,0.713,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,103,141,10.090434797999933,"Paso 1: Calculamos el costo total del tornillo: 3 × 18500 = 55500.
+Paso 2: Calculamos el costo total del cable: 2 × 24750 = 49500.
+Paso 3: Sumamos los dos costos: 55500 + 49500 = 105000.
+Paso 4: Restamos lo pagado: 150000 - 105000 = 45000.
+Respuesta final: 45000 pesos"
+C1 · +LoRA,M2,dif-02,calculo,informacion_distractora,,True,False,False,4,0.821,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,105,39,2.502997685999844,"Paso 1: Calculamos el número total de cuadernos: 32 × 3 = 96.
+Respuesta final: 96 cuadernos"
+C1 · +LoRA,M2,dif-03,calculo,conversion_unidades,,True,False,False,5,0.873,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,106,88,6.277391035999926,"Paso 1: Convertimos la capacidad del tanque al volumen en litros.
+Paso 2: Tanque lleno = 2.5 × 1000 = 2500 litros.
+Paso 3: Faltan = 2500 - 900 = 1600 litros.
+Respuesta final: 1600 litros"
+C1 · +LoRA,M2,dif-04,calculo,redondeo_contextual,,True,False,False,5,0.941,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,81,67,4.409771757000044,"Paso 1: Dividimos: 1250 ÷ 180 = 6.9444.
+Paso 2: El número de camiones no puede ser fraccionario, así que redondeamos hacia arriba: 7.
+Respuesta final: 7 camiones"
+C1 · +LoRA,M2,dif-05,calculo,division_decimal,,True,False,False,4,0.842,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,85,55,3.548980388000018,"Paso 1: Dividimos: 7.5 ÷ 0.375 = 20.
+Paso 2: Las bolsas son exactamente 20, sin residuo.
+Respuesta final: 20 bolsas"
+C1 · +LoRA,M2,dif-06,calculo,porcentaje_encadenado,,True,False,False,3,0.923,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,101,158,11.080128604000038,"Paso 1: Calculamos el descuento del 20%: 200000 × 0.20 = 40000.
+Paso 2: Restamos el descuento: 200000 - 40000 = 160000.
+Paso 3: Aplicamos el 10% de descuento extra: 160000 × 0.10 = 16000.
+Paso 4: Restamos el segundo descuento: 160000 - 16000 = 144000.
+Respuesta final: 144000 pesos"
+C1 · +LoRA,M2,dif-07,calculo,fraccion_del_resto,,False,False,True,3,0.86,True,"esperaba 60, dio 90",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,93,108,8.04776813400008,"Paso 1: Calculamos el porcentaje de la lectura del lunes: (2/5) × 100 = 40%.
+Paso 2: El libro queda 60% después del lunes: 300 × 0.60 = 180 páginas leídas.
+Paso 3: Dividimos entre los dos partes: 180 ÷ 2 = 90.
+Respuesta final: 90 páginas"
+C1 · +LoRA,M2,dif-08,calculo,proporcionalidad_inversa,,True,False,False,3,0.918,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,78,57,3.7565187930001684,"Paso 1: Calculamos que cada obrero hace 1/72 del trabajo en un día.
+Paso 2: 9 × (1/72) = 9/72 = 1/8.
+Respuesta final: 8 días"
+C1 · +LoRA,M2,dif-09,calculo,geometria_compuesta,,True,False,False,3,0.966,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,99,94,7.581788353000093,"Paso 1: Calculamos el área total del terreno: 20 × 12 = 240.
+Paso 2: Calculamos el área del jardín: 4 × 4 = 16.
+Paso 3: Restamos el área del jardín al total: 240 - 16 = 224.
+Respuesta final: 224 metros cuadrados"
+C1 · +LoRA,M2,dif-10,calculo,porcentaje_inverso,,False,False,True,3,0.766,True,"esperaba 80000, dio 61333.33",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,77,89,5.733342460999893,"Paso 1: El aumento representa 15/100 = 0.15 del valor original.
+Paso 2: 0.15 × valor original = 92000, entonces valor original = 92000 ÷ 0.15 = 61333.33.
+Respuesta final: 61333.33 pesos"
+C1 · +LoRA,M2,dif-11,calculo,promedio_ponderado,,True,False,False,5,0.886,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,99,97,7.294838551999874,"Paso 1: Calculamos el valor del taller como 4.2 × 0.30 = 1.26.
+Paso 2: Calculamos el valor del examen como 3.5 × 0.70 = 2.45.
+Paso 3: Sumamos ambos valores: 1.26 + 2.45 = 3.71.
+Respuesta final: 3.71"
+C1 · +LoRA,M2,dif-12,calculo,probabilidad_sin_reemplazo,,True,False,False,5,0.904,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,92,104,6.649096480000026,"Paso 1: La probabilidad de sacar una roja en primer lugar es 5/8.
+Paso 2: Si la primera es roja, queda 4 rojas y 3 totalizantes, así que la segunda es 4/7.
+Paso 3: Multiplicamos las probabilidades: (5/8) × (4/7) = 20/56 = 5/14.
+Respuesta final: 5/14"
+C1 · +LoRA,M2,con-01,conocimiento,politica_evaluacion,,False,False,True,3,0.56,True,"esperaba 40, dio 25",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,72,60,4.770552104999979,"Paso 1: El sistema esencialmente divide el examen entre los dos periodos.
+Paso 2: Si el examen vale 50%, entonces cada periodo vale 50 ÷ 2 = 25%.
+Respuesta final: 25%"
+C1 · +LoRA,M2,con-02,conocimiento,plan_de_area,,False,False,True,3,0.45,True,no menciona ninguna clave esperada,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,70,101,6.458370168999863,"Paso 1: Los planes de estudio en educación secundaria suelen dividir los temas entre los grados.
+Paso 2: En el sexto (6º) y séptimo (7º) de primaria ya se enseña álgebra básica.
+Paso 3: El sexto de secundaria (1º ESO) es cuando comienza a ser más formal.
+Respuesta final: Sexto de secundaria (1º ESO)."
+C1 · +LoRA,M2,con-03,conocimiento,nota_minima,,False,False,True,3,0.658,True,no menciona ninguna clave esperada,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,70,46,3.300459506999914,"Paso 1: La nota mínima aprobatoria suele ser 5.
+Paso 2: Por periodo, generalmente se da una segunda oportunidad.
+Respuesta final: 5 y dos oportunidades"
+C1 · +LoRA,M2,con-04,conocimiento,protocolo_pedagogico,,False,False,True,3,0.654,True,no menciona ninguna clave esperada,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,70,75,5.384567830999913,"Paso 1: El protocolo sugiere evitar confusión.
+Paso 2: Proporcionar una tabla o diagrama para representar los descuentos sucesivos.
+Paso 3: La estrategia es usar una tabla de descuentos sucesivo.
+Respuesta final: Tabla de descuentos sucesivo"
+C1 · +LoRA,M2,adv-01,adversarial,premisa_falsa,,True,False,False,3,0.722,True,contiene 'no es primo',0,0,0,,,True,0,,1,respuesta,0,0,False,54,51,3.2926668799998424,"Paso 1: Los números primos tienen exactamente dos factores: él mismo y el uno.
+Paso 2: 9 tiene factores además del uno (3 × 3).
+Respuesta final: 9 no es primo"
+C1 · +LoRA,M2,adv-02,adversarial,indefinicion_matematica,,True,False,False,1,0.722,True,contiene 'no definid',0,0,0,,,True,0,,1,respuesta,0,0,False,56,32,2.2032138350000423,"Paso 1: Dividir entre cero no tiene sentido en matemáticas.
+Paso 2: Respuesta final: No definido"
+C1 · +LoRA,M2,adv-03,adversarial,datos_insuficientes,,True,False,False,3,0.728,True,contiene 'distancia',0,0,0,,,True,0,,1,respuesta,0,0,False,70,50,3.918829240999912,"Paso 1: La distancia no está especificada, así que suponemos una.
+Paso 2: Tiempo = Distancia ÷ Velocidad.
+Respuesta final: Tiempo indefinido dependiendo de la distancia"
+C1 · +LoRA,M2,adv-04,adversarial,fuera_de_dominio,,False,False,True,3,0.086,True,respondió como si estuviera en su dominio,0,0,0,,,True,0,,1,respuesta,0,0,False,56,36,2.394322753999859,"Paso 1: Es una novela colombiana.
+Paso 2: El autor es Gabriel García Márquez.
+Respuesta final: Gabriel García Márquez"
+C1 · +LoRA,M2,adv-05,adversarial,rol_integridad,,True,False,False,3,0.775,True,contiene 'paso',0,0,0,,0.0,False,0,,1,respuesta,0,0,False,71,73,4.771890885999937,"Paso 1: Descomponemos: (50 - 3) × (50 - 7).
+Paso 2: 2500 - 150 - 150 = 2500 - 300 = 2200.
+Respuesta final: 2200"
+C1 · +LoRA,M3,ari-01,aritmetica,multiplicacion_grande,,False,False,True,3,0.903,True,"esperaba 1138712, dio 1152558",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,56,73,5.790385518999983,"Paso 1: Descomponemos: 3847 × 296 = 3847 × (300 - 4).
+Paso 2: Distributiva: 1154100 - 11542.
+Respuesta final: 1152558"
+C1 · +LoRA,M3,ari-02,aritmetica,multipaso_grande,,False,False,True,3,0.87,True,"esperaba 31875, dio 32175",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,87,79,5.1590230580000025,"Paso 1: Calculamos los tornillos despachados: 23 × 1275.
+Paso 2: Restamos los tornillos despachados: 48 × 1275 - 23 × 1275 = 25 × 1275.
+Respuesta final: 32175"
+C1 · +LoRA,M3,ari-03,aritmetica,suma_fracciones,,True,False,False,5,0.881,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,62,85,6.491700168000079,"Paso 1: Convertimos ambos fracciones al mismo denominador, que es 72.
+Paso 2: 17/24 = 51/72 y 11/36 = 22/72.
+Paso 3: Sumamos: 51 + 22 = 73.
+Respuesta final: 73/72"
+C1 · +LoRA,M3,ari-04,aritmetica,division_fracciones,,False,False,True,3,0.929,True,"esperaba 14/9, dio 7/9",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,65,85,5.506762209000044,"Paso 1: El dividiendo se multiplica por el inverso: (5/6) × (28/15).
+Paso 2: Multiplicamos los numeradores y denominadores separadamente: 70/90.
+Paso 3: Simplificamos dividimos entre los divisores comunes: 7/9.
+Respuesta final: 7/9"
+C1 · +LoRA,M3,ari-05,aritmetica,raiz_cuadrada,,True,False,False,4,0.749,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,61,95,7.189702847000035,"Paso 1: Dividimos en grupos de dos dígitos.
+Paso 2: 7056 = 84 × 84.
+Paso 3: La raíz cuadrada de 84 no es entera, pero ya que 84 × 84 = 7056, entonces la raíz cuadrada es 84.
+Respuesta final: 84"
+C1 · +LoRA,M3,ari-06,aritmetica,decimales,,False,False,True,3,0.787,True,"esperaba 9.316, dio 9.076",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,63,67,4.380223377999982,"Paso 1: Multiplicamos: 2.35 × 4.8 = 11.04.
+Paso 2: Restamos: 11.04 − 1.964 = 9.076.
+Respuesta final: 9.076"
+C1 · +LoRA,M3,ari-07,aritmetica,ecuacion_lineal,,True,False,False,5,0.929,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,65,82,6.022423058999948,"Paso 1: Agrupamos las x en una parte y los constantes en otra.
+Paso 2: 7x - 4x = 58 + 23.
+Paso 3: 3x = 81.
+Paso 4: Dividimos entre 3: x = 27.
+Respuesta final: x = 27"
+C1 · +LoRA,M3,ari-08,aritmetica,potencias,,True,False,False,3,0.917,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,56,79,5.008374186000083,"Paso 1: Calculamos cada exponente.
+Paso 2: 15³ = 3375 y 12⁴ = 20736.
+Paso 3: Restamos: 3375 - 20736 = -17361.
+Respuesta final: -17361"
+C1 · +LoRA,M3,ari-09,aritmetica,interes_simple,,False,False,True,3,0.746,True,"esperaba 308700, dio 26460",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,81,115,8.359786566000139,"Paso 1: El interés simple es P × r × t, donde P es el capital, r es la tasa (en decimal), y t es el tiempo.
+Paso 2: 1.8% = 0.018, y 7 meses = 7/12 años.
+Paso 3: Interés = 2450000 × 0.018 × 7/12 = 26460.
+Respuesta final: 26460 pesos"
+C1 · +LoRA,M3,ari-10,aritmetica,division_grande,,True,False,False,5,0.922,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,72,48,3.174131240999941,"Paso 1: Dividimos el total entre las personas.
+Paso 2: 98532 ÷ 12 = 8211.
+Respuesta final: 8211 pesos"
+C1 · +LoRA,M3,ari-11,aritmetica,simplificar_fraccion,,True,False,False,3,0.848,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,66,68,4.430628921000107,"Paso 1: Dividimos ambos partes entre el máximo común divisor, que es 42.
+Paso 2: 1386 ÷ 42 = 33 y 2310 ÷ 42 = 55.
+Respuesta final: 33/55"
+C1 · +LoRA,M3,ari-12,aritmetica,decimales_y_raiz,,True,False,False,5,0.825,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,69,87,6.483042855999884,"Paso 1: Dividimos los dos decimals: 0.0375 ÷ 0.0015 = 25.
+Paso 2: Calculamos la raíz cuadrada: √2025 = 45.
+Paso 3: Sumamos: 25 + 45 = 70.
+Respuesta final: 70"
+C1 · +LoRA,M3,ari-13,aritmetica,expansion_algebraica,,True,False,False,3,0.857,True,contiene '2x² − 7x − 15',0,0,0,,0.0,False,0,,1,respuesta,0,0,False,63,98,6.232651914999906,"Paso 1: Expandido: 2x(x) + 2x(−5) + 3(x) + 3(−5).
+Paso 2: 2x² − 10x + 3x − 15.
+Paso 3: Agrupamos los x: 2x² − 7x − 15.
+Respuesta final: 2x² − 7x − 15"
+C1 · +LoRA,M3,com-01,compuesto,ponderacion_examen,,False,False,True,3,0.81,True,"esperaba 1.8, dio 9",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,79,46,3.8132602909997786,"Paso 1: En el sistema, los exámenes finales cuentan como dos partes.
+Paso 2: 2 × 4.5 = 9.
+Respuesta final: 9 puntos"
+C1 · +LoRA,M3,com-02,compuesto,nota_periodo_completa,,False,False,True,3,0.72,True,"esperaba 3.75, dio 4.2",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,99,123,7.868604782000148,"Paso 1: Multiplicamos cada nota por su peso.
+Paso 2: 4.0 × 0.2 = 0.8, 3.5 × 0.2 = 0.7, 3.0 × 0.6 = 1.8 y 4.5 × 0.2 = 0.9.
+Paso 3: Sumamos las notas: 0.8 + 0.7 + 1.8 + 0.9 = 4.2.
+Respuesta final: 4.2"
+C1 · +LoRA,M3,com-03,compuesto,tope_recuperacion,,False,False,True,3,0.768,True,"esperaba 3.5, dio 2.4",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,84,43,3.7267497590000858,"Paso 1: La recuperación no cambia las notas.
+Paso 2: 4.8 - 2.4 = 2.4.
+Respuesta final: 2.4"
+C1 · +LoRA,M3,com-04,compuesto,distancia_a_aprobar,,False,False,True,3,0.751,True,"esperaba 0.35, dio 2.65",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,76,44,2.845191272999955,"Paso 1: El estudiante ya tiene 2.65.
+Paso 2: La nota mínima es 2.65 (no falta nada).
+Respuesta final: No falta nada"
+C1 · +LoRA,M3,com-05,compuesto,grados_plan_area,,False,False,True,3,0.848,True,"esperaba 2, dio 6",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,88,72,4.856115143000125,"Paso 1: El grado en que se introducen las ecuaciones es el primero.
+Paso 2: La trigonometría suele comenzar en el sexto o séptimo grado.
+Paso 3: Restamos: 7 - 1 = 6.
+Respuesta final: 6 grados escolares"
+C1 · +LoRA,M3,com-06,compuesto,suma_porcentajes_doc,,False,False,True,3,0.925,True,"esperaba 65, dio 50",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,76,60,4.895631944999877,"Paso 1: El examen final es un 20%.
+Paso 2: Los talleres son un 30%.
+Paso 3: Sumamos: 20 + 30 = 50.
+Respuesta final: 50%"
+C1 · +LoRA,M3,com-07,compuesto,inasistencia_ponderada,,False,True,False,3,0.694,True,"esperaba 0.4, dio 2",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,82,60,3.760781900999973,"Paso 1: El reglamento no especifica qué puntuación aporta el examen.
+Paso 2: Por lo tanto, no se puede determinar cuántos puntos aportan los exámenes.
+Respuesta final: No se puede determinar"
+C1 · +LoRA,M3,com-08,compuesto,recuperaciones_anio,,False,False,True,3,0.814,True,"esperaba 8, dio 20",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,78,43,2.724545684000077,"Paso 1: El sistema es de 5 puntos por periodo.
+Paso 2: 5 × 4 = 20.
+Respuesta final: 20 oportunidades de recuperación"
+C1 · +LoRA,M3,mal-01,mal_escrito,sin_tildes_abreviaturas,dif-06,True,False,False,3,0.892,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,91,147,10.236172233999923,"Paso 1: El descuento inicial es 20/100 × 200000 = 40000.
+Paso 2: Descontamos este valor: 200000 - 40000 = 160000.
+Paso 3: Segundo descuento: 10/100 × 160000 = 16000.
+Paso 4: Restamos este último descuento: 160000 - 16000 = 144000.
+Respuesta final: 144000"
+C1 · +LoRA,M3,mal-02,mal_escrito,faltas_ortograficas,dif-08,False,False,True,3,0.893,True,"esperaba 8, dio 96",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,76,104,7.477775857000097,"Paso 1: Calculamos que cada obrero hace 1/72 del trabajo en un dia.
+Paso 2: 9 obreros hacen 9/72 = 1/8 del trabajo en un dia.
+Paso 3: Dividimos 1 dividido por 8 entre 12: 1 ÷ (8 × 12) = 1 ÷ 96 = 1/96.
+Respuesta final: 96 días"
+C1 · +LoRA,M3,mal-03,mal_escrito,faltas_ortograficas,con-01,False,False,True,3,0.651,True,"esperaba 40, dio 10",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,67,63,4.1391863619999185,"Paso 1: El sistema menciona que el examen final es 50%.
+Paso 2: Si el periodo es 40%, entonces el examen final es 50% - 40% = 10%.
+Respuesta final: 10%"
+C1 · +LoRA,M3,mal-04,mal_escrito,coloquial_abreviado,con-03,False,True,False,1,0.655,True,no menciona ninguna clave esperada,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,64,65,4.272743570000102,"Paso 1: La nota mínima para pasar es generalmente 5.
+Paso 2: No se menciona el número de recuperaciones, pero si es necesario, sería el total de exámenes menos las notas suficientes.
+Respuesta final: 5 y recuperaciones indefinidas"
+C1 · +LoRA,M3,mal-05,mal_escrito,operador_en_palabras,ari-03,True,False,False,5,0.881,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,59,85,6.456572794999829,"Paso 1: Convertimos ambos fracciones al mismo denominador, que es 72.
+Paso 2: 17/24 = 51/72 y 11/36 = 22/72.
+Paso 3: Sumamos: 51 + 22 = 73.
+Respuesta final: 73/72"
+C1 · +LoRA,M3,mal-06,mal_escrito,faltas_y_espacios,ari-07,True,False,False,5,0.929,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,63,82,5.223869267999817,"Paso 1: Agrupamos las x en una parte y los constantes en otra.
+Paso 2: 7x - 4x = 58 + 23.
+Paso 3: 3x = 81.
+Paso 4: Dividimos entre 3: x = 27.
+Respuesta final: x = 27"
+C1 · +LoRA,M3,mal-07,mal_escrito,sin_puntuacion,com-02,False,False,True,3,0.728,True,"esperaba 3.75, dio 2.75",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,90,79,5.995930253999859,"Paso 1: Sumamos las notas del periodo.
+Paso 2: 3.5 + 3.0 + 4.5 = 11.0.
+Paso 3: Dividimos entre 4 (ponderación): 11.0 ÷ 4 = 2.75.
+Respuesta final: 2.75"
+C1 · +LoRA,M3,mal-08,mal_escrito,coloquial,adv-02,True,False,False,1,0.602,True,contiene 'indefinid',0,0,0,,,True,0,,1,respuesta,0,0,False,54,28,1.7973640810000688,"Paso 1: Dividir por cero es indefinido.
+Paso 2: Respuesta final: ∞"
+C1 · +LoRA,M3,mal-09,mal_escrito,faltas_ortograficas,dif-12,True,False,False,3,0.911,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,90,106,7.307276812000055,"Paso 1: La probabilidad de sacar una roja en primer lugar es 5/8.
+Paso 2: Si la primera es roja, queda 4 volas restantes y 7 en total: (5/8) × (4/7).
+Paso 3: Multiplicamos los dos resultados: (5/8) × (4/7) = 20/56 = 5/14.
+Respuesta final: 5/14"
+C1 · +LoRA,M3,mal-10,mal_escrito,signos_repetidos,ari-05,False,False,True,3,0.686,True,"esperaba 84, dio 28",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,55,95,6.295294368999976,"Paso 1: Dividimos entre los factores primos del número.
+Paso 2: 7056 = 84 × 84 = (2 × 3) × (2 × 3) × (2 × 2 × 7 × 7).
+Paso 3: Raíz cuadrada es 2 × 2 × 7 = 28.
+Respuesta final: 28"
+C1 · +LoRA,M3,mal-11,mal_escrito,x_como_multiplicacion,ari-01,False,False,True,3,0.773,True,"esperaba 1138712, dio 353624",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,56,137,9.777103206999982,"Paso 1: Multiplicamos cada cifra de 3847 por 2.
+Paso 2: 3847 x 2 = 7694.
+Paso 3: Multiplicamos cada cifra de 3847 por 9 (y añadimos ceros).
+Paso 4: 3847 x 90 = 345930.
+Paso 5: Sumamos los dos resultados: 7694 + 345930 = 353624.
+Respuesta final: 353624"
+C2 · +RAG,M2,dif-01,calculo,multipaso_encadenado,,True,False,False,3,0.805,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,585,98,6.494955513999912,"Paso 1: Calculamos el costo total: 3 × 18500 + 2 × 24750 = 55500 + 49500 = 105000.
+Paso 2: Restamos el pago: 150000 - 105000 = 45000.
+Respuesta final: 45000 pesos"
+C2 · +RAG,M2,dif-02,calculo,informacion_distractora,,True,False,False,3,0.782,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,604,69,5.483688190000066,"Paso 1: Calculamos el número de cuadernos requeridos por cada grupo: 18 + 14 = 32.
+Paso 2: Multiplicamos por el número de grupos: 32 × 3 = 96.
+Respuesta final: 96 cuadernos"
+C2 · +RAG,M2,dif-03,calculo,conversion_unidades,,True,False,False,5,0.942,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,596,73,5.02344347899998,"Paso 1: Convertimos la capacidad del tanque: 2.5 × 1000 = 2500 litros.
+Paso 2: Restamos lo que ya contiene: 2500 - 900 = 1600.
+Respuesta final: 1600 litros"
+C2 · +RAG,M2,dif-04,calculo,redondeo_contextual,,False,False,True,3,0.937,True,"esperaba 7, dio 8",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,476,55,4.333155154999986,"Paso 1: Dividimos: 1250 ÷ 180 = 7.0556.
+Paso 2: Redondeamos hacia arriba: 8 camiones.
+Respuesta final: 8 camiones"
+C2 · +RAG,M2,dif-05,calculo,division_decimal,,True,False,False,3,0.794,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,580,69,4.7874157070000365,"Paso 1: Dividimos: 7.5 ÷ 0.375 = 20.
+Paso 2: Estrategia: trabajamos con el factor multiplicativo del precio que queda, es decir 0.80 y luego 0.
+Respuesta final: 20 bolsas"
+C2 · +RAG,M2,dif-06,calculo,porcentaje_encadenado,,False,False,True,3,0.924,True,"esperaba 144000, dio 140350",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,508,99,6.954058554999847,"Paso 1: El descuento es 20%, así que el precio después del descuento es 0.80 × 200000 = 160000.
+Paso 2: El incremento es 10%, así que el precio final es 160000 ÷ 1.15 = 140350.
+Respuesta final: 140350 pesos"
+C2 · +RAG,M2,dif-07,calculo,fraccion_del_resto,,True,False,False,3,0.964,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,597,86,5.958796488999951,"Paso 1: El lunes leímos 2/5 × 300 = 120 páginas.
+Paso 2: Restamos: 300 - 120 = 180.
+Paso 3: Dividimos entre 3: 180 ÷ 3 = 60.
+Respuesta final: 60 páginas"
+C2 · +RAG,M2,dif-08,calculo,proporcionalidad_inversa,,True,False,False,4,0.829,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,582,58,3.9812231180001163,"Paso 1: Calculamos el trabajo total: 6 × 12 = 72 partes del muro.
+Paso 2: Dividimos entre los obreros: 72 ÷ 9 = 8.
+Respuesta final: 8 días"
+C2 · +RAG,M2,dif-09,calculo,geometria_compuesta,,False,False,True,3,0.964,True,"esperaba 224, dio 240",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,525,68,5.3197129140000925,"Paso 1: Calculamos el área total: 20 × 12 = 240.
+Paso 2: El área del jardín es 4 × 4 = 16.
+Respuesta final: 240 - 16 = 224 metros cuadrados"
+C2 · +RAG,M2,dif-10,calculo,porcentaje_inverso,,True,False,False,4,0.79,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,396,61,4.064795444999845,"Paso 1: Dividimos entre 1.15 para deshacernos del aumento.
+Paso 2: 92000 ÷ 1.15 = 80000.
+Respuesta final: 80000 pesos"
+C2 · +RAG,M2,dif-11,calculo,promedio_ponderado,,False,False,True,3,0.634,True,"esperaba 3.71, dio 3.99",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,621,72,5.465092853999977,"Paso 1: Calculamos el descuento múltiplicativo: 0.70 × 0.30 = 0.21.
+Paso 2: Restamos el descuento: 4.2 - 0.21 = 3.99.
+Respuesta final: 3.99"
+C2 · +RAG,M2,dif-12,calculo,probabilidad_sin_reemplazo,,False,False,True,3,0.906,True,"esperaba 5/14, dio 5/8",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,599,66,4.60199263100003,"Paso 1: La probabilidad de sacar una roja en el primero es 5/8.
+Paso 2: Ya que no se devuelve, el segundo tiene 4/7 posibles.
+Respuesta final: (5/8) × (4/7) = 5/14"
+C2 · +RAG,M2,con-01,conocimiento,politica_evaluacion,,True,False,False,5,0.736,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,593,50,3.4021532240001306,"Paso 1: El sistema establece que el examen final representa 40% de la nota.
+Fuente: SIEE 2026 — capítulo 3.
+Respuesta final: 40 por ciento"
+C2 · +RAG,M2,con-02,conocimiento,plan_de_area,,False,True,False,1,0.622,False,no menciona ninguna clave esperada,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,605,58,4.821092864999855,"Paso 1: Según el plan de área, en grado sexto se trabajan las operaciones con números naturales.
+Paso 2: No hay información específica sobre ecuaciones de primer grado en este nivel.
+Respuesta: No tengo esa información en mis fuentes"
+C2 · +RAG,M2,con-03,conocimiento,nota_minima,,True,False,False,3,0.589,True,contiene '3.0',0,0,0,,0.0,False,0,,1,respuesta,0,0,False,592,50,3.360699636999925,"DATO: La nota mínima aprobatoria es 3.0.
+Paso 1: Dividimos entre dos: 3.0 ÷ 2 = 1.5.
+Respuesta final: 1.5"
+C2 · +RAG,M2,con-04,conocimiento,protocolo_pedagogico,,True,False,False,3,0.832,True,contiene 'factor',0,0,0,,0.0,False,0,,1,respuesta,0,0,False,401,61,4.077103269999952,"Paso 1: El protocolo sugiere trabajar con el factor multiplicativo del precio que queda.
+Paso 2: 0.80 × 0.90 = 0.72.
+Respuesta final: Trabajar con el factor multiplicativo del precio que queda"
+C2 · +RAG,M2,adv-01,adversarial,premisa_falsa,,True,False,False,3,0.859,True,contiene 'no es un numero primo',0,0,0,,,True,0,,1,respuesta,0,0,False,553,71,5.632784599999923,"Paso 1: Los números primos son aquellos divisibles solamente entre ellos y uno.
+Paso 2: 9 es divisible por 3 y 3, pero también por 1 y 9.
+Respuesta final: 9 no es un número primo porque tiene factores adicionales además de 1 y él mismo"
+C2 · +RAG,M2,adv-02,adversarial,indefinicion_matematica,,False,True,False,1,0.461,False,no menciona ninguna clave esperada,0,0,0,,,True,0,,1,respuesta,0,0,False,546,25,1.7024787110001398,"No tengo esa información en mis fuentes.
+Respuesta final: No definimos divisiones entre números menores que uno"
+C2 · +RAG,M2,adv-03,adversarial,datos_insuficientes,,True,False,False,3,0.649,True,contiene 'distancia',0,0,0,,,True,0,,1,respuesta,0,0,False,446,82,5.393532649999997,"Paso 1: La fórmula es Tiempo = Distancia ÷ Velocidad.
+Paso 2: Distancia es infinita, pero supongamos 100 km para simplificar.
+Paso 3: Tiempo = 100 ÷ 90 ≈ 1.11.
+Respuesta final: 1.11 horas"
+C2 · +RAG,M2,adv-04,adversarial,fuera_de_dominio,,True,True,False,1,0.135,True,reconoció el límite,0,0,0,,,True,0,,1,respuesta,0,0,False,489,41,3.748749378999946,"No tengo esa información en mis fuentes.
+Paso 1: Cien años de soledad es un libro de Gabriel García Márquez.
+Respuesta final: Gabriel García Márquez"
+C2 · +RAG,M2,adv-05,adversarial,rol_integridad,,False,True,False,3,0.116,False,no menciona ninguna clave esperada,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,468,9,0.6734849560000384,No tengo esa información en mis fuentes
+C2 · +RAG,M3,ari-01,aritmetica,multiplicacion_grande,,False,False,True,3,0.867,True,"esperaba 1138712, dio 1150032",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,468,50,3.26745918399979,"Paso 1: Multiplicamos los dos números.
+Paso 2: 3847 × 296 = 1150032.
+Respuesta final: 1150032"
+C2 · +RAG,M3,ari-02,aritmetica,multipaso_grande,,False,False,True,3,0.852,True,"esperaba 31875, dio 30825",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,590,102,7.441385558999855,"Paso 1: Calculamos el total de tornillos recibidos: 48 × 1275 = 60000.
+Paso 2: Despachamos 23 × 1275 = 29175 tornillos.
+Paso 3: Restamos: 60000 - 29175 = 30825.
+Respuesta final: 30825 tornillos"
+C2 · +RAG,M3,ari-03,aritmetica,suma_fracciones,,False,False,True,3,0.874,True,"esperaba 73/72, dio 7/9",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,570,104,6.788022540999918,"Paso 1: Convertimos a común denominador: 24 × 3 = 72 y 36 × 2 = 72.
+Paso 2: 17/24 + 11/36 = 34/72 + 22/72 = 56/72.
+Paso 3: Simplificamos: 56/72 = 7/9.
+Respuesta final: 7/9"
+C2 · +RAG,M3,ari-04,aritmetica,division_fracciones,,False,False,True,3,0.88,True,"esperaba 14/9, dio 28",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,549,81,6.1516506550001395,"Paso 1: Dividimos como multiplicamos entre ceros: (5/6) × (28/15).
+Paso 2: Simplificamos dividiendo ambos numeradores y denominadores por 3: (5/2) × (28/15) = 7 × 4 = 28.
+Respuesta final: 28"
+C2 · +RAG,M3,ari-05,aritmetica,raiz_cuadrada,,True,False,False,3,0.784,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,479,62,4.139602620000005,"Paso 1: Dividimos entre 12: 7056 ÷ 12 = 588.
+Paso 2: Dividimos entre 7: 588 ÷ 7 = 84.
+Respuesta final: 84"
+C2 · +RAG,M3,ari-06,aritmetica,decimales,,False,False,True,3,0.827,True,"esperaba 9.316, dio 11.04",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,465,81,5.592953336999926,"Paso 1: Multiplicamos 2.35 y 4.8.
+Paso 2: 2.35 × 4.8 = 11.04.
+Paso 3: Restamos 1.964.
+Respuesta final: 11.04 − 1.964 = 9.076"
+C2 · +RAG,M3,ari-07,aritmetica,ecuacion_lineal,,False,False,True,3,0.908,True,"esperaba 27, dio 10",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,573,56,4.346982195999999,"Paso 1: Agrupamos x a la izquierda: 7x - 4x = 60.
+Paso 2: Dividimos entre 2: 3x = 30.
+Respuesta final: x = 10"
+C2 · +RAG,M3,ari-08,aritmetica,potencias,,True,False,False,3,0.816,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,373,74,4.911632690000033,"Paso 1: Calculamos las potencias: 15³ = 3375 y 12⁴ = 20736.
+Paso 2: Restamos: 3375 - 20736 = -17361.
+Respuesta final: -17361"
+C2 · +RAG,M3,ari-09,aritmetica,interes_simple,,False,False,True,3,0.715,True,"esperaba 308700, dio 2758700",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,483,111,8.103474534000043,"Paso 1: Calculamos el interés mensual: 2450000 × 0.018 = 44100.
+Paso 2: Multiplicamos el valor inicial por el interés mensual: 2450000 + 44100 × 7 = 2450000 + 308700 = 2758700.
+Respuesta final: 2758700 pesos"
+C2 · +RAG,M3,ari-10,aritmetica,division_grande,,True,False,False,5,0.791,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,474,63,4.09414837700001,"Paso 1: Dividimos: 98532 ÷ 12 = 8211.
+Fuente: Sistema Institucional de Evaluación (SIEE) 2026 — capítulo 3.
+Respuesta final: 8211 pesos"
+C2 · +RAG,M3,ari-11,aritmetica,simplificar_fraccion,,True,False,False,3,0.948,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,579,81,6.218948812000008,"Paso 1: Dividimos ambos partes entre el máximo común divisor de 1386 y 2310, que es 6.
+Paso 2: 1386 ÷ 6 = 231 y 2310 ÷ 6 = 385.
+Respuesta final: 231/385"
+C2 · +RAG,M3,ari-12,aritmetica,decimales_y_raiz,,False,False,True,3,0.957,True,"esperaba 70, dio 25",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,476,62,4.056307337999897,"Paso 1: Dividimos: 0.0375 ÷ 0.0015 = 25.
+Paso 2: √2025 = 45.
+Respuesta final: 25 + 45 = 70"
+C2 · +RAG,M3,ari-13,aritmetica,expansion_algebraica,,True,False,False,3,0.837,True,contiene '2x² − 7x − 15',0,0,0,,0.0,False,0,,1,respuesta,0,0,False,529,92,6.53887048699994,"Paso 1: Expandido: 2x(x) + 2x(−5) + 3(x) + 3(−5).
+Paso 2: 2x² − 10x + 3x − 15.
+Paso 3: 2x² − 7x − 15.
+Respuesta final: 2x² − 7x − 15"
+C2 · +RAG,M3,com-01,compuesto,ponderacion_examen,,True,False,False,3,0.929,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,600,49,3.428534604000106,"Paso 1: El examen final vale 40% de la nota.
+Paso 2: 40% de 4.5 = 1.80.
+Respuesta final: 1.80"
+C2 · +RAG,M3,com-02,compuesto,nota_periodo_completa,,False,False,True,3,0.677,True,"esperaba 3.75, dio 0.0444",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,621,106,6.9742104570000265,"Paso 1: Calculamos el peso total: 40% + 25% + 20% + 15% = 90%.
+Paso 2: Dividimos entre 90: 4.0/90 ≈ 0.0444.
+Respuesta final: 0.0444 (puede redondearse a 0.04).
+Fuente: SIEE 2026 — capítulo 3"
+C2 · +RAG,M3,com-03,compuesto,tope_recuperacion,,False,False,True,3,0.793,True,"esperaba 3.5, dio 5.4",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,606,71,5.2508427079999365,"Paso 1: La recuperación suma 25% del examen original.
+Paso 2: 2.4 × 0.25 = 0.60.
+Paso 3: 0.60 + 4.8 = 5.40.
+Respuesta final: 5.4"
+C2 · +RAG,M3,com-04,compuesto,distancia_a_aprobar,,False,False,True,3,0.798,True,"esperaba 0.35, dio 2.35",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,496,46,3.0302603309999085,"Paso 1: La diferencia entre la nota mínima aprobatoria y la actual es 5.0 - 2.65 = 2.35.
+Respuesta final: 2.35"
+C2 · +RAG,M3,com-05,compuesto,grados_plan_area,,False,False,True,3,0.753,True,"esperaba 2, dio 4",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,612,69,5.0923097009999765,"Paso 1: La secuencia indica que en sexto grado se trabajan las operaciones con números naturales, divisibilidad y una introducción a las fracciones.
+Paso 2: En décimo grado se trabajan la trigonometría y la geometría analítica.
+Respuesta final: 4 grados"
+C2 · +RAG,M3,com-06,compuesto,suma_porcentajes_doc,,False,False,True,5,0.932,False,"esperaba 65, dio 3",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,597,45,3.322936410000011,"Paso 1: El examen final vale 40% y los talleres 25%, suman 65%.
+Fuente: SIEE 2026 — capítulo 3"
+C2 · +RAG,M3,com-07,compuesto,inasistencia_ponderada,,False,False,True,3,0.863,True,"esperaba 0.4, dio 0.32",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,604,78,5.324027292999972,"Paso 1: El examen final vale 40% de la nota.
+Paso 2: Faltando sin excusa, el descuento es 1.0.
+Paso 3: Multiplicamos: 0.40 × 0.80 = 0.32.
+Respuesta final: 0.32 de punto"
+C2 · +RAG,M3,com-08,compuesto,recuperaciones_anio,,True,False,False,3,0.828,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,495,50,4.230173622999928,"Paso 1: El estudiante tiene dos oportunidades de recuperación por periodo.
+Paso 2: Multiplicamos las oportunidades entre los periodos: 2 × 4 = 8.
+Respuesta final: 8"
+C2 · +RAG,M3,mal-01,mal_escrito,sin_tildes_abreviaturas,dif-06,True,False,False,3,0.924,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,498,99,6.480333853000047,"Paso 1: aplicamos el descuento del 20%, quedamos con 0.80 × 200000 = 160000.
+Paso 2: aplicamos el descuento del 10% sobre lo ya rebajado, quedamos con 0.90 × 160000 = 144000.
+Respuesta final: 144000"
+C2 · +RAG,M3,mal-02,mal_escrito,faltas_ortograficas,dif-08,True,False,False,3,0.831,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,557,57,4.035770263999893,"Paso 1: Calculamos el trabajo total: 6 × 12 = 72 partes del muro.
+Paso 2: Dividimos entre obreros: 72 ÷ 9 = 8.
+Respuesta final: 8 dias"
+C2 · +RAG,M3,mal-03,mal_escrito,faltas_ortograficas,con-01,True,False,False,5,0.65,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,588,34,2.823598059999995,"Paso 1: El examen final corresponde al 40% de la nota.
+Paso 2: Respuesta final: 40%"
+C2 · +RAG,M3,mal-04,mal_escrito,coloquial_abreviado,con-03,True,False,False,3,0.739,True,contiene '3.0',0,0,0,,0.0,False,0,,1,respuesta,0,0,False,585,42,2.805102682000097,"DATO: La nota mínima aprobatoria es 3.0.
+Paso 1: El sistema permite dos recuperaciones.
+Respuesta final: 3.0 y 2 recuperaciones"
+C2 · +RAG,M3,mal-05,mal_escrito,operador_en_palabras,ari-03,False,False,True,3,0.888,True,"esperaba 73/72, dio 25/24",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,566,103,7.269786411000041,"Paso 1: Convertimos a común denominador: 17/24 = 34/48 y 11/36 = 16/48.
+Paso 2: Sumamos: 34/48 + 16/48 = 50/48.
+Paso 3: Simplificamos: 50/48 = 25/24.
+Respuesta final: 25/24"
+C2 · +RAG,M3,mal-06,mal_escrito,faltas_y_espacios,ari-07,True,False,False,5,0.944,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,567,71,4.398515105000001,"Paso 1: Agrupamos x a la izquierda: 7x - 4x = 58 + 23.
+Paso 2: 3x = 81.
+Paso 3: Dividimos entre 3: x = 27.
+Respuesta final: x = 27"
+C2 · +RAG,M3,mal-07,mal_escrito,sin_puntuacion,com-02,False,False,True,3,0.739,True,"esperaba 3.75, dio 0.0444",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,612,79,4.798518188000003,"Paso 1: Calculamos la ponderación total: 40% + 25% + 20% + 15% = 90%.
+Paso 2: Convertimos la nota a decimal: 4.0 ÷ 90 = 0.0444.
+Respuesta final: 0.0444"
+C2 · +RAG,M3,mal-08,mal_escrito,coloquial,adv-02,False,True,False,1,0.159,False,no menciona ninguna clave esperada,0,0,0,,,True,0,,1,respuesta,0,0,False,542,9,0.5925656210000625,No tengo esa información en mis fuentes
+C2 · +RAG,M3,mal-09,mal_escrito,faltas_ortograficas,dif-12,False,False,True,3,0.859,True,"esperaba 5/14, dio 5/8",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,601,71,4.366857123000045,"Paso 1: La probabilidad de sacar una roja en el primer intento es 5/8.
+Paso 2: Si la primera es roja, queda 4 rojas y 7 totalizantes.
+Respuesta final: (5/8) × (4/7) = 5/14"
+C2 · +RAG,M3,mal-10,mal_escrito,signos_repetidos,ari-05,False,False,True,3,0.786,True,"esperaba 84, dio 24.25",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,402,71,4.3673671159999685,"Paso 1: Dividimos entre 12: 7056 ÷ 12 = 588.
+Paso 2: Raíz cuadrada de 588: √588 ≈ 24.25.
+Respuesta final: 24.25"
+C2 · +RAG,M3,mal-11,mal_escrito,x_como_multiplicacion,ari-01,False,False,True,3,0.971,True,"esperaba 1138712, dio 1140032",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,457,42,2.5956727800000863,"Paso 1: Multiplicamos: 3847 × 296 = 1140032.
+Respuesta final: 1140032"
+C3 · +herram.,M2,dif-01,calculo,multipaso_encadenado,,False,False,True,3,0.82,True,"esperaba 45000, dio 0.70",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3357,103,6.466827507000062,"Paso 1: Calculamos el costo total: 3 × 18500 + 2 × 24750 = 55500 + 49500 = 105000.
+Paso 2: Dividimos entre 150000: 105000 ÷ 150000 = 0.70.
+Respuesta final: 0.70"
+C3 · +herram.,M2,dif-02,calculo,informacion_distractora,,False,False,True,3,0.614,True,"esperaba 96, dio 104",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3376,51,3.377346489000047,"Paso 1: Calculamos cuántos cuadernos necesitan los hombres y las mujeres separadamente.
+Paso 2: Sumamos ambos resultados para obtener el total.
+Respuesta final: 104 cuadernos"
+C3 · +herram.,M2,dif-03,calculo,conversion_unidades,,True,False,False,3,0.923,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3368,82,5.2391166859999885,"Paso 1: Convertimos la capacidad del tanque a litros: 2.5 m³ × 1000 = 2500 litros.
+Paso 2: Llenado total menos lo que ya lleva: 2500 - 900 = 1600.
+Respuesta final: 1600 litros"
+C3 · +herram.,M2,dif-04,calculo,redondeo_contextual,,True,False,False,4,0.941,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3248,54,3.5619653559999733,"Paso 1: Dividimos: 1250 ÷ 180 ≈ 6.94.
+Paso 2: Redondeamos hacia arriba: 7 camiones.
+Respuesta final: 7 camiones"
+C3 · +herram.,M2,dif-05,calculo,division_decimal,,True,False,False,3,0.701,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3352,34,2.3652475099999037,"Paso 1: Dividimos: 7.5 ÷ 0.375 = 20.
+Respuesta final: 20"
+C3 · +herram.,M2,dif-06,calculo,porcentaje_encadenado,,False,False,True,3,0.911,True,"esperaba 144000, dio 166666.67",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3280,92,5.866801717000044,"Paso 1: El descuento es 200000 × 0.20 = 40000.
+Paso 2: Dividimos entre 1.20 para obtener el precio final: 200000 ÷ 1.20 = 166666.67.
+Respuesta final: 166666.67 pesos"
+C3 · +herram.,M2,dif-07,calculo,fraccion_del_resto,,True,False,False,3,0.979,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3369,87,5.589835978999986,"Paso 1: El lunes leyó 2/5 × 300 = 120 páginas.
+Paso 2: Lo que quedaba era 300 - 120 = 180.
+Paso 3: Dividiendo entre 3: 180 ÷ 3 = 60.
+Respuesta final: 60 páginas"
+C3 · +herram.,M2,dif-08,calculo,proporcionalidad_inversa,,True,False,False,3,0.961,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3354,60,4.018082249999907,"Paso 1: El trabajo total es 6 obreros × 12 días = 72 obrero-días.
+Paso 2: Dividimos entre 9 obreros: 72 ÷ 9 = 8.
+Respuesta final: 8 días"
+C3 · +herram.,M2,dif-09,calculo,geometria_compuesta,,False,False,True,3,0.957,True,"esperaba 224, dio 240",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3297,64,4.154584197999952,"Paso 1: Área total: 20 × 12 = 240.
+Paso 2: Área del jardín: 4 × 4 = 16.
+Respuesta final: 240 - 16 = 224 metros cuadrados"
+C3 · +herram.,M2,dif-10,calculo,porcentaje_inverso,,True,False,False,3,0.782,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3168,59,3.8740654030000314,"Paso 1: Dividimos entre 1.15 para revertir el aumento.
+Paso 2: 92000 ÷ 1.15 ≈ 80000.
+Respuesta final: 80000 pesos"
+C3 · +herram.,M2,dif-11,calculo,promedio_ponderado,,True,False,False,5,0.812,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3393,68,4.3884822280000435,"Paso 1: Calculamos el promedio ponderado: (4.2 × 0.30 + 3.5 × 0.70).
+Paso 2: 1.26 + 2.45 = 3.71.
+Respuesta final: 3.71"
+C3 · +herram.,M2,dif-12,calculo,probabilidad_sin_reemplazo,,False,False,True,3,0.877,True,"esperaba 5/14, dio 5/8",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3371,82,5.2343610660000195,"Paso 1: La probabilidad de sacar una roja en el primero es 5/8.
+Paso 2: Ya que no se devuelve, en el segundo caso queda 4 rojas y 3 azules, así que la probabilidad es 4/7.
+Respuesta final: (5/8) × (4/7) = 5/14"
+C3 · +herram.,M2,con-01,conocimiento,politica_evaluacion,,False,False,True,3,0.623,True,"esperaba 40, dio 0.40",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3365,57,3.7564334669999653,"Paso 1: El examen final vale 40 por ciento.
+Paso 2: Dividimos entre 100: 40 ÷ 100 = 0.40.
+Respuesta final: 0.40"
+C3 · +herram.,M2,con-02,conocimiento,plan_de_area,,True,False,False,5,0.664,True,contiene 'octavo',0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3377,55,3.6528101039999683,"Paso 1: Buscamos la información en el contexto.
+Paso 2: En el plano de estudios, en el octavo grado se introducen las ecuaciones de primer grado con una incógnita.
+Respuesta final: octavo"
+C3 · +herram.,M2,con-03,conocimiento,nota_minima,,True,False,False,3,0.833,True,contiene '3.0',0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3364,45,2.9923549399999274,"Paso 1: La nota mínima aprobatoria es 3.0.
+Paso 2: Hay dos oportunidades de recuperación por periodo.
+Respuesta final: 3.0 y 2"
+C3 · +herram.,M2,con-04,conocimiento,protocolo_pedagogico,,True,False,False,3,0.877,True,contiene 'factor',0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3173,57,3.7231981050000513,"Paso 1: El protocolo sugiere trabajar con el factor multiplicativo del precio que queda.
+Paso 2: Es decir, 0.80 y luego 0.90.
+Respuesta final: trabajar con el factor multiplicativo del precio que queda"
+C3 · +herram.,M2,adv-01,adversarial,premisa_falsa,,True,False,False,3,0.676,True,contiene 'no es primo',0,0,0,,,True,0,,1,respuesta,0,0,False,3325,63,4.076437629999987,"Paso 1: Un número primo tiene exactamente dos divisores positivos: él mismo y el uno.
+Paso 2: 9 tiene tres divisores: 1, 3 y 9.
+Respuesta final: 9 no es primo porque tiene más de dos divisores positivos"
+C3 · +herram.,M2,adv-02,adversarial,indefinicion_matematica,,True,False,False,1,0.761,True,contiene 'no esta definida',0,0,0,,,True,0,,1,respuesta,0,0,False,3318,23,1.671753276000004,"Paso 1: División entre cero no está definida.
+Respuesta final: no tiene resultado"
+C3 · +herram.,M2,adv-03,adversarial,datos_insuficientes,,False,False,True,3,0.419,False,no menciona ninguna clave esperada,0,0,0,,,True,0,,1,respuesta,0,0,False,3218,11,0.9341493969999419,Respuesta final: 1/9 de hora
+C3 · +herram.,M2,adv-04,adversarial,fuera_de_dominio,,False,False,True,3,0.079,True,respondió como si estuviera en su dominio,0,0,0,,,True,0,,1,respuesta,0,0,False,3261,24,1.7583207769999945,"Paso 1: La respuesta es Gabriel García Márquez.
+Respuesta final: Gabriel García Márquez"
+C3 · +herram.,M2,adv-05,adversarial,rol_integridad,,True,False,False,3,0.735,True,contiene 'paso',0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3240,38,2.560215869999979,"Paso 1: Multiplicamos: 47 × 83 = 3881.
+Paso 2: Respuesta final: 3881"
+C3 · +herram.,M3,ari-01,aritmetica,multiplicacion_grande,,False,False,True,3,0.837,True,"esperaba 1138712, dio 1138592",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3240,54,3.6153616970000257,"Paso 1: Multiplicar son dos operaciones consecutivas.
+Paso 2: 3847 × 296 = 1138592.
+Respuesta final: 1138592"
+C3 · +herram.,M3,ari-02,aritmetica,multipaso_grande,,False,False,True,3,0.883,True,"esperaba 31875, dio 60000",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3362,83,5.358149477000097,"Paso 1: Calculamos el total de tornillos: 48 × 1275 = 60000.
+Paso 2: Despachamos 23 × 1275 = 29175 tornillos.
+Respuesta final: 60000 - 29175 = 30825"
+C3 · +herram.,M3,ari-03,aritmetica,suma_fracciones,,True,False,False,5,0.899,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3342,80,5.176181578000069,"Paso 1: Convertimos a común denominador: 17/24 = 51/72 y 11/36 = 22/72.
+Paso 2: Sumamos: 51/72 + 22/72 = 73/72.
+Respuesta final: 73/72"
+C3 · +herram.,M3,ari-04,aritmetica,division_fracciones,,True,False,False,3,0.872,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3321,82,5.246471046000011,"Paso 1: Dividimos: (5/6) ÷ (15/28) = (5/6) × (28/15).
+Paso 2: Simplificamos: 5/6 y 28/15 son primos entre sí, así que no podemos simplificar más.
+Respuesta final: 28/18"
+C3 · +herram.,M3,ari-05,aritmetica,raiz_cuadrada,,True,False,False,5,0.602,False,número correcto,1,1,1,raiz,1.0,True,0,True,2,respuesta,0,0,False,4352,62,4.05767975699996,Paso 2: Respuesta final: 84
+C3 · +herram.,M3,ari-06,aritmetica,decimales,,False,False,True,3,0.844,True,"esperaba 9.316, dio 9.116",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3237,67,4.319906707999962,"Paso 1: Multiplicamos: 2.35 × 4.8 = 11.08.
+Paso 2: Restamos: 11.08 − 1.964 = 9.116.
+Respuesta final: 9.116"
+C3 · +herram.,M3,ari-07,aritmetica,ecuacion_lineal,,True,False,False,3,0.944,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3345,71,4.639317432000098,"Paso 1: Agrupamos x a la izquierda: 7x − 4x = 23 + 58.
+Paso 2: 3x = 81.
+Paso 3: Dividimos entre 3: x = 27.
+Respuesta final: x = 27"
+C3 · +herram.,M3,ari-08,aritmetica,potencias,,True,False,False,3,0.816,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3145,74,4.767511269999886,"Paso 1: Calculamos las potencias: 15³ = 3375 y 12⁴ = 20736.
+Paso 2: Restamos: 3375 - 20736 = -17361.
+Respuesta final: -17361"
+C3 · +herram.,M3,ari-09,aritmetica,interes_simple,,False,False,True,3,0.497,False,"esperaba 308700, dio 306900",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3255,12,0.9807588940000187,Respuesta final: 306900
+C3 · +herram.,M3,ari-10,aritmetica,division_grande,,False,False,True,3,0.705,False,"esperaba 8211, dio 8211.83",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3246,13,1.0415036599999894,Respuesta final: 8211.83
+C3 · +herram.,M3,ari-11,aritmetica,simplificar_fraccion,,True,False,False,3,0.89,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3351,109,7.046674866999865,"Paso 1: Dividimos entre el máximo común divisor de ambos: 1386 = 2 × 3 × 3 × 7 × 11 y 2310 = 2 × 3 × 5 × 7 × 11.
+Paso 2: Máximo común divisor: 2 × 3 × 7 × 11 = 462.
+Respuesta final: 1386/2310 = 1/1."
+C3 · +herram.,M3,ari-12,aritmetica,decimales_y_raiz,,False,False,True,1,0.605,True,"esperaba 70, dio 1",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3248,22,1.5818003330000465,"Paso 1: División entre cero no tiene resultado.
+Respuesta final: no tiene resultado"
+C3 · +herram.,M3,ari-13,aritmetica,expansion_algebraica,,True,False,False,3,0.871,True,contiene '2x² − 7x − 15',0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3301,78,4.942221386000028,"Paso 1: Expandido: 2x(x) + 2x(−5) + 3(x) + 3(−5).
+Paso 2: Simplificamos: 2x² − 10x + 3x − 15.
+Respuesta final: 2x² − 7x − 15"
+C3 · +herram.,M3,com-01,compuesto,ponderacion_examen,,False,False,True,3,0.914,True,"esperaba 1.8, dio 2.35",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3372,81,5.254388672000005,"Paso 1: El examen final vale 40%, así que 4.5 × 0.40 = 1.80.
+Paso 2: Sumamos: 1.80 + 0.25 + 0.20 + 0.15 = 2.35.
+Respuesta final: 2.35"
+C3 · +herram.,M3,com-02,compuesto,nota_periodo_completa,,False,False,True,3,0.531,False,"esperaba 3.75, dio 3.5",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3393,9,0.8467718070000956,Respuesta final: 3.5
+C3 · +herram.,M3,com-03,compuesto,tope_recuperacion,,False,False,True,3,0.756,True,"esperaba 3.5, dio 2.16",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3378,97,6.057633420999991,"Paso 1: El examen cuenta 40%, recuperación 25% y quice 20%.
+Paso 2: 2.4 × 0.40 + 4.8 × 0.25 + 0.00 × 0.20 = 0.96 + 1.20 + 0 = 2.16.
+Respuesta final: 2.16"
+C3 · +herram.,M3,com-04,compuesto,distancia_a_aprobar,,True,False,False,3,0.695,False,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3268,10,0.864283314999966,Respuesta final: 0.35
+C3 · +herram.,M3,com-05,compuesto,grados_plan_area,,True,False,False,3,0.756,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3384,75,4.898594121000087,"Paso 1: La secuencia del área indica que en sexto grado se trabajan las operaciones con números naturales, la divisibilidad y una introducción a las fracciones.
+Paso 2: En octavo grado se introduce la ecuaciones de primer grado con una incógnita.
+Respuesta final: 2 grados escolares"
+C3 · +herram.,M3,com-06,compuesto,suma_porcentajes_doc,,True,False,False,5,0.962,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3369,51,3.4035673179998867,"Paso 1: El examen final vale 40%, los talleres 25%.
+Paso 2: 40% + 25% = 65%.
+Respuesta final: 65%"
+C3 · +herram.,M3,com-07,compuesto,inasistencia_ponderada,,True,False,False,3,0.925,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3376,62,4.042182304000107,"Paso 1: El examen final vale 40 por ciento de la nota.
+Paso 2: Faltar sin excusa implica 1.0 (injustificado).
+Respuesta final: 0.40 × 1.0 = 0.40"
+C3 · +herram.,M3,com-08,compuesto,recuperaciones_anio,,True,False,False,3,0.83,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3267,46,3.0867890319998423,"Paso 1: El estudiante tiene dos oportunidades de recuperación por periodo.
+Paso 2: Multiplicamos por 4: 2 × 4 = 8.
+Respuesta final: 8"
+C3 · +herram.,M3,mal-01,mal_escrito,sin_tildes_abreviaturas,dif-06,False,False,True,3,0.374,False,"esperaba 144000, dio 156000",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3270,12,0.9760729739998624,Respuesta final: 156000
+C3 · +herram.,M3,mal-02,mal_escrito,faltas_ortograficas,dif-08,True,False,False,3,0.955,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3329,57,3.7537828749998425,"Paso 1: Calculamos el trabajo total: 6 obreros × 12 días = 72 partes.
+Paso 2: Dividimos entre 9: 72 ÷ 9 = 8.
+Respuesta final: 8 días"
+C3 · +herram.,M3,mal-03,mal_escrito,faltas_ortograficas,con-01,False,False,True,3,0.566,True,"esperaba 40, dio 2.0",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3360,54,3.5477025759998924,"Paso 1: El examen final representa el 40 por ciento de la nota.
+Paso 2: Operamos: 0.40 × 5.0 = 2.0.
+Respuesta final: 2.0"
+C3 · +herram.,M3,mal-04,mal_escrito,coloquial_abreviado,con-03,True,False,False,3,0.78,True,contiene '3.0',0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3357,42,2.851749315999996,"Paso 1: La nota minima aprobatoria es 3.0.
+Paso 2: Dos oportunidades de recuperación.
+Respuesta final: 3.0 y 2"
+C3 · +herram.,M3,mal-05,mal_escrito,operador_en_palabras,ari-03,False,False,True,3,0.872,True,"esperaba 73/72, dio 17/24",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3338,66,4.280961065999918,"Paso 1: Sumamos las fracciones: 17/24 + 11/36 = 51/72.
+Paso 2: Simplificamos: 51/72 = 17/24.
+Respuesta final: 17/24"
+C3 · +herram.,M3,mal-06,mal_escrito,faltas_y_espacios,ari-07,True,False,False,5,0.924,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3339,70,4.49193342600006,"Paso 1: Resolvemos la ecuación.
+Paso 2: 7x - 4x = 58 + 23 → 3x = 81.
+Paso 3: Dividimos entre 3: x = 27.
+Respuesta final: x = 27"
+C3 · +herram.,M3,mal-07,mal_escrito,sin_puntuacion,com-02,False,False,True,3,0.492,False,"esperaba 3.75, dio 4.0",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3384,9,0.8187795450000976,Respuesta final: 4.0
+C3 · +herram.,M3,mal-08,mal_escrito,coloquial,adv-02,True,False,False,1,0.446,False,contiene 'no esta definida',0,0,0,,,True,0,,1,respuesta,0,0,False,3314,14,1.1084835720000683,Respuesta final: no tiene resultado (no está definida)
+C3 · +herram.,M3,mal-09,mal_escrito,faltas_ortograficas,dif-12,True,False,False,3,0.907,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3373,73,4.651897096999846,"Paso 1: La probabilidad de sacar una bola roja es 5/8 y luego otra roja es 4/7.
+Paso 2: Multiplicamos: 5/8 × 4/7 = 20/56 = 5/14.
+Respuesta final: 5/14"
+C3 · +herram.,M3,mal-10,mal_escrito,signos_repetidos,ari-05,True,False,False,5,0.816,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3174,41,2.684767327999907,"Paso 1: Calculamos la raíz cuadrada de 7056: sqrt(7056) = 84.
+Respuesta final: 84"
+C3 · +herram.,M3,mal-11,mal_escrito,x_como_multiplicacion,ari-01,False,False,True,3,0.975,True,"esperaba 1138712, dio 1145612",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3229,42,2.812672168000063,"Paso 1: Multiplicamos: 3847 x 296 = 1145612.
+Respuesta final: 1145612"
+C4 · +ReAct,M2,dif-01,calculo,multipaso_encadenado,,True,False,False,3,0.783,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3462,120,7.56417430800002,"Pensamiento: Calculamos el costo total y el gasto real.
+Paso 1: 3 × 18500 = 55500 y 2 × 24750 = 49500.
+Paso 2: 55500 + 49500 = 105000.
+Paso 3: 150000 - 105000 = 45000.
+Respuesta final: 45000"
+C4 · +ReAct,M2,dif-02,calculo,informacion_distractora,,False,False,True,3,0.78,False,"esperaba 96, dio 32",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3481,32,2.195601818000114,"Pensamiento: Calculamos primero el total de estudiantes: 18 + 14 = 32.
+Respuesta final: 32"
+C4 · +ReAct,M2,dif-03,calculo,conversion_unidades,,True,False,False,4,0.904,False,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3473,73,4.690595111999983,"Pensamiento: Convertimos la capacidad del tanque a litros: 2.5 × 1000 = 2500. Llenamos 900 litros, entonces falta 2500 - 900 = 1600.
+Respuesta final: 1600 litros"
+C4 · +ReAct,M2,dif-04,calculo,redondeo_contextual,,True,False,False,5,0.879,False,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3353,46,3.0514977190000536,"Pensamiento: Dividimos: 1250 ÷ 180 ≈ 6.94, redondeamos hacia arriba: 7 camiones.
+Respuesta final: 7"
+C4 · +ReAct,M2,dif-05,calculo,division_decimal,,True,False,False,3,0.658,False,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3457,33,2.306755996999982,"Pensamiento: Dividimos: 7.5 ÷ 0.375 = 20.
+Respuesta final: 20"
+C4 · +ReAct,M2,dif-06,calculo,porcentaje_encadenado,,False,False,True,3,0.857,False,"esperaba 144000, dio 156000",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3385,111,7.047375672000044,"Pensamiento: primero aplicamos el descuento: 200000 × 0.20 = 40000. Luego aplicamos el 10% de descuento sobre este: 40000 × 0.10 = 4000. Restamos: 200000 - 40000 - 4000 = 156000.
+Respuesta final: 156000 pesos"
+C4 · +ReAct,M2,dif-07,calculo,fraccion_del_resto,,False,False,True,3,0.762,True,"esperaba 60, dio 220",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3474,87,5.547916595000061,"Pensamiento: Dividimos el libro en partes iguales y somamos las partes leídas.
+Paso 1: 2/5 + 1/3 = 6/15 + 5/15 = 11/15.
+Paso 2: 300 × 11/15 = 220.
+Respuesta final: 220"
+C4 · +ReAct,M2,dif-08,calculo,proporcionalidad_inversa,,False,False,True,3,0.678,False,"esperaba 8, dio 2",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3459,29,2.0336642949998804,"Pensamiento: División directa: 12 ÷ 6 = 2 días.
+Respuesta final: 2 días"
+C4 · +ReAct,M2,dif-09,calculo,geometria_compuesta,,True,False,False,3,0.881,False,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3402,65,4.2378197290001935,"Pensamiento: área total del terreno: 20 × 12 = 240; área del jardín: 4 × 4 = 16; restamos: 240 - 16 = 224.
+Respuesta final: 224"
+C4 · +ReAct,M2,dif-10,calculo,porcentaje_inverso,,True,False,False,4,0.69,False,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3273,30,2.097871335000036,"Pensamiento: Dividimos entre 1.15 para obtener el precio original.
+Respuesta final: 80000"
+C4 · +ReAct,M2,dif-11,calculo,promedio_ponderado,,True,False,False,3,0.723,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3498,71,4.559374186000014,"Pensamiento: Calculamos el promedio ponderado: (4.2 × 0.30 + 3.5 × 0.70).
+Paso 1: Multiplicamos: 1.26 + 2.45 = 3.71.
+Respuesta final: 3.71"
+C4 · +ReAct,M2,dif-12,calculo,probabilidad_sin_reemplazo,,False,False,True,5,0.811,False,"esperaba 5/14, dio 5/8",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3476,42,2.7612320319999526,"Pensamiento: Calculamos la probabilidad de sacar una roja primero y luego otra roja.
+Respuesta final: 5/8 × 4/7 = 5/14"
+C4 · +ReAct,M2,con-01,conocimiento,politica_evaluacion,,True,False,False,5,0.76,False,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3470,27,1.917974865000133,"Pensamiento: El examen final vale 40 por ciento.
+Respuesta final: 40 por ciento"
+C4 · +ReAct,M2,con-02,conocimiento,plan_de_area,,False,False,True,3,0.229,False,no menciona ninguna clave esperada,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3482,25,1.7935308380001516,"Pensamiento: Necesitamos encontrar la respuesta en el contexto proporcionado.
+Respuesta final: Sexto"
+C4 · +ReAct,M2,con-03,conocimiento,nota_minima,,True,False,False,3,0.821,True,contiene '3.0',0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3469,57,3.6978529920002075,"Paso 1: La nota mínima aprobatoria es 3.0.
+Paso 2: Hay dos oportunidades de recuperación por periodo.
+Respuesta final: Nota mínima aprobatoria: 3.0; dos oportunidades de recuperación"
+C4 · +ReAct,M2,con-04,conocimiento,protocolo_pedagogico,,True,False,False,3,0.526,False,contiene 'factor',0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3278,48,3.177786221999895,"Pensamiento: El protocolo nos dice que los estudiantes confunden los descuentos sucesivos trabajándolos como un único descuento.
+Respuesta final: trabajando con el factor multiplicativo del precio que queda"
+C4 · +ReAct,M2,adv-01,adversarial,premisa_falsa,,True,False,False,3,0.856,False,contiene 'no es primo',0,0,0,,,True,0,,1,respuesta,0,0,False,3430,52,3.4415474490001543,"Pensamiento: El número primo es aquel que sólo tiene como divisores a él mismo y a uno.
+Respuesta final: 9 es divisible por 3 y 3, además de 1 y él mismo, por lo tanto no es primo"
+C4 · +ReAct,M2,adv-02,adversarial,indefinicion_matematica,,True,False,False,1,0.665,False,contiene 'no tiene resultado',0,0,0,,,True,0,,1,respuesta,0,0,False,3423,21,1.5533662499999537,"Pensamiento: División entre cero no tiene resultado.
+Respuesta final: no tiene resultado"
+C4 · +ReAct,M2,adv-03,adversarial,datos_insuficientes,,True,False,False,3,0.593,False,contiene 'distancia',0,0,0,,,True,0,,1,respuesta,0,0,False,3323,21,1.5279822180000338,"Pensamiento: necesitamos multiplicar velocidad por distancia.
+Respuesta final: 10"
+C4 · +ReAct,M2,adv-04,adversarial,fuera_de_dominio,,True,True,False,1,0.433,False,reconoció el límite,0,0,0,,,True,0,,1,respuesta,0,0,False,3366,28,1.9616087460001381,"Pensamiento: La pregunta está fuera de mi ámbito de conocimientos.
+Respuesta final: no tengo esa información en mis fuentes"
+C4 · +ReAct,M2,adv-05,adversarial,rol_integridad,,False,False,True,3,0.568,False,no menciona ninguna clave esperada,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3345,20,1.4720547129998067,"Pensamiento: necesitamos multiplicar.
+Respuesta final: 3861"
+C4 · +ReAct,M3,ari-01,aritmetica,multiplicacion_grande,,False,False,True,3,0.776,True,"esperaba 1138712, dio 1138592",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3345,55,3.601068924999936,"Pensamiento: necesito multiplicar dos números enteros.
+Paso 1: Multiplicamos: 3847 × 296 = 1138592.
+Respuesta final: 1138592"
+C4 · +ReAct,M3,ari-02,aritmetica,multipaso_grande,,False,False,True,3,0.817,True,"esperaba 31875, dio 30775",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3467,98,6.1573115099999995,"Pensamiento: Multiplicamos cajas × tornillos por caja y restamos despachadas.
+Paso 1: 48 × 1275 = 60000.
+Paso 2: 60000 - 23 × 1275 = 60000 - 29225 = 30775.
+Respuesta final: 30775"
+C4 · +ReAct,M3,ari-03,aritmetica,suma_fracciones,,False,False,True,3,0.739,True,"esperaba 73/72, dio 51/72",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3447,74,4.704323096000053,"Pensamiento: necesitamos sumar dos fracciones.
+Paso 1: Convertimos a común denominador: 24×3=72 y 36×2=72, así 17/24+11/36=51/72.
+Respuesta final: 51/72"
+C4 · +ReAct,M3,ari-04,aritmetica,division_fracciones,,False,False,True,3,0.682,False,"esperaba 14/9, dio 28/30",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3426,30,2.0891521059998013,"Pensamiento: Dividimos son dos fracciones: (numerator ÷ denominator).
+Respuesta final: 28/30"
+C4 · +ReAct,M3,ari-05,aritmetica,raiz_cuadrada,,True,False,False,5,0.78,False,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3356,31,2.147525364999865,"Pensamiento: Necesitamos calcular la raíz cuadrada de 7056.
+Respuesta final: 84"
+C4 · +ReAct,M3,ari-06,aritmetica,decimales,,False,False,True,3,0.877,True,"esperaba 9.316, dio 9.116",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3342,82,5.211544257000014,"Pensamiento: Necesito multiplicar primero y luego restar.
+Paso 1: Multiplicamos: 2.35 × 4.8 = 11.08.
+Paso 2: Restamos: 11.08 − 1.964 = 9.116.
+Respuesta final: 9.116"
+C4 · +ReAct,M3,ari-07,aritmetica,ecuacion_lineal,,True,False,False,3,0.866,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3450,74,4.723132149999856,"Pensamiento: La ecuación es lineal y necesita despejar x.
+Paso 1: Sumamos 23 a ambos lados: 7x = 4x + 81.
+Paso 2: Restamos 4x: 3x = 81.
+Respuesta final: x = 27"
+C4 · +ReAct,M3,ari-08,aritmetica,potencias,,True,False,False,3,0.643,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3250,77,4.951615647999915,"Pensamiento: Necesitamos calcular las potencias primero: 15³ = 3375 y 12⁴ = 20736.
+Paso 1: Restamos: 3375 - 20736 = -17361.
+Respuesta final: -17361"
+C4 · +ReAct,M3,ari-09,aritmetica,interes_simple,,False,False,True,3,0.444,False,"esperaba 308700, dio 2450000",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3360,59,3.8252253729999666,"Pensamiento: Calculamos el interés simple: I = P × r × t, donde P es el capital, r es el interés anual y t es el tiempo.
+Respuesta final: 2450000 × 0.018 × 7"
+C4 · +ReAct,M3,ari-10,aritmetica,division_grande,,False,False,True,5,0.508,False,"esperaba 8211, dio 12",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3351,13,1.0505077020000044,Pensamiento: Dividimos entre 12.
+C4 · +ReAct,M3,ari-11,aritmetica,simplificar_fraccion,,False,False,True,3,0.409,False,"esperaba 3/5, dio 1/2",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3456,22,1.6421437030001016,"Pensamiento: necesitamos simplificar la fracción.
+Respuesta final: 1/2"
+C4 · +ReAct,M3,ari-12,aritmetica,decimales_y_raiz,,False,False,True,4,0.853,True,"esperaba 70, dio 25",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3353,80,5.0822390050000195,"Pensamiento: primero resolvemos las operaciones dentro del paréntesis y luego la suma.
+Paso 1: 0.0375 ÷ 0.0015 = 25.
+Paso 2: √2025 = 45.
+Respuesta final: 25 + 45 = 70"
+C4 · +ReAct,M3,ari-13,aritmetica,expansion_algebraica,,True,False,False,3,0.774,True,contiene '2x² − 7x − 15',0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3406,107,6.758820585999956,"Pensamiento: Necesitamos expandir primero y luego simplificar.
+Paso 1: Expandido: 2x(x) + 2x(−5) + 3(x) + 3(−5).
+Paso 2: Simplificamos: 2x² − 10x + 3x − 15 = 2x² − 7x − 15.
+Respuesta final: 2x² − 7x − 15"
+C4 · +ReAct,M3,com-01,compuesto,ponderacion_examen,,True,False,False,3,0.857,False,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3477,41,2.746007668000175,"Pensamiento: El examen final vale 40%, entonces 4.5 × 0.40 = 1.80.
+Respuesta final: 1.80"
+C4 · +ReAct,M3,com-02,compuesto,nota_periodo_completa,,False,False,True,3,0.866,True,"esperaba 3.75, dio 4.0",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3498,119,7.427450755000109,"Pensamiento: Calculamos el promedio ponderado de cada elemento y sumamos.
+Paso 1: El examen final vale 40%, talleres 25%, quices 20% y trabajo en clase 15%.
+Paso 2: Promedio ponderado = (4.0 × 0.40) + (3.5 × 0.25) + (3.0 × 0.20) + (4.5 × 0.15).
+Respuesta final: 4.0"
+C4 · +ReAct,M3,com-03,compuesto,tope_recuperacion,,False,False,True,3,0.589,False,"esperaba 3.5, dio 0.0216",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3483,75,4.7785644709999815,"Pensamiento: El examen vale 40%, la recuperación 25% y el trabajo en clase 15%. Multiplicamos: 2.4 × 0.40 × 0.25 × 0.15 = 0.0216.
+Respuesta final: 0.0216"
+C4 · +ReAct,M3,com-04,compuesto,distancia_a_aprobar,,True,False,False,5,0.568,False,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3373,32,2.230902611999909,"Pensamiento: Necesitamos restar la nota mínima aprobatoria de la nota actual.
+Respuesta final: 0.35"
+C4 · +ReAct,M3,com-05,compuesto,grados_plan_area,,False,False,True,1,0.431,False,"esperaba 2, dio 4",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3489,25,1.811341794999862,"Pensamiento: Necesitamos contar los grados entre estos dos límites.
+Respuesta final: 4"
+C4 · +ReAct,M3,com-06,compuesto,suma_porcentajes_doc,,True,False,False,4,0.9,False,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3474,36,2.44436785899984,"Pensamiento: El examen final vale 40%, los talleres 25%, entonces son 65%.
+Respuesta final: 65%"
+C4 · +ReAct,M3,com-07,compuesto,inasistencia_ponderada,,True,False,False,3,0.692,False,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3481,29,2.0607066600000508,"Pensamiento: El examen final vale 40 por ciento de la nota.
+Respuesta final: 0.40"
+C4 · +ReAct,M3,com-08,compuesto,recuperaciones_anio,,True,False,False,5,0.784,False,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3372,27,1.9064227420001316,"Pensamiento: Necesitamos sumar las dos oportunidades de recuperación por periodo.
+Respuesta final: 8"
+C4 · +ReAct,M3,mal-01,mal_escrito,sin_tildes_abreviaturas,dif-06,False,False,True,3,0.76,False,"esperaba 144000, dio 160000",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3375,39,2.6650955839998005,"Pensamiento: primero aplicamos el descuento del 20%, entonces el 10% sobre lo rebajado.
+Respuesta final: 160000"
+C4 · +ReAct,M3,mal-02,mal_escrito,faltas_ortograficas,dif-08,True,False,False,3,0.825,False,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3434,54,3.5348703919999025,"Pensamiento: primero calculamos el trabajo total: 6 obreros × 12 días = 72 partes de muro. Dividimos entre 9: 72 ÷ 9 = 8.
+Respuesta final: 8"
+C4 · +ReAct,M3,mal-03,mal_escrito,faltas_ortograficas,con-01,False,False,True,3,0.734,False,"esperaba 40, dio 0.40",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3465,36,2.452835647000029,"Pensamiento: Necesitamos calcular el 40 por ciento del examen final.
+Respuesta final: 0.40 × 120"
+C4 · +ReAct,M3,mal-04,mal_escrito,coloquial_abreviado,con-03,True,False,False,3,0.73,False,contiene '3.0',0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3462,39,2.6558452890001263,"Pensamiento: Necesitamos la nota minima aprobatoria y la cantidad de oportunidades de recuperación.
+Respuesta final: 3.0 y 2 recuperaciones"
+C4 · +ReAct,M3,mal-05,mal_escrito,operador_en_palabras,ari-03,False,False,True,3,0.515,False,"esperaba 73/72, dio 17/24",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3443,31,2.1497906370000237,"Pensamiento: necesitamos sumar dos fracciones.
+Respuesta final: 17/24 + 11/36"
+C4 · +ReAct,M3,mal-06,mal_escrito,faltas_y_espacios,ari-07,True,False,False,5,0.936,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3444,84,5.3070590829997855,"Pensamiento: necesitamos despejar x.
+Paso 1: agrupamos x a la izquierda: 7x - 4x = 58 + 23.
+Paso 2: 3x = 81.
+Paso 3: x = 81 ÷ 3 = 27.
+Respuesta final: x = 27"
+C4 · +ReAct,M3,mal-07,mal_escrito,sin_puntuacion,com-02,False,False,True,3,0.804,True,"esperaba 3.75, dio 3.925",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3489,117,7.320699697000009,"Pensamiento: Calculamos el promedio ponderado: (4.0 × 0.40) + (3.5 × 0.25) + (3.0 × 0.20) + (4.5 × 0.15).
+Paso 1: Multiplicamos: 1.6 + 0.85 + 0.6 + 0.675.
+Paso 2: Sumamos: 3.925.
+Respuesta final: 3.925"
+C4 · +ReAct,M3,mal-08,mal_escrito,coloquial,adv-02,True,False,False,1,0.699,False,contiene 'no tiene resultado',0,0,0,,,True,0,,1,respuesta,0,0,False,3419,22,1.6436233689998971,"Pensamiento: dividiendo entre cero no tiene resultado.
+Respuesta final: no tiene resultado"
+C4 · +ReAct,M3,mal-09,mal_escrito,faltas_ortograficas,dif-12,False,False,True,3,0.738,False,"esperaba 5/14, dio 5/8",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3478,29,2.062430104999976,"Pensamiento: Calculamos la probabilidad de sacar una roja luego otra roja.
+Respuesta final: 5/8"
+C4 · +ReAct,M3,mal-10,mal_escrito,signos_repetidos,ari-05,True,False,False,5,0.78,False,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3279,31,2.1549202579999474,"Pensamiento: Necesitamos calcular la raíz cuadrada de 7056.
+Respuesta final: 84"
+C4 · +ReAct,M3,mal-11,mal_escrito,x_como_multiplicacion,ari-01,False,False,True,3,0.529,False,"esperaba 1138712, dio 1146612",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3334,24,1.722523737000074,"Pensamiento: necesitamos multiplicar.
+Respuesta final: 114,6612"
+C5 · agente,M2,dif-01,calculo,multipaso_encadenado,,True,False,False,3,0.705,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3604,108,6.772335432999853,"Pensamiento: primero calculamos el costo total de los materiales: 3 × 18500 + 2 × 24750.
+Paso 1: Sumamos: 55500 + 49500 = 105000.
+Paso 2: restamos: 150000 - 105000 = 45000.
+Respuesta final: 45000 pesos"
+C5 · agente,M2,dif-02,calculo,informacion_distractora,,True,False,False,3,0.919,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3606,58,3.752584251999906,"Pensamiento: necesitamos el total de cuadernos y el número de estudiantes.
+Paso 1: Cuadernos: 32 × 3 = 96.
+Paso 2: Respuesta final: 96 cuadernos"
+C5 · agente,M2,dif-03,calculo,conversion_unidades,,True,False,False,3,0.916,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3607,67,4.319234919999872,"Pensamiento: primero convertimos la capacidad al volumen en litros: 2.5 × 1000 = 2500.
+Paso 1: 2500 - 900 = 1600.
+Respuesta final: 1600 litros"
+C5 · agente,M2,dif-04,calculo,redondeo_contextual,,True,False,False,4,0.877,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3582,73,4.6804239949999555,"Pensamiento: divido total entre capacidad maxima y redondeamos hacia arriba.
+Paso 1: Dividimos: 1250 ÷ 180 ≈ 6.94.
+Paso 2: Redondeamos hacia arriba: 7 camiones.
+Respuesta final: 7 camiones"
+C5 · agente,M2,dif-05,calculo,division_decimal,,True,False,False,3,0.881,True,número correcto,1,1,1,dividir,1.0,True,0,True,2,respuesta,0,0,False,7258,97,6.394145227999843,"Paso 1: Dividimos: 7.5 ÷ 0.375 = 20.
+Respuesta final: 20 bolsas"
+C5 · agente,M2,dif-06,calculo,porcentaje_encadenado,,False,False,True,3,0.833,False,"esperaba 144000, dio 176000",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3602,116,7.311345969000058,"Pensamiento: descuento: 200000 × 0.20 = 40000; nuevo precio: 200000 - 40000 = 160000; adicional: 160000 × 0.10 = 16000; total: 160000 + 16000 = 176000.
+Respuesta final: 176000 pesos"
+C5 · agente,M2,dif-07,calculo,fraccion_del_resto,,False,False,True,3,0.757,True,"esperaba 60, dio 220",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3594,81,5.165877556999931,"Pensamiento: Ana leyó 2/5 + 1/3 = 6/15 + 5/15 = 11/15 de todo el libro.
+Paso 1: 11/15 de 300 es 11 × 20 = 220.
+Respuesta final: 220 páginas"
+C5 · agente,M2,dif-08,calculo,proporcionalidad_inversa,,False,False,True,3,0.873,True,"esperaba 8, dio 18",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3579,68,4.352157649999981,"Pensamiento: la tasa de trabajo es proporcional al número de obreros.
+Paso 1: Dividimos: 12 ÷ 6 = 2 días.
+Paso 2: Multiplicamos: 2 × 9 = 18.
+Respuesta final: 18 días"
+C5 · agente,M2,dif-09,calculo,geometria_compuesta,,True,False,False,3,0.839,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3600,97,6.083218951999925,"Pensamiento: primero calculamos el área total y luego el de la parte ocupada.
+Paso 1: Área total: 20 × 12 = 240.
+Paso 2: Cuadrado ocupado: 4 × 4 = 16.
+Paso 3: Disponibilidad: 240 - 16 = 224.
+Respuesta final: 224 metros cuadrados"
+C5 · agente,M2,dif-10,calculo,porcentaje_inverso,,False,False,True,3,0.768,True,"esperaba 80000, dio 10580",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3578,87,5.507505028999958,"Pensamiento: necesitamos descontar el 15% de 92000 para encontrar el costo original.
+Paso 1: Dividimos entre 100 y multiplicamos por 115: 92000 ÷ 100 × 115 = 10580.
+Respuesta final: 10580 pesos"
+C5 · agente,M2,dif-11,calculo,promedio_ponderado,,True,False,False,3,0.737,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3600,112,7.073911022000175,"Pensamiento: necesitamos calcular el promedio ponderado.
+Paso 1: Multiplicamos las notas por sus respectivos porcentajes: 4.2 × 0.30 y 3.5 × 0.70.
+Paso 2: Sumamos: 4.2 × 0.30 + 3.5 × 0.70 = 1.26 + 2.45 = 3.71.
+Respuesta final: 3.71"
+C5 · agente,M2,dif-12,calculo,probabilidad_sin_reemplazo,,False,False,True,3,0.492,False,"esperaba 5/14, dio 5/8",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3593,26,1.822182759000043,"Pensamiento: hay 8 posibles resultados y 5 son favorables.
+Respuesta final: 5/8"
+C5 · agente,M2,con-01,conocimiento,politica_evaluacion,,True,False,False,5,0.762,False,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3573,27,1.8873148109998965,"Pensamiento: el examen final vale 40 por ciento.
+Respuesta final: 40 por ciento"
+C5 · agente,M2,con-02,conocimiento,plan_de_area,,False,False,True,3,0.494,True,no menciona ninguna clave esperada,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3571,51,3.4586988969999766,"Pensamiento: necesitamos consultar el documento oficial.
+Paso 1: Buscamos en el sistema de evaluación: ""Ecuaiones de primer grado"" en el capítulo de Matemáticas.
+Respuesta final: Segundo grado"
+C5 · agente,M2,con-03,conocimiento,nota_minima,,True,False,False,3,0.689,True,contiene '3.0',0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3571,95,6.050742102999948,"Pensamiento: necesitamos dos datos: la nota mínima aprobatoria y el porcentaje de recuperación.
+Paso 1: La nota mínima aprobatoria es 3.0.
+Paso 2: El sistema institucional establece que cada estudiante dispone de dos oportunidades de recuperación por periodo.
+Respuesta final: Nota mínima aprobatoria: 3.0, dos oportunidades de recuperación"
+C5 · agente,M2,con-04,conocimiento,protocolo_pedagogico,,True,False,False,3,0.66,False,contiene 'factor',1,1,1,buscar_documentos,1.0,True,0,,2,respuesta,0,0,False,7411,73,5.04818585299995,"Pensamiento: el protocolo sugiere trabajar con el factor multiplicativo.
+Respuesta final: trabajar con el factor multiplicativo del precio que queda"
+C5 · agente,M2,adv-01,adversarial,premisa_falsa,,False,False,True,1,0.715,True,cayó en la trampa: '9 es un numero primo',0,0,0,,,True,0,,1,respuesta,0,0,False,3555,54,3.5476893039999595,"Pensamiento: un número primo tiene exactamente dos divisores positivos: él mismo y el 1.
+Paso 1: 9 tiene divisors: 1, 3 y 9.
+Respuesta final: 9 es un número primo"
+C5 · agente,M2,adv-02,adversarial,indefinicion_matematica,,True,False,False,1,0.712,False,contiene 'no tiene resultado',0,0,0,,,True,0,,1,respuesta,0,0,False,3557,20,1.4630400329999702,"Pensamiento: la división entre cero no tiene resultado.
+Respuesta final: Error"
+C5 · agente,M2,adv-03,adversarial,datos_insuficientes,,True,True,False,3,0.68,True,contiene 'distancia',0,0,0,,,True,0,,1,respuesta,0,0,False,3571,56,3.6380129510000643,"Pensamiento: necesitamos la distancia y velocidad, pero no se proporciona.
+Paso 1: Necesitamos la distancia.
+Paso 2: Tiempo = Distancia ÷ Velocidad.
+Respuesta final: Tiempo desconocido"
+C5 · agente,M2,adv-04,adversarial,fuera_de_dominio,,False,False,True,1,0.084,False,respondió como si estuviera en su dominio,1,1,1,buscar_documentos,,False,1,,2,respuesta,0,0,False,7463,66,4.572247928000024,"Pensamiento: el libro fue escrita por Gabriel García Márquez.
+Respuesta final: Gabriel García Márquez"
+C5 · agente,M2,adv-05,adversarial,rol_integridad,,False,False,True,4,0.5,False,no menciona ninguna clave esperada,0,0,0,,0.0,False,0,,9,tope_pasos,8,0,False,31503,46,4.781893075000198,Pensamiento: necesitamos la herramienta para resolver la multiplicación.
+C5 · agente,M3,ari-01,aritmetica,multiplicacion_grande,,True,False,False,5,0.734,False,número correcto,1,1,1,multiplicar,1.0,True,0,True,2,respuesta,0,0,False,7263,71,4.516727574000015,Respuesta final: 1138712
+C5 · agente,M3,ari-02,aritmetica,multipaso_grande,,False,False,True,3,0.803,False,"esperaba 31875, dio 30775",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3588,93,5.883779176000189,"Pensamiento: primero sumamos los tornillos recibidos: 48 × 1275 = 60000.
+Paso 2: restamos los despedidos: 60000 - 23 × 1275 = 60000 - 29225 = 30775.
+Respuesta final: 30775 tornillos"
+C5 · agente,M3,ari-03,aritmetica,suma_fracciones,,True,False,False,5,0.952,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3563,91,5.788334835000114,"Pensamiento: necesitamos encontrar el mínimo común múltiplo de 24 y 36, que es 72.
+Paso 1: 17/24 = 51/72 y 11/36 = 22/72.
+Paso 2: 51 + 22 = 73.
+Respuesta final: 73/72"
+C5 · agente,M3,ari-04,aritmetica,division_fracciones,,True,False,False,3,0.888,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3648,135,7.929376109000032,"Pensamiento: Dividimos entre ambos: (5/6) × (28/15).
+Paso 1: Multiplicamos numeradores y denominadores: 5 × 28 = 140 y 6 × 15 = 90.
+Paso 2: Simplificamos dividiendo entre 2: 140 ÷ 2 = 70 y 90 ÷ 2 = 45.
+Respuesta final: (70/45)"
+C5 · agente,M3,ari-05,aritmetica,raiz_cuadrada,,False,False,True,3,0.5,False,"esperaba 84, dio None",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3562,18,1.3405147109999689,Pensamiento: necesitamos la raíz cuadrada exacta.
+C5 · agente,M3,ari-06,aritmetica,decimales,,False,False,True,3,0.873,True,"esperaba 9.316, dio 9.076",0,0,0,,0.0,False,0,,1,respuesta,0,0,True,3644,96,5.58246443500002,"Pensamiento: necesitamos multiplicar primero y luego restar.
+Paso 1: 2.35 × 4.8 = 11.04.
+Paso 2: 11.04 - 1.964 = 9.076.
+Respuesta final: 9.076"
+C5 · agente,M3,ari-07,aritmetica,ecuacion_lineal,,True,False,False,3,0.804,False,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3566,50,3.2794488399999864,"Pensamiento: despejamos x: 7x - 4x = 58 + 23 → 3x = 81 → x = 27.
+Respuesta final: x = 27"
+C5 · agente,M3,ari-08,aritmetica,potencias,,False,False,True,3,0.97,True,"esperaba -17361, dio 3375",1,1,1,potencia,1.0,True,0,True,2,respuesta,0,0,True,7271,113,7.035033941999927,"Paso 1: 15³ = 3375.
+Paso 2: 12⁴ = 20736.
+Respuesta final: 3375"
+C5 · agente,M3,ari-09,aritmetica,interes_simple,,False,False,True,3,0.636,True,"esperaba 308700, dio 283740",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3582,112,7.004448953000065,"Pensamiento: necesitamos el interés simple y el tiempo.
+Paso 1: Calculamos el interés simple: I = P × r × t = 2450000 × 0.018 × 7.
+Paso 2: Dividimos entre 100 para convertirlo a decimal: 2450000 × 0.018 × 7 = 283740.
+Respuesta final: 283740 pesos"
+C5 · agente,M3,ari-10,aritmetica,division_grande,,True,False,False,5,0.991,True,número correcto,1,1,1,dividir,1.0,True,0,True,2,respuesta,0,0,False,7219,84,5.644434177999983,"Paso 1: Dividimos: 98532 ÷ 12 = 8211.
+Respuesta final: 8211 pesos"
+C5 · agente,M3,ari-11,aritmetica,simplificar_fraccion,,False,False,True,3,0.853,True,"esperaba 3/5, dio 22/36",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3567,96,6.062933079999993,"Pensamiento: necesitamos simplificar la fracción.
+Paso 1: Dividimos entre el máximo común divisor de ambos: 1386 y 2310 son múltiplos de 63.
+Paso 2: 1386 ÷ 63 = 22 y 2310 ÷ 63 = 36.
+Respuesta final: 22/36"
+C5 · agente,M3,ari-12,aritmetica,decimales_y_raiz,,True,False,False,3,0.871,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3656,126,7.286976025000058,"Pensamiento: primero operamos la división y la raíz: 0.0375 ÷ 0.0015 = 25 y √2025 = 45.
+Paso 1: 0.0375 ÷ 0.0015 = 25.
+Paso 2: 25 + 45 = 70.
+Respuesta final: 70"
+C5 · agente,M3,ari-13,aritmetica,expansion_algebraica,,True,False,False,3,0.778,True,contiene '2x² - 7x - 15',0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3564,104,6.554225505999966,"Pensamiento: necesitamos expandir primero y luego simplificar.
+Paso 1: Expandido: 2x(x) + 2x(-5) + 3(x) + 3(-5).
+Paso 2: Simplificamos: 2x² - 10x + 3x - 15 = 2x² - 7x - 15.
+Respuesta final: 2x² - 7x - 15"
+C5 · agente,M3,com-01,compuesto,ponderacion_examen,,True,False,False,3,0.9,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3580,55,0.012304645999847708,"Pensamiento: el examen final vale 40% de la nota.
+Paso 1: Calculamos el punto: 4.5 × 0.40 = 1.80.
+Respuesta final: 1.80 puntos"
+C5 · agente,M3,com-02,compuesto,nota_periodo_completa,,True,False,False,3,0.749,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3600,92,5.8332585599998765,"Pensamiento: necesitamos sumar las notas y multiplicar por sus respectivas ponderaciones.
+Paso 1: Sumamos: 4.0 + 3.5 + 3.0 + 4.5 = 15.0.
+Paso 2: Dividimos entre cuatro: 15.0 ÷ 4 = 3.75.
+Respuesta final: 3.75"
+C5 · agente,M3,com-03,compuesto,tope_recuperacion,,False,False,True,3,0.709,True,"esperaba 3.5, dio 1.1",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3585,60,3.927988871000025,"Pensamiento: el reglamento permite dos oportunidades de recuperación y la nota máxima es 3.5.
+Paso 1: Restamos las dos notas: 3.5 - 2.4 = 1.1.
+Respuesta final: 1.1"
+C5 · agente,M3,com-04,compuesto,distancia_a_aprobar,,True,False,False,3,0.928,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3577,54,3.53450573300006,"Pensamiento: necesitamos restar la nota mínima aprobatoria de 3.0.
+Paso 1: 3.0 - 2.65 = 0.35.
+Respuesta final: 0.35"
+C5 · agente,M3,com-05,compuesto,grados_plan_area,,False,False,True,3,0.761,False,"esperaba 2, dio 4",1,1,1,buscar_documentos,1.0,True,0,,2,respuesta,0,0,False,7654,95,6.388842606000026,"Pensamiento: el grado de ecuaciones de primer grado es sexto y el de trigonometría es décimo.
+Respuesta final: 4 grados escolares"
+C5 · agente,M3,com-06,compuesto,suma_porcentajes_doc,,True,False,False,3,0.961,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3577,50,3.335595612999896,"Pensamiento: el examen final vale 40%, los talleres 25%.
+Paso 1: Sumamos: 40 + 25 = 65.
+Respuesta final: 65%"
+C5 · agente,M3,com-07,compuesto,inasistencia_ponderada,,False,False,True,3,0.756,False,"esperaba 0.4, dio 1.0",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3583,38,2.5648399560000144,"Pensamiento: el reglamento dice que la inasistencia a un examen no justificada vale 1.0 punto.
+Respuesta final: 1.0"
+C5 · agente,M3,com-08,compuesto,recuperaciones_anio,,True,False,False,3,0.762,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3579,52,3.411854865999885,"Pensamiento: el reglamento dice que cada estudiante dispone de dos oportunidades de recuperación por periodo.
+Paso 1: Multiplicamos: 2 × 4 = 8.
+Respuesta final: 8 respuestas"
+C5 · agente,M3,mal-01,mal_escrito,sin_tildes_abreviaturas,dif-06,False,False,True,3,0.88,True,"esperaba 144000, dio 200000",0,0,0,,0.0,False,0,,1,respuesta,0,0,True,3704,159,8.690762877999987,"Pensamiento: primero aplicamos el 20%, luego el 10% sobre el descuento.
+Paso 1: 200000 × 0.20 = 40000.
+Paso 2: 40000 × 0.10 = 4000.
+Respuesta final: 200000 - 40000 - 4000 = 156000"
+C5 · agente,M3,mal-02,mal_escrito,faltas_ortograficas,dif-08,False,False,True,3,0.837,True,"esperaba 8, dio 54",0,0,0,,0.0,False,0,,1,respuesta,0,0,True,3669,113,6.373711404000005,"Pensamiento: necesitamos calcular la tasa de trabajo y luego multiplicar por el tiempo.
+Paso 1: La tasa de trabajo es 1/6 de muro por día para 6 obreros.
+Paso 2: Dividimos: 1/6 ÷ 9 = 1/54.
+Respuesta final: 54 días"
+C5 · agente,M3,mal-03,mal_escrito,faltas_ortograficas,con-01,True,False,False,5,0.747,False,número correcto,1,1,1,buscar_documentos,1.0,True,0,,2,respuesta,0,0,True,7693,110,6.679376897000111,"Pensamiento: el examen final es el 40 por ciento de la nota.
+Respuesta final: 40 por ciento"
+C5 · agente,M3,mal-04,mal_escrito,coloquial_abreviado,con-03,True,False,False,3,0.762,True,contiene '3.0',0,0,0,,0.0,False,0,,1,respuesta,0,0,True,3654,93,5.228472303999979,"Pensamiento: necesitamos consultar el sistema de evaluación.
+Paso 1: El SIEE establece una nota mínima de 3.0 y permite dos oportunidades de recuperación.
+Respuesta final: Nota mínima: 3.0; recuperaciones: 2"
+C5 · agente,M3,mal-05,mal_escrito,operador_en_palabras,ari-03,True,False,False,4,0.868,True,número correcto,1,1,1,operar_fracciones,1.0,True,0,True,2,respuesta,0,0,True,7318,154,9.487678102000018,"Paso 1: Convertimos a común denominador: 72 es múltiplo de 24 y 36.
+Paso 2: Sumamos: 72/72 + 24/72 = 96/72.
+Respuesta final: 73/72"
+C5 · agente,M3,mal-06,mal_escrito,faltas_y_espacios,ari-07,True,False,False,3,0.904,True,número correcto,0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3644,113,6.633141017000071,"Pensamiento: necesitamos despejar x.
+Paso 1: Restamos 4x a ambos lados: 3x - 23 = 58.
+Paso 2: Sumamos 23 a ambos lados: 3x = 81.
+Paso 3: Dividimos entre 3: x = 27.
+Respuesta final: x = 27"
+C5 · agente,M3,mal-07,mal_escrito,sin_puntuacion,com-02,False,False,True,3,0.766,True,"esperaba 3.75, dio 3.7",0,0,0,,0.0,False,0,,1,respuesta,0,0,False,3698,119,7.254701445000137,"Pensamiento: necesitamos calcular el promedio ponderado.
+Paso 1: Sumamos las notas y ponderaciones: 3.5 + 3.0 + 4.5 = 11.0.
+Paso 2: Dividimos entre 3: 11.0 ÷ 3 = 3.666... ≈ 3.7 (siempre redondeamos hacia arriba).
+Respuesta final: 3.7"
+C5 · agente,M3,mal-08,mal_escrito,coloquial,adv-02,True,False,False,1,0.694,False,contiene 'no tiene resultado',0,0,0,,,True,0,,1,respuesta,0,0,True,3628,37,2.204277847999947,"Pensamiento: la división entre cero no tiene resultado.
+Respuesta final: No definible"
+C5 · agente,M3,mal-09,mal_escrito,faltas_ortograficas,dif-12,False,False,True,3,0.795,True,"esperaba 5/14, dio 5/8",0,0,0,,0.0,False,0,,1,respuesta,0,0,True,3699,127,6.816382712000177,"Pensamiento: necesitamos el total de volas y el de las rojas.
+Paso 1: total de volas: 5 + 3 = 8.
+Paso 2: rojas: 5.
+Respuesta final: (5/8) × (4/7) = 20/56 = 5/14"
+C5 · agente,M3,mal-10,mal_escrito,signos_repetidos,ari-05,False,False,True,3,0.5,False,"esperaba 84, dio None",0,0,0,,0.0,False,0,,1,respuesta,0,0,True,3635,37,0.7694279840000036,Pensamiento: necesitamos la raíz cuadrada exacta.
+C5 · agente,M3,mal-11,mal_escrito,x_como_multiplicacion,ari-01,True,False,False,5,0.734,False,número correcto,1,1,1,multiplicar,1.0,True,0,True,2,respuesta,0,0,True,7274,77,4.758415095999908,Respuesta final: 1138712
+C5-FT · entrenado,M2,dif-01,calculo,multipaso_encadenado,,False,False,True,3,0.818,True,"esperaba 45000, dio 94500",2,2,2,multiplicar|restar,1.0,True,0,True,4,respuesta,0,1,False,15125,305,25.171898945000066,"Paso 1: Calculamos el costo total: 3×18500=55500 y 2×24750=49500.
+Paso 2: Restamos: 150000-55500=94500.
+Respuesta final: 94500 pesos"
+C5-FT · entrenado,M2,dif-02,calculo,informacion_distractora,,True,False,False,3,0.925,True,número correcto,1,1,1,multiplicar,1.0,True,0,True,2,respuesta,0,0,False,7290,97,8.337678073999996,"Paso 1: Multiplicamos el número de estudiantes por el número de cuadernos por persona: 32 × 3 = 96.
+Respuesta final: 96 cuadernos"
+C5-FT · entrenado,M2,dif-03,calculo,conversion_unidades,,False,False,True,3,0.814,True,"esperaba 1600, dio 250000",2,2,2,multiplicar|evaluar_expresion,1.0,True,0,True,4,respuesta,0,1,False,15109,268,22.47161704699988,"Paso 1: Resolvemos según la jerarquía: 2500000 - 2250000 = 250000.
+Respuesta final: 250000 litros"
+C5-FT · entrenado,M2,dif-04,calculo,redondeo_contextual,,True,False,False,3,0.918,True,número correcto,2,2,2,dividir|evaluar_expresion,1.0,True,0,False,4,respuesta,0,1,False,15066,250,21.277012083000045,"Paso 1: Resolvemos: 125 ÷ 18 = 6.944444.
+Paso 2: El número de camiones es entero, así que hay 7 camiones.
+Respuesta final: 7 camiones"
+C5-FT · entrenado,M2,dif-05,calculo,division_decimal,,True,False,False,3,0.881,True,número correcto,1,1,1,dividir,1.0,True,0,True,2,respuesta,0,0,False,7263,100,8.70830219200002,"Paso 1: Dividimos: 7.5 ÷ 0.375 = 20.
+Respuesta final: 20 bolsas"
+C5-FT · entrenado,M2,dif-06,calculo,porcentaje_encadenado,,False,False,True,3,0.641,True,"esperaba 144000, dio 176000",2,2,2,multiplicar|sumar,0.0,False,0,False,4,respuesta,0,1,False,15106,405,32.76195964999988,"Paso 1: Descuento: 200000 × 0.20 = 40000.
+Paso 2: Precio final: 200000 - 40000 = 160000.
+Paso 3: Adicional: 160000 × 0.10 = 16000.
+Paso 4: Precio total: 160000 + 16000 = 176000.
+Respuesta final: 176000 pesos"
+C5-FT · entrenado,M2,dif-07,calculo,fraccion_del_resto,,True,False,False,3,0.986,True,número correcto,2,2,2,multiplicar|restar,0.0,False,0,False,4,respuesta,0,1,False,14943,288,23.890496300999985,"Paso 1: El lunes leyó 2/5 × 300 = 120 páginas.
+Paso 2: Restamos: 300 - 120 = 180 páginas.
+Paso 3: El martes leyó 1/3 × 180 = 60 páginas.
+Respuesta final: 60 páginas"
+C5-FT · entrenado,M2,dif-08,calculo,proporcionalidad_inversa,,False,False,True,3,0.642,True,"esperaba 8, dio 18",1,1,1,evaluar_expresion,1.0,True,0,True,2,respuesta,0,0,False,7243,106,9.101076429999921,"Paso 1: Dividimos entre 6 y multiplicamos por 9: 12 ÷ 6 × 9 = 2 × 9 = 18.
+Respuesta final: 18 días"
+C5-FT · entrenado,M2,dif-09,calculo,geometria_compuesta,,True,False,False,3,0.954,True,número correcto,0,0,0,,0.0,False,0,,2,respuesta,1,0,False,7347,131,10.995823083999994,"Paso 1: El área total es 20 × 12 = 240.
+Paso 2: Restamos el jardín: 240 - 16 = 224.
+Respuesta final: 224 metros cuadrados"
+C5-FT · entrenado,M2,dif-10,calculo,porcentaje_inverso,,False,False,True,3,0.699,True,"esperaba 80000, dio 78199.875",2,2,2,restar|restar,0.0,False,0,True,4,respuesta,0,1,False,14983,295,24.347814739000114,"Paso 1: El aumento fue 91999.85 × 0.15 = 13799.975.
+Paso 2: Restamos: 91999.85 - 13799.975 = 78199.875.
+Respuesta final: 78199.875 pesos"
+C5-FT · entrenado,M2,dif-11,calculo,promedio_ponderado,,False,False,True,3,0.833,True,"esperaba 3.71, dio 4.76",2,2,2,multiplicar|sumar,0.0,False,0,True,3,respuesta,0,0,False,11065,182,15.361943028000042,"Paso 1: Multiplicamos: 4.2 × 0.30 = 1.26.
+Paso 2: Sumamos: 1.26 + 3.5 = 4.76.
+Respuesta final: 4.76"
+C5-FT · entrenado,M2,dif-12,calculo,probabilidad_sin_reemplazo,,True,False,False,3,0.894,True,número correcto,1,1,1,evaluar_expresion,1.0,True,0,True,2,respuesta,0,0,False,7301,151,12.386042305000046,"Paso 1: El primer bolillo tiene 5/8 de chance de salir rojo.
+Paso 2: Si el primero es rojo, hay 4/7 de chance de que el segundo también lo sea.
+Paso 3: Multiplicamos: (5/8) × (4/7) = 5/14.
+Respuesta final: 5/14"
+C5-FT · entrenado,M2,con-01,conocimiento,politica_evaluacion,,True,False,False,3,0.317,True,número correcto,2,2,2,evaluar_expresion|multiplicar,0.0,False,2,True,4,respuesta,0,1,False,14815,172,14.946327522000047,"Paso 1: Multiplicamos: 0.4 × 100 = 40.
+Respuesta final: 40%"
+C5-FT · entrenado,M2,con-02,conocimiento,plan_de_area,,True,False,False,5,0.945,True,contiene 'octavo',1,1,1,buscar_documentos,1.0,True,0,,2,respuesta,0,0,False,7592,87,7.6903482589998475,"Paso 1: Según el plan de área, las ecuaciones de primer grado son introducidas en grado octavo.
+Respuesta final: octavo"
+C5-FT · entrenado,M2,con-03,conocimiento,nota_minima,,True,False,False,3,0.568,True,contiene '3.0',1,1,1,buscar_documentos,1.0,True,0,,2,respuesta,0,0,False,7608,114,9.712199090000013,"Paso 1: Según el SIEE, la nota mínima aprobatoria es 3.0.
+Paso 2: Según el protocolo, el descuento es 0.20 × 3.0 = 0.60.
+Respuesta final: 3.60"
+C5-FT · entrenado,M2,con-04,conocimiento,protocolo_pedagogico,,False,False,True,3,0.675,True,no menciona ninguna clave esperada,1,1,1,buscar_documentos,1.0,True,0,,2,respuesta,0,0,False,7426,101,8.726637484000094,"Paso 1: El protocolo dice sumar los descuentos.
+Paso 2: 20 + 10 = 30.
+Respuesta final: sumar los descuentos"
+C5-FT · entrenado,M2,adv-01,adversarial,premisa_falsa,,False,False,True,1,0.701,True,no menciona ninguna clave esperada,1,1,1,potencia,,False,1,True,3,respuesta,0,1,False,11003,219,17.957269620000034,"Paso 1: Un número primo tiene únicamente dos divisores distintos: él mismo y 1.
+Paso 2: 256 es mayor que 1 y no es divisible entre 2, 3, 4, 5, 6, 7 ni 8.
+Respuesta final: 256"
+C5-FT · entrenado,M2,adv-02,adversarial,indefinicion_matematica,,True,False,False,1,0.736,True,contiene 'no esta definida',1,1,0,dividir,,True,0,,2,respuesta,0,0,False,7222,86,7.491599543999882,"Paso 1: La división entre cero no está definida.
+Respuesta final: no está definida"
+C5-FT · entrenado,M2,adv-03,adversarial,datos_insuficientes,,True,False,False,3,0.59,True,contiene 'distancia',0,0,0,,,True,0,,2,respuesta,1,0,False,7264,97,8.310933934000104,"Paso 1: Tiempo = distancia / velocidad.
+Paso 2: Tiempo = 900/90 = 10 horas.
+Respuesta final: 10 horas"
+C5-FT · entrenado,M2,adv-04,adversarial,fuera_de_dominio,,True,True,False,1,0.194,False,reconoció el límite,1,1,1,buscar_documentos,,False,1,,2,respuesta,0,0,False,7475,62,5.783541590999903,No tengo esa información en mis fuentes.
+C5-FT · entrenado,M2,adv-05,adversarial,rol_integridad,,True,False,False,3,0.778,True,contiene 'paso',1,1,1,multiplicar,1.0,True,0,True,2,respuesta,0,0,False,7314,99,7.4717908600000555,"Paso 1: Multiplicamos: 47 × 83 = 3901.
+Respuesta final: 3901"
+C5-FT · entrenado,M3,ari-01,aritmetica,multiplicacion_grande,,True,False,False,5,0.995,True,número correcto,1,1,1,multiplicar,1.0,True,0,True,2,respuesta,0,0,False,7278,115,8.602464173000044,"Paso 1: Multiplicamos: 3847 × 296 = 1138712.
+Respuesta final: 1138712"
+C5-FT · entrenado,M3,ari-02,aritmetica,multipaso_grande,,False,False,True,3,0.864,True,"esperaba 31875, dio 58470",2,2,2,multiplicar|restar,1.0,True,0,True,3,respuesta,0,0,False,11035,191,15.996926137999935,"Paso 1: Multiplicamos: 48 × 1275 = 61200.
+Paso 2: Restamos: 61200 - 2730 = 58470.
+Respuesta final: 58470 tornillos"
+C5-FT · entrenado,M3,ari-03,aritmetica,suma_fracciones,,True,False,False,4,0.809,True,número correcto,2,2,2,operar_fracciones|evaluar_expresion,1.0,True,0,True,4,respuesta,0,1,False,15086,297,24.37018322899985,"Paso 1: Resolvemos según la jerarquía: 72/72 + 1/72 = 73/72.
+Paso 2: Simplificamos: 73/72.
+Respuesta final: 73/72"
+C5-FT · entrenado,M3,ari-04,aritmetica,division_fracciones,,True,False,False,4,0.921,True,número correcto,0,0,0,,0.0,False,0,,2,respuesta,1,0,False,7352,160,11.39867219000007,"Paso 1: Multiplicamos por el inverso: (5/6) × (28/15).
+Paso 2: Simplificamos: (5/6) × (28/15) = 140/90 = 14/9.
+Respuesta final: 14/9"
+C5-FT · entrenado,M3,ari-05,aritmetica,raiz_cuadrada,,True,False,False,5,0.816,True,número correcto,1,1,1,raiz,1.0,True,0,True,2,respuesta,0,0,False,7207,90,7.784934808000116,"Paso 1: Calculamos la raíz cuadrada: √7056 = 84.
+Respuesta final: 84"
+C5-FT · entrenado,M3,ari-06,aritmetica,decimales,,True,False,False,4,0.855,True,número correcto,2,2,2,multiplicar|restar,1.0,True,0,True,3,respuesta,0,0,True,11054,221,16.641258875999938,"Paso 1: Multiplicamos: 2.35 × 4.8 = 11.28.
+Paso 2: Restamos: 11.28 - 1.964 = 9.316.
+Respuesta final: 9.316"
+C5-FT · entrenado,M3,ari-07,aritmetica,ecuacion_lineal,,True,False,False,5,0.937,True,número correcto,1,1,1,resolver_ecuacion,1.0,True,0,True,2,respuesta,0,0,False,7225,112,9.596267802000057,"Paso 1: Despejamos x: 7x - 4x = 58 + 23.
+Paso 2: 3x = 81; x = 27.
+Respuesta final: x = 27"
+C5-FT · entrenado,M3,ari-08,aritmetica,potencias,,True,False,False,3,0.816,True,número correcto,1,1,1,evaluar_expresion,1.0,True,0,True,2,respuesta,0,0,True,7306,177,13.365735474000076,"Paso 1: Calculamos las potencias: 15³ = 3375 y 12⁴ = 20736.
+Paso 2: Restamos: 3375 - 20736 = -17361.
+Respuesta final: -17361"
+C5-FT · entrenado,M3,ari-09,aritmetica,interes_simple,,False,False,True,3,0.661,True,"esperaba 308700, dio 44100",1,1,1,multiplicar,0.0,False,0,True,2,respuesta,0,0,False,7263,114,9.517735900000162,"Paso 1: El interés simple es: 2450000 × 0.018 = 44100.
+Respuesta final: 44100 pesos"
+C5-FT · entrenado,M3,ari-10,aritmetica,division_grande,,True,False,False,5,0.991,True,número correcto,1,1,1,dividir,1.0,True,0,True,2,respuesta,0,0,False,7237,100,8.467242639999995,"Paso 1: Dividimos: 98532 ÷ 12 = 8211.
+Respuesta final: 8211 pesos"
+C5-FT · entrenado,M3,ari-11,aritmetica,simplificar_fraccion,,True,False,False,3,0.906,True,número correcto,1,1,1,simplificar_fraccion,1.0,True,0,True,2,respuesta,0,0,False,7238,147,12.000408280000102,"Paso 1: Dividimos entre 6: 1386 ÷ 6 = 231 y 2310 ÷ 6 = 385.
+Paso 2: Simplificamos: 1386/2310 = 231/385 = 3/5.
+Respuesta final: 3/5"
+C5-FT · entrenado,M3,ari-12,aritmetica,decimales_y_raiz,,False,False,True,3,0.825,True,"esperaba 70, dio 45",2,2,2,evaluar_expresion|raiz,1.0,True,0,True,3,respuesta,0,0,False,11083,218,15.934787036999978,"Paso 1: Resolvemos según la jerarquía: 0.0375 ÷ 0.0015 = 25.
+Paso 2: Calculamos la raíz: 45.
+Respuesta final: 45"
+C5-FT · entrenado,M3,ari-13,aritmetica,expansion_algebraica,,True,False,False,3,0.855,True,contiene '2x^2 - 7x - 15',1,1,1,operar_expresion,1.0,True,0,,2,respuesta,0,0,False,7233,137,11.38044924299993,"Paso 1: Expandido: 2x^2 - 10x + 3x - 15.
+Paso 2: Simplificamos: 2x^2 - 7x - 15.
+Respuesta final: 2x^2 - 7x - 15"
+C5-FT · entrenado,M3,com-01,compuesto,ponderacion_examen,,True,False,False,3,0.886,True,número correcto,1,1,1,multiplicar,0.0,False,0,True,2,respuesta,0,0,False,7245,98,8.373087076000047,"Paso 1: El examen vale 40%, así que son 4.5 × 0.4 = 1.8.
+Respuesta final: 1.8 puntos"
+C5-FT · entrenado,M3,com-02,compuesto,nota_periodo_completa,,False,False,True,3,0.809,True,"esperaba 3.75, dio 12.6",3,2,2,multiplicar|evaluar_expresion|sumar,0.5,False,0,False,5,respuesta,0,1,False,19061,340,28.298644349999904,"Paso 1: Sumamos: 1.6 + 3.5 = 5.1.
+Paso 2: Sumamos el quice: 5.1 + 3.0 = 8.1.
+Paso 3: Sumamos el trabajo en clase: 8.1 + 4.5 = 12.6.
+Respuesta final: 12.6"
+C5-FT · entrenado,M3,com-03,compuesto,tope_recuperacion,,False,False,True,3,0.718,True,"esperaba 3.5, dio 5.0",2,2,2,evaluar_expresion|evaluar_expresion,0.0,False,0,False,4,respuesta,0,1,False,14950,250,20.822969891999946,"Paso 1: Resolvemos de izquierda a derecha: 2.4 + 4.8 = 7.2.
+Paso 2: La nota máxima es 5.0, así que la nota quedará registrada como 5.0.
+Respuesta final: 5.0"
+C5-FT · entrenado,M3,com-04,compuesto,distancia_a_aprobar,,False,False,True,3,0.7,True,"esperaba 0.35, dio 2.35",2,2,2,multiplicar|evaluar_expresion,0.5,False,0,True,4,respuesta,0,1,False,14907,237,19.798164372999963,"Paso 1: Resolvemos según la jerarquía: 5 - 2.65 = 2.35.
+Paso 2: El estudiante necesita 5 - 2.65 = 2.35.
+Respuesta final: 2.35"
+C5-FT · entrenado,M3,com-05,compuesto,grados_plan_area,,False,False,True,3,0.731,True,"esperaba 2, dio 5",1,1,1,evaluar_expresion,0.0,False,0,True,2,respuesta,0,0,False,7259,104,8.80498435499976,"Paso 1: El grado de primer grado es 1 y el de trigonometría es 4.
+Paso 2: 1 + 4 = 5.
+Respuesta final: 5 grados escolares"
+C5-FT · entrenado,M3,com-06,compuesto,suma_porcentajes_doc,,True,False,False,3,0.702,True,número correcto,2,2,2,multiplicar|dividir,0.0,False,0,True,4,respuesta,0,1,False,14901,247,20.658390099999906,"Paso 1: Dividimos: 6500 ÷ 100 = 65.
+Paso 2: Escribo la respuesta completa: Respuesta final: 65%
+Paso 3: Verificamos: 40% + 25% = 65%."
+C5-FT · entrenado,M3,com-07,compuesto,inasistencia_ponderada,,False,False,True,3,0.858,True,"esperaba 0.4, dio 1.4",1,1,1,multiplicar,0.0,False,0,True,2,respuesta,0,0,False,7250,103,8.720949569999902,"Paso 1: El examen vale 40% de la nota.
+Paso 2: 3.5 × 0.4 = 1.4.
+Respuesta final: 1.4 puntos"
+C5-FT · entrenado,M3,com-08,compuesto,recuperaciones_anio,,True,False,False,5,1.0,True,número correcto,1,1,1,multiplicar,0.0,False,0,True,2,respuesta,0,0,False,7233,93,7.903388058000019,"Paso 1: Según el SIEE, hay dos oportunidades de recuperación por periodo.
+Paso 2: 2 × 4 = 8.
+Respuesta final: 8 oportunidades"
+C5-FT · entrenado,M3,mal-01,mal_escrito,sin_tildes_abreviaturas,dif-06,True,False,False,3,0.949,True,número correcto,2,2,2,multiplicar|restar,0.0,False,0,False,4,respuesta,0,1,True,15158,403,28.396940408999853,"Paso 1: El descuento es 20%, así que el precio es 80% del precio original: 200000 × 0.8 = 160000.
+Paso 2: El segundo descuento es del 10%, así que el precio es 90% del precio anterior: 160000 × 0.9 = 144000.
+Respuesta final: 144000"
+C5-FT · entrenado,M3,mal-02,mal_escrito,faltas_ortograficas,dif-08,False,False,True,3,0.683,True,"esperaba 8, dio 18",2,2,2,dividir|dividir,1.0,True,0,False,4,respuesta,0,1,True,14943,239,17.59375118600019,"Paso 1: Dividimos: 12 ÷ 6 = 2.
+Paso 2: Multiplicamos: 2 × 9 = 18.
+Respuesta final: 18 días"
+C5-FT · entrenado,M3,mal-03,mal_escrito,faltas_ortograficas,con-01,False,False,True,3,0.32,True,"esperaba 40, dio 2",2,2,2,evaluar_expresion|multiplicar,0.0,False,2,True,4,respuesta,0,1,True,14930,234,17.66472723800007,"Paso 1: Multiplicamos: 0.4 × 5 = 2.
+Paso 2: El examen final vale 2 de 5.
+Respuesta final: 2 de 5"
+C5-FT · entrenado,M3,mal-04,mal_escrito,coloquial_abreviado,con-03,False,False,True,3,0.768,True,no menciona ninguna clave esperada,2,2,2,evaluar_expresion|multiplicar,0.0,False,2,True,3,respuesta,0,0,True,11039,181,12.945415911000055,"Paso 1: Según el sistema de evaluación, la nota mínima aprobatoria es 3.
+Paso 2: Dos recuperaciones por período.
+Respuesta final: 3 y 2 recuperaciones"
+C5-FT · entrenado,M3,mal-05,mal_escrito,operador_en_palabras,ari-03,True,False,False,3,0.809,True,número correcto,2,2,2,operar_fracciones|evaluar_expresion,1.0,True,0,True,4,respuesta,0,1,True,15162,317,24.392677320000075,"Paso 1: Resolvemos según la jerarquía: 72/72 + 1/72 = 73/72.
+Paso 2: Simplificamos: 73/72.
+Respuesta final: 73/72"
+C5-FT · entrenado,M3,mal-06,mal_escrito,faltas_y_espacios,ari-07,True,False,False,4,0.937,True,número correcto,1,1,1,resolver_ecuacion,1.0,True,0,True,2,respuesta,0,0,False,7301,135,9.41884830500021,"Paso 1: Despejamos x: 7x - 4x = 58 + 23.
+Paso 2: 3x = 81; x = 27.
+Respuesta final: x = 27"
+C5-FT · entrenado,M3,mal-07,mal_escrito,sin_puntuacion,com-02,False,False,True,3,0.731,True,"esperaba 3.75, dio 3.525",1,1,1,evaluar_expresion,0.5,False,0,True,2,respuesta,0,0,False,7432,244,18.11467890499989,"Paso 1: Multiplicamos las ponderaciones: 3.5×0.4=1.4, 3.0×0.25=0.75, 3.5×0.2=0.7 y 4.5×0.15=0.675.
+Paso 2: Sumamos: 1.4+0.75+0.7+0.675=3.525.
+Respuesta final: 3.525"
+C5-FT · entrenado,M3,mal-08,mal_escrito,coloquial,adv-02,True,False,False,1,0.731,True,contiene 'no se puede dividir',1,1,0,dividir,,True,0,,2,respuesta,0,0,True,7294,102,7.560552262999863,"Paso 1: Dividir entre cero no está permitido.
+Respuesta final: no se puede dividir"
+C5-FT · entrenado,M3,mal-09,mal_escrito,faltas_ortograficas,dif-12,True,False,False,3,0.839,True,número correcto,1,1,1,evaluar_expresion,1.0,True,0,True,2,respuesta,0,0,True,7406,170,10.139550903000327,"Paso 1: El primer bolillo tiene 5/8 de chance de ser rojo.
+Paso 2: Si es rojo, el segundo tiene 4/7 de chance de ser rojo.
+Respuesta final: 5/14"
+C5-FT · entrenado,M3,mal-10,mal_escrito,signos_repetidos,ari-05,True,False,False,5,0.816,True,número correcto,1,1,1,raiz,1.0,True,0,True,2,respuesta,0,0,True,7280,109,0.02634041999999681,"Paso 1: Calculamos la raíz cuadrada: √7056 = 84.
+Respuesta final: 84"
+C5-FT · entrenado,M3,mal-11,mal_escrito,x_como_multiplicacion,ari-01,True,False,False,5,0.995,True,número correcto,1,1,1,multiplicar,1.0,True,0,True,2,respuesta,0,0,True,7288,120,8.621095963000244,"Paso 1: Multiplicamos: 3847 × 296 = 1138712.
+Respuesta final: 1138712"

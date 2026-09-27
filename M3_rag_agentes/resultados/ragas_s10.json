@@ -1,0 +1,176 @@
+{
+  "evaluador": "Qwen/Qwen2.5-7B-Instruct",
+  "calibracion": {
+    "kappa_relevancia_chunks": 0.7200000000000001,
+    "n_juicios_relevancia": 153,
+    "kappa_context_recall": 0.0,
+    "spearman_faithfulness": 0.09303079618886144
+  },
+  "ragas_por_config": {
+    "C0 · base": {
+      "faithfulness": null,
+      "faithfulness_numerica": 0.356564943,
+      "context_precision": null,
+      "context_precision_oro": null,
+      "context_recall": null,
+      "context_recall_oro": null,
+      "answer_relevancy": 0.6780732236
+    },
+    "C1 · +LoRA": {
+      "faithfulness": null,
+      "faithfulness_numerica": 0.3229761669,
+      "context_precision": null,
+      "context_precision_oro": null,
+      "context_recall": null,
+      "context_recall_oro": null,
+      "answer_relevancy": 0.7087787988
+    },
+    "C2 · +RAG": {
+      "faithfulness": 0.6509433962,
+      "faithfulness_numerica": 0.4479489839,
+      "context_precision": 1.0,
+      "context_precision_oro": 0.9,
+      "context_recall": 0.6888888889,
+      "context_recall_oro": 1.0,
+      "answer_relevancy": 0.6714867289
+    },
+    "C3 · +herram.": {
+      "faithfulness": 0.6871069182,
+      "faithfulness_numerica": 0.4835275379,
+      "context_precision": 1.0,
+      "context_precision_oro": 0.9,
+      "context_recall": 0.6888888889,
+      "context_recall_oro": 1.0,
+      "answer_relevancy": 0.6499311157
+    },
+    "C4 · +ReAct": {
+      "faithfulness": 0.6933962264,
+      "faithfulness_numerica": 0.480582265,
+      "context_precision": 1.0,
+      "context_precision_oro": 0.9,
+      "context_recall": 0.6888888889,
+      "context_recall_oro": 1.0,
+      "answer_relevancy": 0.668129071
+    },
+    "C5 · agente": {
+      "faithfulness": 0.7666666667,
+      "faithfulness_numerica": 0.4045919674,
+      "context_precision": 1.0,
+      "context_precision_oro": 1.0,
+      "context_recall": 1.0,
+      "context_recall_oro": 1.0,
+      "answer_relevancy": 0.6968215622
+    },
+    "C5-FT · entrenado": {
+      "faithfulness": 0.734,
+      "faithfulness_numerica": 0.7740624455,
+      "context_precision": 1.0,
+      "context_precision_oro": 1.0,
+      "context_recall": 1.0,
+      "context_recall_oro": 1.0,
+      "answer_relevancy": 0.6575996753
+    }
+  },
+  "cobertura": {
+    "C0 · base": {
+      "faithfulness": 0,
+      "faithfulness_numerica": 52,
+      "context_precision": 0,
+      "context_precision_oro": 0,
+      "context_recall": 0,
+      "context_recall_oro": 0,
+      "answer_relevancy": 53
+    },
+    "C1 · +LoRA": {
+      "faithfulness": 0,
+      "faithfulness_numerica": 47,
+      "context_precision": 0,
+      "context_precision_oro": 0,
+      "context_recall": 0,
+      "context_recall_oro": 0,
+      "answer_relevancy": 53
+    },
+    "C2 · +RAG": {
+      "faithfulness": 53,
+      "faithfulness_numerica": 48,
+      "context_precision": 15,
+      "context_precision_oro": 15,
+      "context_recall": 15,
+      "context_recall_oro": 15,
+      "answer_relevancy": 53
+    },
+    "C3 · +herram.": {
+      "faithfulness": 53,
+      "faithfulness_numerica": 48,
+      "context_precision": 15,
+      "context_precision_oro": 15,
+      "context_recall": 15,
+      "context_recall_oro": 15,
+      "answer_relevancy": 53
+    },
+    "C4 · +ReAct": {
+      "faithfulness": 53,
+      "faithfulness_numerica": 48,
+      "context_precision": 15,
+      "context_precision_oro": 15,
+      "context_recall": 15,
+      "context_recall_oro": 15,
+      "answer_relevancy": 53
+    },
+    "C5 · agente": {
+      "faithfulness": 10,
+      "faithfulness_numerica": 44,
+      "context_precision": 3,
+      "context_precision_oro": 3,
+      "context_recall": 3,
+      "context_recall_oro": 3,
+      "answer_relevancy": 53
+    },
+    "C5-FT · entrenado": {
+      "faithfulness": 50,
+      "faithfulness_numerica": 49,
+      "context_precision": 3,
+      "context_precision_oro": 3,
+      "context_recall": 3,
+      "context_recall_oro": 3,
+      "answer_relevancy": 53
+    }
+  },
+  "diagnostico_documentos": {
+    "C0 · base": {
+      "GENERACIÓN: el dato llegó y no lo usó": 0,
+      "SIN CONTEXTO: no tiene RAG o no buscó": 15,
+      "acierto": 0
+    },
+    "C1 · +LoRA": {
+      "GENERACIÓN: el dato llegó y no lo usó": 0,
+      "SIN CONTEXTO: no tiene RAG o no buscó": 15,
+      "acierto": 0
+    },
+    "C2 · +RAG": {
+      "GENERACIÓN: el dato llegó y no lo usó": 8,
+      "SIN CONTEXTO: no tiene RAG o no buscó": 0,
+      "acierto": 7
+    },
+    "C3 · +herram.": {
+      "GENERACIÓN: el dato llegó y no lo usó": 6,
+      "SIN CONTEXTO: no tiene RAG o no buscó": 0,
+      "acierto": 9
+    },
+    "C4 · +ReAct": {
+      "GENERACIÓN: el dato llegó y no lo usó": 6,
+      "SIN CONTEXTO: no tiene RAG o no buscó": 0,
+      "acierto": 9
+    },
+    "C5 · agente": {
+      "GENERACIÓN: el dato llegó y no lo usó": 1,
+      "SIN CONTEXTO: no tiene RAG o no buscó": 4,
+      "acierto": 10
+    },
+    "C5-FT · entrenado": {
+      "GENERACIÓN: el dato llegó y no lo usó": 1,
+      "SIN CONTEXTO: no tiene RAG o no buscó": 8,
+      "acierto": 6
+    }
+  }
+}

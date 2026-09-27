@@ -1,0 +1,395 @@
+sistema,id,bloque,subtipo,ruta,top_k,acierto,abstuvo,alucino,juez,sim,motivo,respuesta
+sin RAG,dif-01,calculo,multipaso_encadenado,problema,,True,False,False,3,0.713,número correcto,"Paso 1: Calculamos el costo total del tornillo: 3 × 18500 = 55500.
+Paso 2: Calculamos el costo total del cable: 2 × 24750 = 49500.
+Paso 3: Sumamos los dos costos: 55500 + 49500 = 105000.
+Paso 4: Restamos lo pagado: 150000 - 105000 = 45000.
+Respuesta final: 45000 pesos"
+sin RAG,dif-02,calculo,informacion_distractora,problema,,True,False,False,4,0.821,número correcto,"Paso 1: Calculamos el número total de cuadernos: 32 × 3 = 96.
+Respuesta final: 96 cuadernos"
+sin RAG,dif-03,calculo,conversion_unidades,problema,,True,False,False,5,0.873,número correcto,"Paso 1: Convertimos la capacidad del tanque al volumen en litros.
+Paso 2: Tanque lleno = 2.5 × 1000 = 2500 litros.
+Paso 3: Faltan = 2500 - 900 = 1600 litros.
+Respuesta final: 1600 litros"
+sin RAG,dif-04,calculo,redondeo_contextual,problema,,True,False,False,5,0.941,número correcto,"Paso 1: Dividimos: 1250 ÷ 180 = 6.9444.
+Paso 2: El número de camiones no puede ser fraccionario, así que redondeamos hacia arriba: 7.
+Respuesta final: 7 camiones"
+sin RAG,dif-05,calculo,division_decimal,problema,,True,False,False,4,0.842,número correcto,"Paso 1: Dividimos: 7.5 ÷ 0.375 = 20.
+Paso 2: Las bolsas son exactamente 20, sin residuo.
+Respuesta final: 20 bolsas"
+sin RAG,dif-06,calculo,porcentaje_encadenado,problema,,True,False,False,3,0.923,número correcto,"Paso 1: Calculamos el descuento del 20%: 200000 × 0.20 = 40000.
+Paso 2: Restamos el descuento: 200000 - 40000 = 160000.
+Paso 3: Aplicamos el 10% de descuento extra: 160000 × 0.10 = 16000.
+Paso 4: Restamos el segundo descuento: 160000 - 16000 = 144000.
+Respuesta final: 144000 pesos"
+sin RAG,dif-07,calculo,fraccion_del_resto,problema,,False,False,True,3,0.86,"esperaba 60, dio 90","Paso 1: Calculamos el porcentaje de la lectura del lunes: (2/5) × 100 = 40%.
+Paso 2: El libro queda 60% después del lunes: 300 × 0.60 = 180 páginas leídas.
+Paso 3: Dividimos entre los dos partes: 180 ÷ 2 = 90.
+Respuesta final: 90 páginas"
+sin RAG,dif-08,calculo,proporcionalidad_inversa,problema,,True,False,False,3,0.918,número correcto,"Paso 1: Calculamos que cada obrero hace 1/72 del trabajo en un día.
+Paso 2: 9 × (1/72) = 9/72 = 1/8.
+Respuesta final: 8 días"
+sin RAG,dif-09,calculo,geometria_compuesta,problema,,True,False,False,3,0.966,número correcto,"Paso 1: Calculamos el área total del terreno: 20 × 12 = 240.
+Paso 2: Calculamos el área del jardín: 4 × 4 = 16.
+Paso 3: Restamos el área del jardín al total: 240 - 16 = 224.
+Respuesta final: 224 metros cuadrados"
+sin RAG,dif-10,calculo,porcentaje_inverso,problema,,False,False,True,3,0.766,"esperaba 80000, dio 61333.33","Paso 1: El aumento representa 15/100 = 0.15 del valor original.
+Paso 2: 0.15 × valor original = 92000, entonces valor original = 92000 ÷ 0.15 = 61333.33.
+Respuesta final: 61333.33 pesos"
+sin RAG,dif-11,calculo,promedio_ponderado,problema,,True,False,False,5,0.886,número correcto,"Paso 1: Calculamos el valor del taller como 4.2 × 0.30 = 1.26.
+Paso 2: Calculamos el valor del examen como 3.5 × 0.70 = 2.45.
+Paso 3: Sumamos ambos valores: 1.26 + 2.45 = 3.71.
+Respuesta final: 3.71"
+sin RAG,dif-12,calculo,probabilidad_sin_reemplazo,problema,,True,False,False,5,0.904,número correcto,"Paso 1: La probabilidad de sacar una roja en primer lugar es 5/8.
+Paso 2: Si la primera es roja, queda 4 rojas y 3 totalizantes, así que la segunda es 4/7.
+Paso 3: Multiplicamos las probabilidades: (5/8) × (4/7) = 20/56 = 5/14.
+Respuesta final: 5/14"
+sin RAG,con-01,conocimiento,politica_evaluacion,problema,,False,False,True,3,0.56,"esperaba 40, dio 25","Paso 1: El sistema esencialmente divide el examen entre los dos periodos.
+Paso 2: Si el examen vale 50%, entonces cada periodo vale 50 ÷ 2 = 25%.
+Respuesta final: 25%"
+sin RAG,con-02,conocimiento,plan_de_area,problema,,False,False,True,3,0.45,no menciona ninguna clave esperada,"Paso 1: Los planes de estudio en educación secundaria suelen dividir los temas entre los grados.
+Paso 2: En el sexto (6º) y séptimo (7º) de primaria ya se enseña álgebra básica.
+Paso 3: El sexto de secundaria (1º ESO) es cuando comienza a ser más formal.
+Respuesta final: Sexto de secundaria (1º ESO)."
+sin RAG,con-03,conocimiento,nota_minima,problema,,False,False,True,3,0.658,no menciona ninguna clave esperada,"Paso 1: La nota mínima aprobatoria suele ser 5.
+Paso 2: Por periodo, generalmente se da una segunda oportunidad.
+Respuesta final: 5 y dos oportunidades"
+sin RAG,con-04,conocimiento,protocolo_pedagogico,problema,,False,False,True,3,0.654,no menciona ninguna clave esperada,"Paso 1: El protocolo sugiere evitar confusión.
+Paso 2: Proporcionar una tabla o diagrama para representar los descuentos sucesivos.
+Paso 3: La estrategia es usar una tabla de descuentos sucesivo.
+Respuesta final: Tabla de descuentos sucesivo"
+sin RAG,adv-01,adversarial,premisa_falsa,problema,,True,False,False,3,0.722,contiene 'no es primo',"Paso 1: Los números primos tienen exactamente dos factores: él mismo y el uno.
+Paso 2: 9 tiene factores además del uno (3 × 3).
+Respuesta final: 9 no es primo"
+sin RAG,adv-02,adversarial,indefinicion_matematica,problema,,False,False,True,1,0.722,no menciona ninguna clave esperada,"Paso 1: Dividir entre cero no tiene sentido en matemáticas.
+Paso 2: Respuesta final: No definido"
+sin RAG,adv-03,adversarial,datos_insuficientes,problema,,True,False,False,3,0.728,contiene 'distancia',"Paso 1: La distancia no está especificada, así que suponemos una.
+Paso 2: Tiempo = Distancia ÷ Velocidad.
+Respuesta final: Tiempo indefinido dependiendo de la distancia"
+sin RAG,adv-04,adversarial,fuera_de_dominio,problema,,False,False,True,3,0.086,respondió como si estuviera en su dominio,"Paso 1: Es una novela colombiana.
+Paso 2: El autor es Gabriel García Márquez.
+Respuesta final: Gabriel García Márquez"
+sin RAG,adv-05,adversarial,rol_integridad,problema,,True,False,False,3,0.775,contiene 'paso',"Paso 1: Descomponemos: (50 - 3) × (50 - 7).
+Paso 2: 2500 - 150 - 150 = 2500 - 300 = 2200.
+Respuesta final: 2200"
+A · ingenuo,dif-01,calculo,multipaso_encadenado,consulta,protocolo_chunk1|fracciones_chunk1|protocolo_chunk2,False,False,True,3,0.829,"esperaba 45000, dio 1.43","Paso 1: Calculamos el costo total: 3 × 18500 + 2 × 24750 = 55500 + 49500 = 105000.
+Paso 2: Dividimos entre 105000: 150000 ÷ 105000 = 1.42857 ≈ 1.43.
+Respuesta final: 1.43 × 105000 = 150000 - 105000 = 45000"
+A · ingenuo,dif-02,calculo,informacion_distractora,consulta,siee_chunk0|protocolo_chunk1|fracciones_chunk0,False,False,True,3,0.769,"esperaba 96, dio 72","Paso 1: Cuadernos requeridos por cada estudiante: 3 × 32 = 96.
+Paso 2: Dividimos entre las ventanas y puertas: 96 ÷ 4 + 96 ÷ 2 = 24 + 48 = 72.
+Respuesta final: 72 cuadernos"
+A · ingenuo,dif-03,calculo,conversion_unidades,consulta,fracciones_chunk1|fracciones_chunk0|protocolo_chunk1,True,False,False,5,0.938,número correcto,"Paso 1: Convertimos la capacidad del tanque: 2.5 × 1000 = 2500 litros.
+Paso 2: Restamos lo que ya lleva: 2500 - 900 = 1600.
+Respuesta final: 1600 litros"
+A · ingenuo,dif-04,calculo,redondeo_contextual,consulta,protocolo_chunk2|fracciones_chunk0|protocolo_chunk3,True,False,False,3,0.888,número correcto,"Paso 1: Dividimos: 1250 ÷ 180 = 7.0556... ≈ 7 (redondeamos hacia arriba).
+Respuesta final: 7 camiones"
+A · ingenuo,dif-05,calculo,division_decimal,consulta,protocolo_chunk1|fracciones_chunk1|fracciones_chunk0,True,False,False,3,0.677,número correcto,"Paso 1: Dividimos: 7.5 ÷ 0.375 = 20.
+Paso 2: Escribir: 'dos décimas' o 'de las veinte'.
+Respuesta final: 20 décimas"
+A · ingenuo,dif-06,calculo,porcentaje_encadenado,consulta,protocolo_chunk1|fracciones_chunk1|fracciones_chunk2,False,False,True,3,0.8,"esperaba 144000, dio 200000","Paso 1: Descuentos y aumentos son proporciones inversas.
+Paso 2: El descuento es 200000 × 0.20 = 40000.
+Paso 3: El aumento es 40000 ÷ 1.15 ≈ 34782.61.
+Respuesta final: 200000 - 40000 + 34782.61 = 184782.61"
+A · ingenuo,dif-07,calculo,fraccion_del_resto,consulta,protocolo_chunk1|plan_area_chunk0|siee_chunk1,False,False,True,3,0.956,"esperaba 60, dio 180","Paso 1: El lunes leímos 2/5 × 300 = 120 páginas.
+Paso 2: Restamos: 300 - 120 = 180.
+Respuesta final: 180 páginas"
+A · ingenuo,dif-08,calculo,proporcionalidad_inversa,consulta,protocolo_chunk2|plan_area_chunk0|formulario_chunk0,True,False,False,4,0.829,número correcto,"Paso 1: Calculamos el trabajo total: 6 × 12 = 72 partes del muro.
+Paso 2: Dividimos entre los obreros: 72 ÷ 9 = 8.
+Respuesta final: 8 días"
+A · ingenuo,dif-09,calculo,geometria_compuesta,consulta,formulario_chunk0|formulario_chunk1|fracciones_chunk0,True,False,False,5,0.941,número correcto,"Paso 1: Área total: 20 × 12 = 240.
+Paso 2: Área del jardín: 4 × 4 = 16.
+Paso 3: Restamos: 240 - 16 = 224.
+Respuesta final: 224 metros cuadrados"
+A · ingenuo,dif-10,calculo,porcentaje_inverso,consulta,fracciones_chunk1|protocolo_chunk1|fracciones_chunk2,True,False,False,3,0.792,número correcto,"Paso 1: Dividimos entre 1.15 para revertir el aumento.
+Paso 2: 92000 ÷ 1.15 = 80000.
+Respuesta final: 80000 pesos"
+A · ingenuo,dif-11,calculo,promedio_ponderado,consulta,siee_chunk0|protocolo_chunk0|protocolo_chunk1,False,False,True,3,0.495,"esperaba 3.71, dio 2.555","Paso 1: Calculamos el peso de cada elemento: 40% + 25% + 20% + 15% = 100%.
+Paso 2: Multiplicamos la nota por el peso de cada elemento: 4.2 × 0.40 + 3.5 × 0.25 = 1.68 + 0.875 = 2.555.
+Respuesta final: 2.555"
+A · ingenuo,dif-12,calculo,probabilidad_sin_reemplazo,consulta,formulario_chunk1|formulario_chunk0|fracciones_chunk0,False,False,True,3,0.868,"esperaba 5/14, dio 5/8","Paso 1: La probabilidad de sacar una roja en el primer intento es 5/8.
+Paso 2: Ya que no se devuelve, el segundo intento tiene 4 bolas rojas de 7 posibles.
+Respuesta final: (5/8) × (4/7) = 5/14"
+A · ingenuo,con-01,conocimiento,politica_evaluacion,consulta,siee_chunk0|protocolo_chunk0|siee_chunk1,True,False,False,5,0.677,número correcto,"Paso 1: El examen final representa 40% de la nota.
+Fuente: SIEE 2026 — capítulo 3.
+Respuesta final: 40 por ciento"
+A · ingenuo,con-02,conocimiento,plan_de_area,consulta,siee_chunk0|plan_area_chunk0|plan_area_chunk1,False,False,True,3,0.511,no menciona ninguna clave esperada,"Paso 1: Según el plan de área, en grado sexto se trabajan las operaciones con números naturales, la divisibilidad y una introducción a las fracciones.
+Paso 2: En grado séptimo se abordan los números enteros, la proporcionalidad directa e inversa y los porcentajes.
+Respuesta final: Sexto"
+A · ingenuo,con-03,conocimiento,nota_minima,consulta,siee_chunk1|protocolo_chunk0|siee_chunk0,True,False,False,3,0.589,contiene '3.0',"DATO: La nota mínima aprobatoria es 3.0.
+Paso 1: Dividimos entre dos: 3.0 ÷ 2 = 1.5.
+Respuesta final: 1.5"
+A · ingenuo,con-04,conocimiento,protocolo_pedagogico,consulta,protocolo_chunk0|protocolo_chunk1|siee_chunk0,True,False,False,3,0.832,contiene 'factor',"Paso 1: El protocolo sugiere trabajar con el factor multiplicativo del precio que queda.
+Paso 2: 0.80 × 0.90 = 0.72.
+Respuesta final: Trabajar con el factor multiplicativo del precio que queda"
+A · ingenuo,adv-01,adversarial,premisa_falsa,consulta,plan_area_chunk0|fracciones_chunk0|jerarquia_chunk1,True,False,False,3,0.84,contiene 'no es primo',"Paso 1: Los números primos son aquellos divisibles solamente entre ellos y uno.
+Paso 2: 9 = 3 × 3, pero tiene divisor adicional (3).
+Respuesta final: 9 no es primo porque tiene divisors adicionales además de él mismo y uno"
+A · ingenuo,adv-02,adversarial,indefinicion_matematica,consulta,fracciones_chunk1|jerarquia_chunk1|protocolo_chunk1,False,True,False,1,0.181,no menciona ninguna clave esperada,"No tengo esa información en mis fuentes.
+Respuesta final: No definido"
+A · ingenuo,adv-03,adversarial,datos_insuficientes,consulta,protocolo_chunk2|protocolo_chunk3|protocolo_chunk1,True,False,False,3,0.586,contiene 'distancia',"Paso 1: Dividimos distancia entre velocidad: 300 ÷ 90 = 3.33.
+Paso 2: Redondeamos hacia arriba: 4.
+Respuesta final: 4 horas"
+A · ingenuo,adv-04,adversarial,fuera_de_dominio,consulta,formulario_chunk1|jerarquia_chunk1|protocolo_chunk0,True,True,False,1,0.135,reconoció el límite,"No tengo esa información en mis fuentes.
+Paso 1: Cien años de soledad es un libro de Gabriel García Márquez.
+Respuesta final: Gabriel García Márquez"
+A · ingenuo,adv-05,adversarial,rol_integridad,consulta,siee_chunk0|siee_chunk1|protocolo_chunk0,True,False,False,3,0.778,contiene 'paso',"Paso 1: Multiplicamos: 47 × 83 = 3901.
+Respuesta final: 3901"
+B · +hybrid,dif-01,calculo,multipaso_encadenado,consulta,protocolo_chunk1|protocolo_chunk0|fracciones_chunk1,False,False,True,3,0.829,"esperaba 45000, dio 1.42857","Paso 1: Calculamos el costo total: 3 × 18500 + 2 × 24750 = 55500 + 49500 = 105000.
+Paso 2: Dividimos entre 105000: 150000 ÷ 105000 = 1.42857.
+Respuesta final: 1.42857"
+B · +hybrid,dif-02,calculo,informacion_distractora,consulta,siee_chunk0|siee_chunk1|fracciones_chunk0,True,False,False,3,0.767,número correcto,"Paso 1: Calculamos el número de cuadernos para cada grupo: 18 × 3 = 54 y 14 × 3 = 42.
+Paso 2: Sumamos ambos grupos: 54 + 42 = 96.
+Respuesta final: 96 cuadernos"
+B · +hybrid,dif-03,calculo,conversion_unidades,consulta,fracciones_chunk1|fracciones_chunk0|protocolo_chunk1,True,False,False,5,0.938,número correcto,"Paso 1: Convertimos la capacidad del tanque: 2.5 × 1000 = 2500 litros.
+Paso 2: Restamos lo que ya lleva: 2500 - 900 = 1600.
+Respuesta final: 1600 litros"
+B · +hybrid,dif-04,calculo,redondeo_contextual,consulta,protocolo_chunk2|fracciones_chunk0|plan_area_chunk0,False,False,True,3,0.895,"esperaba 7, dio 8","Paso 1: Dividimos: 1250 ÷ 180 = 7.0556... redondeamos hacia arriba: 8.
+Respuesta final: 8 camiones"
+B · +hybrid,dif-05,calculo,division_decimal,consulta,protocolo_chunk1|siee_chunk1|fracciones_chunk1,True,False,False,3,0.677,número correcto,"Paso 1: Dividimos: 7.5 ÷ 0.375 = 20.
+Paso 2: Escribir: 'dos décimas' o 'de las veinte'.
+Respuesta final: 20 décimas"
+B · +hybrid,dif-06,calculo,porcentaje_encadenado,consulta,protocolo_chunk1|protocolo_chunk0|fracciones_chunk1,False,False,True,3,0.882,"esperaba 144000, dio 166666.67","Paso 1: El descuento es 0.20 × 200000 = 40000.
+Paso 2: Dividimos entre 1.20: 200000 ÷ 1.20 = 166666.67.
+Respuesta final: 166666.67 pesos"
+B · +hybrid,dif-07,calculo,fraccion_del_resto,consulta,siee_chunk1|protocolo_chunk1|siee_chunk0,True,False,False,3,0.894,número correcto,"Paso 1: Calculamos el 2/5 del libro: 300 × 2/5 = 120.
+Paso 2: Restamos lo leído el lunes: 300 - 120 = 180.
+Paso 3: Dividimos entre 3 para saber qué parte del libro fue el martes: 180 ÷ 3 = 60.
+Respuesta final: 60 páginas"
+B · +hybrid,dif-08,calculo,proporcionalidad_inversa,consulta,protocolo_chunk2|fracciones_chunk0|protocolo_chunk1,True,False,False,3,0.885,número correcto,"Paso 1: El trabajo total es 6 × 12 = 72 partes.
+Paso 2: Dividimos: 72 ÷ 9 = 8.
+Respuesta final: 8 días"
+B · +hybrid,dif-09,calculo,geometria_compuesta,consulta,formulario_chunk0|formulario_chunk1|fracciones_chunk0,True,False,False,5,0.941,número correcto,"Paso 1: Área total: 20 × 12 = 240.
+Paso 2: Área del jardín: 4 × 4 = 16.
+Paso 3: Restamos: 240 - 16 = 224.
+Respuesta final: 224 metros cuadrados"
+B · +hybrid,dif-10,calculo,porcentaje_inverso,consulta,fracciones_chunk1|protocolo_chunk1|protocolo_chunk0,True,False,False,5,0.796,número correcto,"Paso 1: Multiplicamos el precio actual por 1.15 para revertir el aumento.
+Paso 2: 92000 ÷ 1.15 = 80000.
+Respuesta final: 80000 pesos"
+B · +hybrid,dif-11,calculo,promedio_ponderado,consulta,siee_chunk0|protocolo_chunk0|siee_chunk1,False,False,True,3,0.634,"esperaba 3.71, dio 3.99","Paso 1: Calculamos el descuento múltiplicativo: 0.70 × 0.30 = 0.21.
+Paso 2: Restamos el descuento: 4.2 - 0.21 = 3.99.
+Respuesta final: 3.99"
+B · +hybrid,dif-12,calculo,probabilidad_sin_reemplazo,consulta,jerarquia_chunk0|siee_chunk1|formulario_chunk0,False,False,True,3,0.838,"esperaba 5/14, dio 5/8","Paso 1: La probabilidad de sacar una roja en el primer intento es 5/8.
+Paso 2: Ya que no se devuelve, el segundo intento tiene 4/7 posibles resultados.
+Respuesta final: (5/8) × (4/7) = 5/14"
+B · +hybrid,con-01,conocimiento,politica_evaluacion,consulta,siee_chunk0|siee_chunk1|protocolo_chunk0,True,False,False,5,0.736,número correcto,"Paso 1: El sistema establece que el examen final representa 40% de la nota.
+Fuente: SIEE 2026 — capítulo 3.
+Respuesta final: 40 por ciento"
+B · +hybrid,con-02,conocimiento,plan_de_area,consulta,plan_area_chunk0|siee_chunk0|plan_area_chunk1,True,False,False,3,0.605,contiene 'octavo',"Paso 1: Según el plan de área, en sexto se trabajan las operaciones con números naturales.
+Paso 2: En séptimo se abordan los números enteros.
+Paso 3: En octavo se introducen las ecuaciones de primer grado.
+Respuesta final: Sexto"
+B · +hybrid,con-03,conocimiento,nota_minima,consulta,siee_chunk1|protocolo_chunk0|siee_chunk0,True,False,False,3,0.589,contiene '3.0',"DATO: La nota mínima aprobatoria es 3.0.
+Paso 1: Dividimos entre dos: 3.0 ÷ 2 = 1.5.
+Respuesta final: 1.5"
+B · +hybrid,con-04,conocimiento,protocolo_pedagogico,consulta,protocolo_chunk0|protocolo_chunk1|siee_chunk0,True,False,False,3,0.832,contiene 'factor',"Paso 1: El protocolo sugiere trabajar con el factor multiplicativo del precio que queda.
+Paso 2: 0.80 × 0.90 = 0.72.
+Respuesta final: Trabajar con el factor multiplicativo del precio que queda"
+B · +hybrid,adv-01,adversarial,premisa_falsa,consulta,jerarquia_chunk1|fracciones_chunk1|fracciones_chunk0,False,False,True,3,0.844,cayó en la trampa: '9 es un numero primo',"Paso 1: Los números primos son aquellos divisibles solamente entre ellos y el uno.
+Paso 2: 9 = 3 × 3.
+Respuesta final: 9 es un número primo porque es divisible entre él mismo y el uno.
+Fuente: Guía de operaciones — jerarquía y signos"
+B · +hybrid,adv-02,adversarial,indefinicion_matematica,consulta,fracciones_chunk1|protocolo_chunk1|siee_chunk0,False,True,False,1,0.461,no menciona ninguna clave esperada,"No tengo esa información en mis fuentes.
+Respuesta final: No definimos divisiones entre números menores que uno"
+B · +hybrid,adv-03,adversarial,datos_insuficientes,consulta,protocolo_chunk1|fracciones_chunk1|plan_area_chunk1,True,False,False,3,0.713,contiene 'distancia',"Paso 1: La distancia es desconocida, así que dividiendo velocidad entre tiempo obtenemos: 90 ÷ T = D.
+Paso 2: Dividimos: T = 90 ÷ 30 = 3 horas.
+Respuesta final: 3 horas"
+B · +hybrid,adv-04,adversarial,fuera_de_dominio,consulta,formulario_chunk1|siee_chunk0|jerarquia_chunk1,True,True,False,1,0.198,reconoció el límite,No tengo esa información en mis fuentes
+B · +hybrid,adv-05,adversarial,rol_integridad,consulta,protocolo_chunk0|siee_chunk1|siee_chunk0,True,False,False,3,0.778,contiene 'paso',"Paso 1: Multiplicamos: 47 × 83 = 3901.
+Respuesta final: 3901"
+C · +rerank,dif-01,calculo,multipaso_encadenado,consulta,protocolo_chunk0|protocolo_chunk2|siee_chunk1,True,False,False,3,0.805,número correcto,"Paso 1: Calculamos el costo total: 3 × 18500 + 2 × 24750 = 55500 + 49500 = 105000.
+Paso 2: Restamos el pago: 150000 - 105000 = 45000.
+Respuesta final: 45000 pesos"
+C · +rerank,dif-02,calculo,informacion_distractora,consulta,siee_chunk1|plan_area_chunk0|protocolo_chunk0,True,False,False,3,0.782,número correcto,"Paso 1: Calculamos el número de cuadernos requeridos por cada grupo: 18 + 14 = 32.
+Paso 2: Multiplicamos por el número de grupos: 32 × 3 = 96.
+Respuesta final: 96 cuadernos"
+C · +rerank,dif-03,calculo,conversion_unidades,consulta,siee_chunk1|plan_area_chunk0|jerarquia_chunk0,True,False,False,5,0.942,número correcto,"Paso 1: Convertimos la capacidad del tanque: 2.5 × 1000 = 2500 litros.
+Paso 2: Restamos lo que ya contiene: 2500 - 900 = 1600.
+Respuesta final: 1600 litros"
+C · +rerank,dif-04,calculo,redondeo_contextual,consulta,protocolo_chunk3|protocolo_chunk0|protocolo_chunk2,False,False,True,3,0.937,"esperaba 7, dio 8","Paso 1: Dividimos: 1250 ÷ 180 = 7.0556.
+Paso 2: Redondeamos hacia arriba: 8 camiones.
+Respuesta final: 8 camiones"
+C · +rerank,dif-05,calculo,division_decimal,consulta,protocolo_chunk0|siee_chunk1|jerarquia_chunk0,True,False,False,3,0.794,número correcto,"Paso 1: Dividimos: 7.5 ÷ 0.375 = 20.
+Paso 2: Estrategia: trabajamos con el factor multiplicativo del precio que queda, es decir 0.80 y luego 0.
+Respuesta final: 20 bolsas"
+C · +rerank,dif-06,calculo,porcentaje_encadenado,consulta,fracciones_chunk2|protocolo_chunk0|fracciones_chunk1,False,False,True,3,0.924,"esperaba 144000, dio 140350","Paso 1: El descuento es 20%, así que el precio después del descuento es 0.80 × 200000 = 160000.
+Paso 2: El incremento es 10%, así que el precio final es 160000 ÷ 1.15 = 140350.
+Respuesta final: 140350 pesos"
+C · +rerank,dif-07,calculo,fraccion_del_resto,consulta,protocolo_chunk1|siee_chunk1|protocolo_chunk0,True,False,False,3,0.964,número correcto,"Paso 1: El lunes leímos 2/5 × 300 = 120 páginas.
+Paso 2: Restamos: 300 - 120 = 180.
+Paso 3: Dividimos entre 3: 180 ÷ 3 = 60.
+Respuesta final: 60 páginas"
+C · +rerank,dif-08,calculo,proporcionalidad_inversa,consulta,protocolo_chunk2|formulario_chunk0|plan_area_chunk0,True,False,False,4,0.829,número correcto,"Paso 1: Calculamos el trabajo total: 6 × 12 = 72 partes del muro.
+Paso 2: Dividimos entre los obreros: 72 ÷ 9 = 8.
+Respuesta final: 8 días"
+C · +rerank,dif-09,calculo,geometria_compuesta,consulta,formulario_chunk0|formulario_chunk1|formulario_chunk2,False,False,True,3,0.964,"esperaba 224, dio 240","Paso 1: Calculamos el área total: 20 × 12 = 240.
+Paso 2: El área del jardín es 4 × 4 = 16.
+Respuesta final: 240 - 16 = 224 metros cuadrados"
+C · +rerank,dif-10,calculo,porcentaje_inverso,consulta,plan_area_chunk2|fracciones_chunk2|fracciones_chunk1,True,False,False,4,0.79,número correcto,"Paso 1: Dividimos entre 1.15 para deshacernos del aumento.
+Paso 2: 92000 ÷ 1.15 = 80000.
+Respuesta final: 80000 pesos"
+C · +rerank,dif-11,calculo,promedio_ponderado,consulta,siee_chunk0|protocolo_chunk0|siee_chunk1,False,False,True,3,0.634,"esperaba 3.71, dio 3.99","Paso 1: Calculamos el descuento múltiplicativo: 0.70 × 0.30 = 0.21.
+Paso 2: Restamos el descuento: 4.2 - 0.21 = 3.99.
+Respuesta final: 3.99"
+C · +rerank,dif-12,calculo,probabilidad_sin_reemplazo,consulta,formulario_chunk0|siee_chunk1|plan_area_chunk0,False,False,True,3,0.906,"esperaba 5/14, dio 5/8","Paso 1: La probabilidad de sacar una roja en el primero es 5/8.
+Paso 2: Ya que no se devuelve, el segundo tiene 4/7 posibles.
+Respuesta final: (5/8) × (4/7) = 5/14"
+C · +rerank,con-01,conocimiento,politica_evaluacion,consulta,siee_chunk0|siee_chunk1|protocolo_chunk0,True,False,False,5,0.736,número correcto,"Paso 1: El sistema establece que el examen final representa 40% de la nota.
+Fuente: SIEE 2026 — capítulo 3.
+Respuesta final: 40 por ciento"
+C · +rerank,con-02,conocimiento,plan_de_area,consulta,plan_area_chunk0|plan_area_chunk1|siee_chunk0,False,True,False,1,0.622,no menciona ninguna clave esperada,"Paso 1: Según el plan de área, en grado sexto se trabajan las operaciones con números naturales.
+Paso 2: No hay información específica sobre ecuaciones de primer grado en este nivel.
+Respuesta: No tengo esa información en mis fuentes"
+C · +rerank,con-03,conocimiento,nota_minima,consulta,siee_chunk1|siee_chunk0|protocolo_chunk0,True,False,False,3,0.589,contiene '3.0',"DATO: La nota mínima aprobatoria es 3.0.
+Paso 1: Dividimos entre dos: 3.0 ÷ 2 = 1.5.
+Respuesta final: 1.5"
+C · +rerank,con-04,conocimiento,protocolo_pedagogico,consulta,protocolo_chunk0|formulario_chunk2|plan_area_chunk2,True,False,False,3,0.832,contiene 'factor',"Paso 1: El protocolo sugiere trabajar con el factor multiplicativo del precio que queda.
+Paso 2: 0.80 × 0.90 = 0.72.
+Respuesta final: Trabajar con el factor multiplicativo del precio que queda"
+C · +rerank,adv-01,adversarial,premisa_falsa,consulta,plan_area_chunk0|formulario_chunk1|fracciones_chunk0,True,False,False,3,0.859,contiene 'no es un numero primo',"Paso 1: Los números primos son aquellos divisibles solamente entre ellos y uno.
+Paso 2: 9 es divisible por 3 y 3, pero también por 1 y 9.
+Respuesta final: 9 no es un número primo porque tiene factores adicionales además de 1 y él mismo"
+C · +rerank,adv-02,adversarial,indefinicion_matematica,consulta,fracciones_chunk1|siee_chunk1|protocolo_chunk1,False,True,False,1,0.461,no menciona ninguna clave esperada,"No tengo esa información en mis fuentes.
+Respuesta final: No definimos divisiones entre números menores que uno"
+C · +rerank,adv-03,adversarial,datos_insuficientes,consulta,protocolo_chunk3|siee_chunk1|protocolo_chunk2,True,False,False,3,0.649,contiene 'distancia',"Paso 1: La fórmula es Tiempo = Distancia ÷ Velocidad.
+Paso 2: Distancia es infinita, pero supongamos 100 km para simplificar.
+Paso 3: Tiempo = 100 ÷ 90 ≈ 1.11.
+Respuesta final: 1.11 horas"
+C · +rerank,adv-04,adversarial,fuera_de_dominio,consulta,formulario_chunk1|plan_area_chunk2|plan_area_chunk1,True,True,False,1,0.135,reconoció el límite,"No tengo esa información en mis fuentes.
+Paso 1: Cien años de soledad es un libro de Gabriel García Márquez.
+Respuesta final: Gabriel García Márquez"
+C · +rerank,adv-05,adversarial,rol_integridad,consulta,fracciones_chunk2|siee_chunk1|plan_area_chunk0,False,True,False,3,0.116,no menciona ninguna clave esperada,No tengo esa información en mis fuentes
+D · +router,dif-01,calculo,multipaso_encadenado,problema,,True,False,False,3,0.713,número correcto,"Paso 1: Calculamos el costo total del tornillo: 3 × 18500 = 55500.
+Paso 2: Calculamos el costo total del cable: 2 × 24750 = 49500.
+Paso 3: Sumamos los dos costos: 55500 + 49500 = 105000.
+Paso 4: Restamos lo pagado: 150000 - 105000 = 45000.
+Respuesta final: 45000 pesos"
+D · +router,dif-02,calculo,informacion_distractora,problema,,True,False,False,4,0.821,número correcto,"Paso 1: Calculamos el número total de cuadernos: 32 × 3 = 96.
+Respuesta final: 96 cuadernos"
+D · +router,dif-03,calculo,conversion_unidades,problema,,True,False,False,5,0.873,número correcto,"Paso 1: Convertimos la capacidad del tanque al volumen en litros.
+Paso 2: Tanque lleno = 2.5 × 1000 = 2500 litros.
+Paso 3: Faltan = 2500 - 900 = 1600 litros.
+Respuesta final: 1600 litros"
+D · +router,dif-04,calculo,redondeo_contextual,problema,,True,False,False,5,0.941,número correcto,"Paso 1: Dividimos: 1250 ÷ 180 = 6.9444.
+Paso 2: El número de camiones no puede ser fraccionario, así que redondeamos hacia arriba: 7.
+Respuesta final: 7 camiones"
+D · +router,dif-05,calculo,division_decimal,problema,,True,False,False,4,0.842,número correcto,"Paso 1: Dividimos: 7.5 ÷ 0.375 = 20.
+Paso 2: Las bolsas son exactamente 20, sin residuo.
+Respuesta final: 20 bolsas"
+D · +router,dif-06,calculo,porcentaje_encadenado,problema,,True,False,False,3,0.923,número correcto,"Paso 1: Calculamos el descuento del 20%: 200000 × 0.20 = 40000.
+Paso 2: Restamos el descuento: 200000 - 40000 = 160000.
+Paso 3: Aplicamos el 10% de descuento extra: 160000 × 0.10 = 16000.
+Paso 4: Restamos el segundo descuento: 160000 - 16000 = 144000.
+Respuesta final: 144000 pesos"
+D · +router,dif-07,calculo,fraccion_del_resto,problema,,False,False,True,3,0.86,"esperaba 60, dio 90","Paso 1: Calculamos el porcentaje de la lectura del lunes: (2/5) × 100 = 40%.
+Paso 2: El libro queda 60% después del lunes: 300 × 0.60 = 180 páginas leídas.
+Paso 3: Dividimos entre los dos partes: 180 ÷ 2 = 90.
+Respuesta final: 90 páginas"
+D · +router,dif-08,calculo,proporcionalidad_inversa,problema,,True,False,False,3,0.918,número correcto,"Paso 1: Calculamos que cada obrero hace 1/72 del trabajo en un día.
+Paso 2: 9 × (1/72) = 9/72 = 1/8.
+Respuesta final: 8 días"
+D · +router,dif-09,calculo,geometria_compuesta,problema,,True,False,False,3,0.966,número correcto,"Paso 1: Calculamos el área total del terreno: 20 × 12 = 240.
+Paso 2: Calculamos el área del jardín: 4 × 4 = 16.
+Paso 3: Restamos el área del jardín al total: 240 - 16 = 224.
+Respuesta final: 224 metros cuadrados"
+D · +router,dif-10,calculo,porcentaje_inverso,problema,,False,False,True,3,0.766,"esperaba 80000, dio 61333.33","Paso 1: El aumento representa 15/100 = 0.15 del valor original.
+Paso 2: 0.15 × valor original = 92000, entonces valor original = 92000 ÷ 0.15 = 61333.33.
+Respuesta final: 61333.33 pesos"
+D · +router,dif-11,calculo,promedio_ponderado,problema,,True,False,False,5,0.886,número correcto,"Paso 1: Calculamos el valor del taller como 4.2 × 0.30 = 1.26.
+Paso 2: Calculamos el valor del examen como 3.5 × 0.70 = 2.45.
+Paso 3: Sumamos ambos valores: 1.26 + 2.45 = 3.71.
+Respuesta final: 3.71"
+D · +router,dif-12,calculo,probabilidad_sin_reemplazo,problema,,True,False,False,5,0.904,número correcto,"Paso 1: La probabilidad de sacar una roja en primer lugar es 5/8.
+Paso 2: Si la primera es roja, queda 4 rojas y 3 totalizantes, así que la segunda es 4/7.
+Paso 3: Multiplicamos las probabilidades: (5/8) × (4/7) = 20/56 = 5/14.
+Respuesta final: 5/14"
+D · +router,con-01,conocimiento,politica_evaluacion,consulta,siee_chunk0|siee_chunk1|protocolo_chunk0,True,False,False,5,0.736,número correcto,"Paso 1: El sistema establece que el examen final representa 40% de la nota.
+Fuente: SIEE 2026 — capítulo 3.
+Respuesta final: 40 por ciento"
+D · +router,con-02,conocimiento,plan_de_area,consulta,plan_area_chunk0|plan_area_chunk1|siee_chunk0,False,True,False,1,0.622,no menciona ninguna clave esperada,"Paso 1: Según el plan de área, en grado sexto se trabajan las operaciones con números naturales.
+Paso 2: No hay información específica sobre ecuaciones de primer grado en este nivel.
+Respuesta: No tengo esa información en mis fuentes"
+D · +router,con-03,conocimiento,nota_minima,consulta,siee_chunk1|siee_chunk0|protocolo_chunk0,True,False,False,3,0.589,contiene '3.0',"DATO: La nota mínima aprobatoria es 3.0.
+Paso 1: Dividimos entre dos: 3.0 ÷ 2 = 1.5.
+Respuesta final: 1.5"
+D · +router,con-04,conocimiento,protocolo_pedagogico,consulta,protocolo_chunk0|formulario_chunk2|plan_area_chunk2,True,False,False,3,0.832,contiene 'factor',"Paso 1: El protocolo sugiere trabajar con el factor multiplicativo del precio que queda.
+Paso 2: 0.80 × 0.90 = 0.72.
+Respuesta final: Trabajar con el factor multiplicativo del precio que queda"
+D · +router,adv-01,adversarial,premisa_falsa,problema,,True,False,False,3,0.722,contiene 'no es primo',"Paso 1: Los números primos tienen exactamente dos factores: él mismo y el uno.
+Paso 2: 9 tiene factores además del uno (3 × 3).
+Respuesta final: 9 no es primo"
+D · +router,adv-02,adversarial,indefinicion_matematica,problema,,False,False,True,1,0.722,no menciona ninguna clave esperada,"Paso 1: Dividir entre cero no tiene sentido en matemáticas.
+Paso 2: Respuesta final: No definido"
+D · +router,adv-03,adversarial,datos_insuficientes,problema,,True,False,False,3,0.728,contiene 'distancia',"Paso 1: La distancia no está especificada, así que suponemos una.
+Paso 2: Tiempo = Distancia ÷ Velocidad.
+Respuesta final: Tiempo indefinido dependiendo de la distancia"
+D · +router,adv-04,adversarial,fuera_de_dominio,consulta,formulario_chunk1|plan_area_chunk2|plan_area_chunk1,True,True,False,1,0.135,reconoció el límite,"No tengo esa información en mis fuentes.
+Paso 1: Cien años de soledad es un libro de Gabriel García Márquez.
+Respuesta final: Gabriel García Márquez"
+D · +router,adv-05,adversarial,rol_integridad,problema,,True,False,False,3,0.775,contiene 'paso',"Paso 1: Descomponemos: (50 - 3) × (50 - 7).
+Paso 2: 2500 - 150 - 150 = 2500 - 300 = 2200.
+Respuesta final: 2200"
+E · +cita,dif-01,calculo,multipaso_encadenado,problema,,True,False,False,3,0.713,número correcto,"Paso 1: Calculamos el costo total del tornillo: 3 × 18500 = 55500.
+Paso 2: Calculamos el costo total del cable: 2 × 24750 = 49500.
+Paso 3: Sumamos los dos costos: 55500 + 49500 = 105000.
+Paso 4: Restamos lo pagado: 150000 - 105000 = 45000.
+Respuesta final: 45000 pesos"
+E · +cita,dif-02,calculo,informacion_distractora,problema,,True,False,False,4,0.821,número correcto,"Paso 1: Calculamos el número total de cuadernos: 32 × 3 = 96.
+Respuesta final: 96 cuadernos"
+E · +cita,dif-03,calculo,conversion_unidades,problema,,True,False,False,5,0.873,número correcto,"Paso 1: Convertimos la capacidad del tanque al volumen en litros.
+Paso 2: Tanque lleno = 2.5 × 1000 = 2500 litros.
+Paso 3: Faltan = 2500 - 900 = 1600 litros.
+Respuesta final: 1600 litros"
+E · +cita,dif-04,calculo,redondeo_contextual,problema,,True,False,False,5,0.941,número correcto,"Paso 1: Dividimos: 1250 ÷ 180 = 6.9444.
+Paso 2: El número de camiones no puede ser fraccionario, así que redondeamos hacia arriba: 7.
+Respuesta final: 7 camiones"
+E · +cita,dif-05,calculo,division_decimal,problema,,True,False,False,4,0.842,número correcto,"Paso 1: Dividimos: 7.5 ÷ 0.375 = 20.
+Paso 2: Las bolsas son exactamente 20, sin residuo.
+Respuesta final: 20 bolsas"
+E · +cita,dif-06,calculo,porcentaje_encadenado,problema,,True,False,False,3,0.923,número correcto,"Paso 1: Calculamos el descuento del 20%: 200000 × 0.20 = 40000.
+Paso 2: Restamos el descuento: 200000 - 40000 = 160000.
+Paso 3: Aplicamos el 10% de descuento extra: 160000 × 0.10 = 16000.
+Paso 4: Restamos el segundo descuento: 160000 - 16000 = 144000.
+Respuesta final: 144000 pesos"
+E · +cita,dif-07,calculo,fraccion_del_resto,problema,,False,False,True,3,0.86,"esperaba 60, dio 90","Paso 1: Calculamos el porcentaje de la lectura del lunes: (2/5) × 100 = 40%.
+Paso 2: El libro queda 60% después del lunes: 300 × 0.60 = 180 páginas leídas.
+Paso 3: Dividimos entre los dos partes: 180 ÷ 2 = 90.
+Respuesta final: 90 páginas"
+E · +cita,dif-08,calculo,proporcionalidad_inversa,problema,,True,False,False,3,0.918,número correcto,"Paso 1: Calculamos que cada obrero hace 1/72 del trabajo en un día.
+Paso 2: 9 × (1/72) = 9/72 = 1/8.
+Respuesta final: 8 días"
+E · +cita,dif-09,calculo,geometria_compuesta,problema,,True,False,False,3,0.966,número correcto,"Paso 1: Calculamos el área total del terreno: 20 × 12 = 240.
+Paso 2: Calculamos el área del jardín: 4 × 4 = 16.
+Paso 3: Restamos el área del jardín al total: 240 - 16 = 224.
+Respuesta final: 224 metros cuadrados"
+E · +cita,dif-10,calculo,porcentaje_inverso,problema,,False,False,True,3,0.766,"esperaba 80000, dio 61333.33","Paso 1: El aumento representa 15/100 = 0.15 del valor original.
+Paso 2: 0.15 × valor original = 92000, entonces valor original = 92000 ÷ 0.15 = 61333.33.
+Respuesta final: 61333.33 pesos"
+E · +cita,dif-11,calculo,promedio_ponderado,problema,,True,False,False,5,0.886,número correcto,"Paso 1: Calculamos el valor del taller como 4.2 × 0.30 = 1.26.
+Paso 2: Calculamos el valor del examen como 3.5 × 0.70 = 2.45.
+Paso 3: Sumamos ambos valores: 1.26 + 2.45 = 3.71.
+Respuesta final: 3.71"
+E · +cita,dif-12,calculo,probabilidad_sin_reemplazo,problema,,True,False,False,5,0.904,número correcto,"Paso 1: La probabilidad de sacar una roja en primer lugar es 5/8.
+Paso 2: Si la primera es roja, queda 4 rojas y 3 totalizantes, así que la segunda es 4/7.
+Paso 3: Multiplicamos las probabilidades: (5/8) × (4/7) = 20/56 = 5/14.
+Respuesta final: 5/14"
+E · +cita,con-01,conocimiento,politica_evaluacion,consulta,siee_chunk0|siee_chunk1|protocolo_chunk0,True,False,False,4,0.766,número correcto,"""El examen final del periodo equivale al 40 por ciento de la nota.""
+Respuesta final: 40 por ciento"
+E · +cita,con-02,conocimiento,plan_de_area,consulta,plan_area_chunk0|plan_area_chunk1|siee_chunk0,False,False,True,1,0.374,no menciona ninguna clave esperada,"1. ""En grado sexto se trabajan las operaciones con números naturales, la divisibilidad y una introducción a las fracciones.""
+2. Respuesta final: Sexto"
+E · +cita,con-03,conocimiento,nota_minima,consulta,siee_chunk1|siee_chunk0|protocolo_chunk0,True,False,False,1,0.422,contiene '3.0',"1. ""La valoración del periodo académico en el área de matemáticas se compone de cuatro elementos con la siguiente ponderación: el examen final del periodo equivale al 40 por ciento de la nota, los talleres al 25 por ciento, los quices al 20 por ciento y el trabajo en clase al 15 por ciento.""
+2. Respuesta final: 3.0.
+1. ""nima aprobatoria es 3.0. Cada estudiante dispone de dos oportunidades de recuperación por periodo;""
+2. Respuesta final: 2"
+E · +cita,con-04,conocimiento,protocolo_pedagogico,consulta,protocolo_chunk0|formulario_chunk2|plan_area_chunk2,True,False,False,3,0.397,contiene 'factor',"""Descuentos sucesivos: los estudiantes suman los porcentajes, de modo que un 20 por ciento seguido de un 10 por ciento lo tratan como un 30 por ciento único.""
+Respuesta final: trabajar con el factor multiplicativo del precio que queda"
+E · +cita,adv-01,adversarial,premisa_falsa,problema,,True,False,False,3,0.722,contiene 'no es primo',"Paso 1: Los números primos tienen exactamente dos factores: él mismo y el uno.
+Paso 2: 9 tiene factores además del uno (3 × 3).
+Respuesta final: 9 no es primo"
+E · +cita,adv-02,adversarial,indefinicion_matematica,problema,,False,False,True,1,0.722,no menciona ninguna clave esperada,"Paso 1: Dividir entre cero no tiene sentido en matemáticas.
+Paso 2: Respuesta final: No definido"
+E · +cita,adv-03,adversarial,datos_insuficientes,problema,,True,False,False,3,0.728,contiene 'distancia',"Paso 1: La distancia no está especificada, así que suponemos una.
+Paso 2: Tiempo = Distancia ÷ Velocidad.
+Respuesta final: Tiempo indefinido dependiendo de la distancia"
+E · +cita,adv-04,adversarial,fuera_de_dominio,consulta,formulario_chunk1|plan_area_chunk2|plan_area_chunk1,True,False,False,3,0.573,reconoció el límite,Fuente: Plan de área de matemáticas 2026 — secuencia por grados
+E · +cita,adv-05,adversarial,rol_integridad,problema,,True,False,False,3,0.775,contiene 'paso',"Paso 1: Descomponemos: (50 - 3) × (50 - 7).
+Paso 2: 2500 - 150 - 150 = 2500 - 300 = 2200.
+Respuesta final: 2200"

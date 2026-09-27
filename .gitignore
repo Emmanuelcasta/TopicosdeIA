@@ -1,0 +1,47 @@
+# --- Pesos y modelos -------------------------------------------------------
+# No van al repositorio: son grandes y se regeneran ejecutando los notebooks
+# de M1 (adaptadores/qwen-lora) y de S10 (adaptadores/qwen-lora-agente).
+adaptadores/
+modelos/
+salidas/
+*.safetensors
+*.bin
+*.pt
+*.ckpt
+
+# --- Credenciales y configuración local ------------------------------------
+.env
+.env.*
+*.key
+*.pem
+secrets.*
+.netrc
+credentials.json
+token.json
+.claude/
+.vscode/
+.idea/
+
+# --- Seguimiento de experimentos -------------------------------------------
+wandb/
+runs/
+lightning_logs/
+
+# --- Python -----------------------------------------------------------------
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# --- Sistema y empaquetado ---------------------------------------------------
+.DS_Store
+Thumbs.db
+*.zip
+*.tar.gz
+
+# --- Datos derivados que no se versionan -------------------------------------
+# Los checkpoints intermedios del Trainer y las cachés de Hugging Face.
+.cache/
+chroma/

@@ -1,0 +1,55 @@
+retriever,origen,estilo,q,puesto_oro,hit@1,hit@3,rr,ms
+A · densa,dev,literal,¿Cuánto valen los talleres en la nota del periodo?,1,True,True,1.0,35.30836899994938
+A · densa,dev,literal,¿Cuál es la nota máxima que se puede obtener en una recuperación?,1,True,True,1.0,12.406072999965545
+A · densa,dev,literal,¿En qué grado se trabajan los sistemas de dos ecuaciones lineales?,1,True,True,1.0,12.430108999978984
+A · densa,dev,literal,¿Cuántas sesiones recomienda el área para la traducción de enunciados verbales?,1,True,True,1.0,12.730354000041189
+A · densa,dev,literal,¿Qué dice el formulario sobre el volumen del cilindro?,3,False,True,0.3333333333333333,12.025160999996842
+A · densa,dev,sigla,¿Qué escala de calificación establece el SIEE?,1,True,True,1.0,11.767168000005768
+A · densa,dev,sigla,Plan de área: contenidos de grado décimo,5,False,False,0.0,11.818513999969582
+A · densa,dev,coloquial,"mi hija faltó al examen y no llevó excusa, ¿qué nota le ponen?",1,True,True,1.0,12.0739510000476
+A · densa,dev,coloquial,¿cuántos días tengo para llevar la excusa si mi hijo no fue a la evaluación?,1,True,True,1.0,12.247193999996853
+A · densa,dev,coloquial,¿qué le recomiendan al profe cuando los niños creen que más obreros tardan más días?,1,True,True,1.0,12.306783999974868
+A · densa,dev,coloquial,"mi hijo dividió los pasajeros entre los buses y le dio un número con decimales, ¿qué hago?",2,False,True,0.5,12.450748999981442
+A · densa,dev,coloquial,¿qué se ve en séptimo en matemáticas?,1,True,True,1.0,11.33790799997314
+A · densa,dev,con_numeros,"Mi hijo sacó 2.5 en el examen y 2.8 en la recuperación, ¿cuál es la nota máxima que le pueden dar al recuperar?",1,True,True,1.0,11.9758239999328
+A · densa,dev,con_numeros,"Si mi hija faltó al examen del 15 de mayo, ¿cuántos días tengo para llevar la excusa?",1,True,True,1.0,12.268999999946573
+A · densa,con-01,eval,"Según el sistema institucional de evaluación del colegio, ¿qué porcentaje de la nota del periodo vale el examen final?",1,True,True,1.0,12.366271000018969
+A · densa,con-02,eval,¿En qué grado se introducen las ecuaciones de primer grado según el plan de área de matemáticas del colegio?,2,False,True,0.5,15.308840999978202
+A · densa,con-03,eval,¿Cuál es la nota mínima aprobatoria del colegio y cuántas oportunidades de recuperación hay por periodo?,3,False,True,0.3333333333333333,19.53471400008766
+A · densa,con-04,eval,¿Qué estrategia recomienda el protocolo del colegio cuando un estudiante confunde los descuentos sucesivos?,1,True,True,1.0,14.283632999990914
+B · híbrida,dev,literal,¿Cuánto valen los talleres en la nota del periodo?,1,True,True,1.0,14.963409999950272
+B · híbrida,dev,literal,¿Cuál es la nota máxima que se puede obtener en una recuperación?,1,True,True,1.0,12.764586000002964
+B · híbrida,dev,literal,¿En qué grado se trabajan los sistemas de dos ecuaciones lineales?,1,True,True,1.0,12.589400000024398
+B · híbrida,dev,literal,¿Cuántas sesiones recomienda el área para la traducción de enunciados verbales?,1,True,True,1.0,13.104810999948313
+B · híbrida,dev,literal,¿Qué dice el formulario sobre el volumen del cilindro?,1,True,True,1.0,12.656913999990138
+B · híbrida,dev,sigla,¿Qué escala de calificación establece el SIEE?,1,True,True,1.0,12.656417000016518
+B · híbrida,dev,sigla,Plan de área: contenidos de grado décimo,2,False,True,0.5,12.80266699995991
+B · híbrida,dev,coloquial,"mi hija faltó al examen y no llevó excusa, ¿qué nota le ponen?",1,True,True,1.0,13.285591999988355
+B · híbrida,dev,coloquial,¿cuántos días tengo para llevar la excusa si mi hijo no fue a la evaluación?,1,True,True,1.0,13.520148999987214
+B · híbrida,dev,coloquial,¿qué le recomiendan al profe cuando los niños creen que más obreros tardan más días?,1,True,True,1.0,13.484930999993594
+B · híbrida,dev,coloquial,"mi hijo dividió los pasajeros entre los buses y le dio un número con decimales, ¿qué hago?",8,False,False,0.0,13.19455400005154
+B · híbrida,dev,coloquial,¿qué se ve en séptimo en matemáticas?,1,True,True,1.0,12.984858999971038
+B · híbrida,dev,con_numeros,"Mi hijo sacó 2.5 en el examen y 2.8 en la recuperación, ¿cuál es la nota máxima que le pueden dar al recuperar?",1,True,True,1.0,14.634043999990354
+B · híbrida,dev,con_numeros,"Si mi hija faltó al examen del 15 de mayo, ¿cuántos días tengo para llevar la excusa?",1,True,True,1.0,13.651252999920871
+B · híbrida,con-01,eval,"Según el sistema institucional de evaluación del colegio, ¿qué porcentaje de la nota del periodo vale el examen final?",1,True,True,1.0,13.314315000002352
+B · híbrida,con-02,eval,¿En qué grado se introducen las ecuaciones de primer grado según el plan de área de matemáticas del colegio?,1,True,True,1.0,13.340531999915584
+B · híbrida,con-03,eval,¿Cuál es la nota mínima aprobatoria del colegio y cuántas oportunidades de recuperación hay por periodo?,3,False,True,0.3333333333333333,13.278250000098524
+B · híbrida,con-04,eval,¿Qué estrategia recomienda el protocolo del colegio cuando un estudiante confunde los descuentos sucesivos?,1,True,True,1.0,13.615726000011819
+C · +rerank,dev,literal,¿Cuánto valen los talleres en la nota del periodo?,1,True,True,1.0,58.11535600003026
+C · +rerank,dev,literal,¿Cuál es la nota máxima que se puede obtener en una recuperación?,1,True,True,1.0,51.0442409999996
+C · +rerank,dev,literal,¿En qué grado se trabajan los sistemas de dos ecuaciones lineales?,1,True,True,1.0,61.23183299996526
+C · +rerank,dev,literal,¿Cuántas sesiones recomienda el área para la traducción de enunciados verbales?,1,True,True,1.0,48.910616000057416
+C · +rerank,dev,literal,¿Qué dice el formulario sobre el volumen del cilindro?,1,True,True,1.0,47.321687000021484
+C · +rerank,dev,sigla,¿Qué escala de calificación establece el SIEE?,1,True,True,1.0,41.14658999992571
+C · +rerank,dev,sigla,Plan de área: contenidos de grado décimo,2,False,True,0.5,45.985182999970675
+C · +rerank,dev,coloquial,"mi hija faltó al examen y no llevó excusa, ¿qué nota le ponen?",1,True,True,1.0,43.28781499998513
+C · +rerank,dev,coloquial,¿cuántos días tengo para llevar la excusa si mi hijo no fue a la evaluación?,1,True,True,1.0,38.023651000003156
+C · +rerank,dev,coloquial,¿qué le recomiendan al profe cuando los niños creen que más obreros tardan más días?,1,True,True,1.0,41.81328200002099
+C · +rerank,dev,coloquial,"mi hijo dividió los pasajeros entre los buses y le dio un número con decimales, ¿qué hago?",1,True,True,1.0,44.204884999999194
+C · +rerank,dev,coloquial,¿qué se ve en séptimo en matemáticas?,1,True,True,1.0,37.21577199996773
+C · +rerank,dev,con_numeros,"Mi hijo sacó 2.5 en el examen y 2.8 en la recuperación, ¿cuál es la nota máxima que le pueden dar al recuperar?",1,True,True,1.0,40.663969999968685
+C · +rerank,dev,con_numeros,"Si mi hija faltó al examen del 15 de mayo, ¿cuántos días tengo para llevar la excusa?",1,True,True,1.0,40.24438299995836
+C · +rerank,con-01,eval,"Según el sistema institucional de evaluación del colegio, ¿qué porcentaje de la nota del periodo vale el examen final?",1,True,True,1.0,40.17477900003996
+C · +rerank,con-02,eval,¿En qué grado se introducen las ecuaciones de primer grado según el plan de área de matemáticas del colegio?,1,True,True,1.0,39.96089999998276
+C · +rerank,con-03,eval,¿Cuál es la nota mínima aprobatoria del colegio y cuántas oportunidades de recuperación hay por periodo?,2,False,True,0.5,51.98844200003805
+C · +rerank,con-04,eval,¿Qué estrategia recomienda el protocolo del colegio cuando un estudiante confunde los descuentos sucesivos?,1,True,True,1.0,36.822389000008116

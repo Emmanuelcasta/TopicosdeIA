@@ -1,0 +1,7 @@
+sistema,anade,aciertos,calculo,conocimiento,adversarial,alucinaciones,abstenciones,juez,sim,delta_aciertos,mejora,empeora,p_mcnemar,ms_retrieval,tokens_prompt
+sin RAG,El tutor de M2. Referencia.,14/21,10/12,0/4,4/5,7,0,3.38,0.751,,,,,0.0,81
+A · ingenuo,RAG de S07: densa top-3 + prompt de dos modos.,14/21,6/12,3/4,5/5,7,2,3.14,0.71,0,5,5,1.0,11.6,568
+B · +hybrid,A + BM25 fusionado con RRF.,14/21,7/12,4/4,3/5,6,2,3.19,0.749,0,3,3,1.0,13.0,590
+C · +rerank,B + cross-encoder sobre el top-10.,13/21,7/12,3/4,3/5,5,4,3.0,0.727,-1,2,3,1.0,42.9,541
+D · +router,C solo para consultas; los problemas van sin RAG.,18/21,10/12,3/4,5/5,2,2,3.29,0.775,5,7,2,0.18,55.0,193
+E · +cita,D con prompt de un solo modo y cita textual en la vía RAG.,18/21,10/12,3/4,5/5,3,0,3.24,0.757,0,0,0,1.0,56.4,181

@@ -1,0 +1,21 @@
+{"id": "dif-01", "herramientas": {"familias": ["aritmetica"], "opcionales": []}}
+{"id": "dif-02", "herramientas": {"familias": ["aritmetica"], "opcionales": []}}
+{"id": "dif-03", "herramientas": {"familias": ["aritmetica"], "opcionales": []}}
+{"id": "dif-04", "herramientas": {"familias": ["aritmetica"], "opcionales": []}}
+{"id": "dif-05", "herramientas": {"familias": ["aritmetica"], "opcionales": []}}
+{"id": "dif-06", "herramientas": {"familias": ["porcentajes"], "opcionales": ["aritmetica"]}}
+{"id": "dif-07", "herramientas": {"familias": ["fracciones"], "opcionales": ["aritmetica"]}}
+{"id": "dif-08", "herramientas": {"familias": ["aritmetica"], "opcionales": []}}
+{"id": "dif-09", "herramientas": {"familias": ["aritmetica"], "opcionales": []}}
+{"id": "dif-10", "herramientas": {"familias": ["porcentajes"], "opcionales": ["aritmetica"]}}
+{"id": "dif-11", "herramientas": {"familias": ["estadistica"], "opcionales": ["aritmetica", "porcentajes"]}}
+{"id": "dif-12", "herramientas": {"familias": ["fracciones"], "opcionales": ["aritmetica"]}}
+{"id": "con-01", "herramientas": {"familias": ["documentos"], "opcionales": []}}
+{"id": "con-02", "herramientas": {"familias": ["documentos"], "opcionales": []}}
+{"id": "con-03", "herramientas": {"familias": ["documentos"], "opcionales": []}}
+{"id": "con-04", "herramientas": {"familias": ["documentos"], "opcionales": []}}
+{"id": "adv-01", "herramientas": {"familias": [], "opcionales": ["aritmetica"]}}
+{"id": "adv-02", "herramientas": {"familias": [], "opcionales": ["aritmetica"]}}
+{"id": "adv-03", "herramientas": {"familias": [], "opcionales": []}}
+{"id": "adv-04", "herramientas": {"familias": [], "opcionales": []}}
+{"id": "adv-05", "herramientas": {"familias": ["aritmetica"], "opcionales": []}}

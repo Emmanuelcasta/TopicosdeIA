@@ -1,0 +1,12 @@
+dimension,C0 · base,C1 · +LoRA,C2 · +RAG,C3 · +herram.,C4 · +ReAct,C5 · agente,C5-FT · entrenado
+exactitud_calculo,0.5,0.833,0.583,0.583,0.583,0.583,0.5
+sim_embeddings_prom,0.677,0.751,0.727,0.759,0.707,0.709,0.739
+llm_juez_prom,2.762,3.381,3.0,3.143,3.19,2.905,2.81
+aciertos_total,9/21,13/21,13/21,13/21,14/21,12/21,13/21
+aciertos_calculo,6/12,10/12,7/12,7/12,7/12,7/12,6/12
+aciertos_conocimiento,0/4,0/4,3/4,3/4,3/4,3/4,3/4
+aciertos_adversarial,3/5,3/5,3/5,3/5,4/5,2/5,4/5
+alucinaciones,12,8,5,8,7,9,8
+abstenciones,0,0,4,0,1,1,1
+formato_valido,0.19,1.0,0.857,0.952,0.19,0.667,0.952
+palabras_media,111.3,33.4,28.5,24.8,20.6,26.0,22.0
