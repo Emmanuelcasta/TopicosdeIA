@@ -1,15 +1,4 @@
 # Plantilla de definición del proyecto integrador
-
-Completa esta plantilla con tu equipo (3–4 personas). Es el documento que hace
-crecer el proyecto módulo a módulo durante todo el semestre.
-
-> **En la Sesión 1 solo se exigen los campos 1 y 2.** El resto se completa para
-> la Sesión 2. No borres los campos vacíos: déjalos con su encabezado para
-> irlos llenando.
-
-Reemplaza cada bloque `> _...` con tu respuesta. Los ejemplos van entre
-comentarios HTML y no se renderizan.
-
 ---
 
 ## 1. Dominio
