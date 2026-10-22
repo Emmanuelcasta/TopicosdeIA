@@ -58,29 +58,63 @@ def cargar_imagen(ruta, lado_mayor=LADO_MAYOR):
 
 
 DIR_IMAGENES.mkdir(parents=True, exist_ok=True)
-EXTENSIONES = (".jpg", ".jpeg", ".png", ".webp")
 
-presentes = {p.name for p in DIR_IMAGENES.iterdir() if p.suffix.lower() in EXTENSIONES}
-PEDIDAS, FALTAN, SOBRAN = inventario(eval_m4, presentes)
+# El emparejamiento es por NOMBRE BASE, no por nombre exacto: `vis-10.jpeg`
+# satisface el caso que el eval set declara como `vis-10.jpg`. En la corrida del
+# 22-10 el emparejamiento exacto dejó ese caso sin evaluar, que era el único
+# adversarial de hoja ilegible.
+#
+# Si hay dos archivos con el mismo nombre base, `inventario` LANZA y la corrida
+# se detiene: elegir uno por orden alfabético mediría una hoja y el informe
+# hablaría de la otra, sin que nada avisara.
+presentes = [p.name for p in DIR_IMAGENES.iterdir() if not p.name.startswith(".")]
+PEDIDAS, FALTAN, SOBRAN = inventario(eval_m4, presentes)   # puede lanzar ImagenAmbigua
 
-print(f"{len(eval_m4)} casos  |  {len(PEDIDAS)} archivos distintos  |  {len(presentes)} en la carpeta\n")
-for archivo, ids in sorted(PEDIDAS.items()):
-    marca = "FALTA" if archivo in FALTAN else " ok  "
-    print(f"  [{marca}] {archivo:14s} -> {', '.join(ids)}")
+print(f"{len(eval_m4)} casos  |  {len(PEDIDAS)} fotos distintas  |  {len(presentes)} archivos en la carpeta\n")
+for logico, info in sorted(PEDIDAS.items()):
+    marca = "FALTA" if info["archivo"] is None else " ok  "
+    real = "" if info["archivo"] in (None, logico) else f"  [archivo: {info['archivo']}]"
+    print(f"  [{marca}] {logico:14s} -> {', '.join(info['casos'])}{real}")
 if SOBRAN:
     print("\nArchivos que el eval set no pide (se ignoran):", sorted(SOBRAN))
 
 if FALTAN:
-    print(f"\nFaltan {len(FALTAN)} imágenes de {len(PEDIDAS)}.")
+    print(f"\nFaltan {len(FALTAN)} fotos de {len(PEDIDAS)}.")
     print("El notebook sigue, pero esos casos quedan marcados `sin_imagen` y NO entran")
     print("en ninguna media: una foto que no se subió no es un fallo del sistema, y")
     print("contarla como cero sería inventar un resultado.")
-    print("\nLas hojas para escribirlas a mano están en m4/eval_set/HOJAS_PARA_ESCRIBIR.md.")
-    print(f"Súbanlas a {DIR_IMAGENES} con exactamente esos nombres.")
+    print("\nQué escribir en cada hoja está en m4/eval_set/HOJAS_PARA_ESCRIBIR.md.")
+    print(f"Súbanlas a {DIR_IMAGENES} con el nombre base del eval set (.jpg, .jpeg o .png).")
 else:
-    print(f"\nEstán las {len(PEDIDAS)} imágenes: el scorecard de esta corrida será completo.")
+    print(f"\nEstán las {len(PEDIDAS)} fotos: el scorecard de esta corrida será completo.")
 '''
 
+
+CODIGO_GUARDA_EVAL_M2 = r'''
+# GUARDA: ¿es este el mismo eval set con el que se midió M3?
+#
+# La corrida del 22-10 imprimió `SHA coincide: False` y nadie se detuvo. Eso
+# significa que en Drive había una copia distinta de `data/eval_set_m2.jsonl`
+# —la de antes de corregir el criterio de `adv-02`— así que su 15/21 NO es
+# comparable con el 13/21 de M3, que se midió con la versión corregida.
+#
+# No se compara contra un número de M3 lo que no se midió con la misma vara.
+EVAL_M2_COMPARABLE = (sha_real == SHA_EVAL)
+if EVAL_M2_COMPARABLE:
+    print("El eval set de M2 es el mismo con el que se midió M3: la regresión es comparable.")
+else:
+    print("=" * 78)
+    print("ATENCIÓN · el eval set de M2 en disco NO es el que se usó para medir M3.")
+    print("=" * 78)
+    print(f"  esperado (embebido): {SHA_EVAL[:16]}…")
+    print(f"  encontrado en disco: {sha_real[:16]}…")
+    print()
+    print("La sección 8 se ejecutará igual, pero su cifra queda marcada como NO")
+    print("comparable y no se pone al lado de la de M3.")
+    print()
+    print("Para arreglarlo: borren data/eval_set_m2.jsonl y vuelvan a ejecutar la celda")
+    print("anterior, que reescribe la copia embebida y verificada.")
+'''
 
 CODIGO_VER = r'''
 import json
@@ -134,32 +168,53 @@ PILOTO = {
     "vis-10": "foto movida a propósito: ¿dice que no puede leerla?",
 }
 
+lecturas_piloto = {}
 for cid, que_prueba in PILOTO.items():
     caso = CASOS_M4[cid]
-    ruta = DIR_IMAGENES / archivo_de(caso)
+    logico = archivo_de(caso)
+    real = PEDIDAS[logico]["archivo"]
     print(f"[{cid}] {que_prueba}")
-    if not ruta.exists():
-        print(f"      falta {ruta.name}\n")
+    if real is None:
+        print(f"      falta la foto de {logico}\n")
         continue
-    crudo, js, seg = ver(cargar_imagen(ruta))
-    print(f"      {seg:.1f}s | json parseado: {js is not None}")
-    if js and not js.get("ilegible"):
-        for i, p in enumerate(js.get("pasos") or [], 1):
-            print(f"      Paso {i}: {p}")
-        print(f"      respuesta_final: {js.get('respuesta_final')}")
-    elif js:
+    crudo, js, seg = ver(cargar_imagen(DIR_IMAGENES / real))
+    lectura = {"crudo": crudo, "json": js, "segundos": round(seg, 2),
+               "ok": js is not None, "archivo": real}
+    lecturas_piloto[logico] = lectura
+    print(f"      archivo: {real} | {seg:.1f}s | json parseado: {js is not None}")
+
+    # Se imprimen los pasos YA NUMERADOS, que es exactamente lo que verá el tutor.
+    # La numeración incluye la respuesta final como último paso, igual que el eval
+    # set: si aquí no coincide, el paso que hay que señalar no existe para el tutor.
+    if js and js.get("ilegible"):
         print(f"      ilegible: {js.get('motivo')}")
+    elif js:
+        for i, paso in enumerate(pasos_numerados(lectura), 1):
+            print(f"      Paso {i}: {paso}")
     else:
         print("      crudo:", crudo[:200].replace("\n", " | "))
-    print(f"      la hoja decía: {caso['pasos'] or caso['enunciado']}\n")
 
-print("DECISIÓN: ¿los pasos transcritos coinciden con lo que dice la hoja?")
+    esperados = caso["pasos"]
+    if esperados:
+        vistos = len(pasos_numerados(lectura))
+        print(f"      la hoja tiene {len(esperados)} pasos; el tutor verá {vistos}"
+              + ("  <-- NO COINCIDE" if vistos != len(esperados) else ""))
+        print(f"      diagnóstico esperado: {diagnostico_esperado(caso)!r}")
+        print(f"      ¿transcripción fiel?: {lectura_fiel(caso, lectura)}")
+    else:
+        print(f"      diagnóstico esperado: {diagnostico_esperado(caso)!r} (caso adversarial)")
+    print()
+
+print("DECISIÓN: ¿los pasos transcritos coinciden con lo que dice la hoja, y su")
+print("          numeración con la que cuenta el eval set?")
 print("  Si sí  -> sigan a la transcripción completa.")
 print("  Si no  -> paren aquí. Repliegues, en este orden:")
 print("     1. subir el contraste y el tamaño en el preproceso;")
 print("     2. un OCR clásico (pytesseract) y dejar al VLM solo estructurando el texto;")
 print("     3. declarar la lectura como el cuello de botella y medirlo, que también es")
 print("        un resultado. Lo que NO sirve es correr las 11 y enterarse al final.")
+print("\nSi aparece 'NO COINCIDE', paren igualmente: ese caso sería inacertable por")
+print("construcción y contarlo como fallo del tutor sería un error de medición.")
 '''
 
 
@@ -173,16 +228,21 @@ RUTA_LECTURA = Path("m4/lecturas_m4.json")
 lecturas = json.loads(RUTA_LECTURA.read_text(encoding="utf-8")) if RUTA_LECTURA.exists() else {}
 
 if len(FALTAN) == len(PEDIDAS):
-    raise SystemExit("No hay ninguna imagen en m4/eval_set/imagenes: no hay nada que leer. "
-                     "Suban las fotos y vuelvan a ejecutar desde la celda 3.4.")
+    raise SystemExit("No hay ninguna foto en m4/eval_set/imagenes: no hay nada que leer. "
+                     "Súbanlas y vuelvan a ejecutar desde la celda 3.4.")
 
-for archivo in sorted(PEDIDAS):
-    if archivo in lecturas or archivo in FALTAN:
+# Las lecturas se guardan con el nombre LÓGICO del eval set (`vis-10.jpg`) y
+# registran aparte el archivo real que se leyó (`vis-10.jpeg`). Así el archivo de
+# lecturas no cambia de forma si mañana la foto llega con otra extensión.
+lecturas.update(lecturas_piloto)        # el piloto ya leyó tres: no se repiten
+
+for logico, info in sorted(PEDIDAS.items()):
+    if logico in lecturas or info["archivo"] is None:
         continue
-    crudo, js, seg = ver(cargar_imagen(DIR_IMAGENES / archivo))
-    lecturas[archivo] = {"crudo": crudo, "json": js, "segundos": round(seg, 2),
-                         "ok": js is not None}
-    print(f"  {archivo:14s} {seg:5.1f}s  {'json ok' if js else 'SIN json'}")
+    crudo, js, seg = ver(cargar_imagen(DIR_IMAGENES / info["archivo"]))
+    lecturas[logico] = {"crudo": crudo, "json": js, "segundos": round(seg, 2),
+                        "ok": js is not None, "archivo": info["archivo"]}
+    print(f"  {info['archivo']:14s} {seg:5.1f}s  {'json ok' if js else 'SIN json'}")
 
 RUTA_LECTURA.write_text(json.dumps(lecturas, ensure_ascii=False, indent=2), encoding="utf-8")
 leidas = sum(1 for v in lecturas.values() if v["ok"])
@@ -307,51 +367,56 @@ print(pasos_como_texto({"json": {"enunciado": "Una caja trae 24 lápices...",
 CODIGO_CALIFICAR = r'''
 # Cómo se obtiene el resultado de cada caso.
 #
-# El criterio viene declarado EN el eval set, escrito antes de ejecutar, y lo
-# aplica el mismo `evaluar_caso` que calificó M2 y M3: claves aceptadas, textos
-# prohibidos y las tres señales (acierto / abstuvo / alucinó). Un caso de
-# localización se acierta si la respuesta nombra el paso correcto ("Paso 2") y no
-# cae en ninguno de los prohibidos; uno de `sin_error`, si dice que está correcto
-# y no señala ningún paso.
+# El tutor emite una última línea `Diagnóstico: ...` y **es esa línea la que se
+# califica**. La explicación se conserva y se mide aparte.
 #
-# Además del acierto se registra DE DÓNDE viene el fallo:
-#     lectura      la transcripción no conservó lo que la hoja decía
-#     diagnostico  la transcripción llegó bien y el tutor falló igual
-# Esa atribución no se puede reconstruir después, y es la que dice si el cuello de
-# botella son los ojos o el razonamiento. La hacen `lectura_fiel` y
-# `fuente_del_fallo`, del módulo `vision.py`.
+# Por qué: en la corrida del 22-10 el criterio buscaba los textos prohibidos como
+# subcadena de TODA la respuesta. Como la respuesta empieza repasando el
+# procedimiento ("Paso 1: Correcto. Paso 2: Incorrecto..."), los doce casos
+# fallaron con "cayó en la trampa: 'paso 1'". `vis-05` llegó a concluir el paso
+# correcto y se contó como fallo igualmente. Eso medía la redacción, no el
+# criterio del tutor.
+#
+# Se siguen registrando tres señales independientes, como en M2 y M3, más dos
+# sobre la explicación que son diagnóstico y nunca deciden el acierto.
 
 filas = []
 for caso in eval_m4:
-    archivo = archivo_de(caso)
-    if archivo in FALTAN:
+    logico = archivo_de(caso)
+    if PEDIDAS[logico]["archivo"] is None:
         filas.append({"id": caso["id"], "bloque": caso["bloque"],
                       "criterio": caso["criterio_s13"], "estado": "sin_imagen",
-                      "acierto": None, "motivo": f"falta {archivo}"})
-        print(f"  {caso['id']:8s} {caso['bloque']:13s} ---  sin imagen: {archivo}")
+                      "esperado": diagnostico_esperado(caso),
+                      "acierto": None, "motivo": f"falta la foto de {logico}"})
+        print(f"  {caso['id']:8s} {caso['bloque']:13s} ---  sin imagen")
         continue
 
-    lectura = lecturas.get(archivo)
+    lectura = lecturas.get(logico)
     t0 = time.perf_counter()
     respuesta = sistema_multimodal(caso["pregunta"], lectura)
     seg_tutor = time.perf_counter() - t0
 
-    ev = evaluar_caso(caso, respuesta)
+    ev = calificar_m4(caso, respuesta)
     fiel = lectura_fiel(caso, lectura)
     filas.append({
         "id": caso["id"], "bloque": caso["bloque"], "criterio": caso["criterio_s13"],
         "estado": "evaluado",
-        "acierto": ev["acierto"], "abstuvo": ev["abstuvo"], "alucino": ev["alucino"],
+        "esperado": ev["esperado"], "conclusion": ev["conclusion"],
+        "acierto": ev["acierto"], "abstuvo": ev["abstuvo"], "abstuvo_bien": ev["abstuvo_bien"],
+        "alucino": ev["alucino"], "sin_conclusion": ev["sin_conclusion"],
         "motivo": ev["motivo"],
+        # La explicación, medida aparte: nunca decide el acierto.
+        "explicacion_pasos": " ".join(map(str, ev["explicacion_pasos"])),
+        "explicacion_justifica": ev["explicacion_justifica"],
         "lectura_fiel": fiel,
         "fuente_del_fallo": fuente_del_fallo(ev["acierto"], fiel),
         "segundos_lectura": (lectura or {}).get("segundos", 0.0),
         "segundos_tutor": round(seg_tutor, 2),
         "segundos_total": round(seg_tutor + (lectura or {}).get("segundos", 0.0), 2),
-        "respuesta": respuesta[:500],
+        "respuesta": respuesta[:700],
     })
     marca = "OK " if ev["acierto"] else ("abs" if ev["abstuvo"] else "MAL")
-    print(f"  {caso['id']:8s} {caso['bloque']:13s} {marca}  {ev['motivo'][:48]}")
+    print(f"  {caso['id']:8s} {caso['bloque']:13s} {marca}  {ev['motivo'][:56]}")
 
 M4 = pd.DataFrame(filas)
 evaluados = M4[M4.estado == "evaluado"]
@@ -381,6 +446,7 @@ def bloque(nombre):
 
 print("=" * 78)
 print("SCORECARD M4 · casos CON IMAGEN · tarea nueva: localizar el paso erróneo")
+print("Se califica la línea `Diagnóstico:`; la explicación se mide aparte.")
 print("=" * 78)
 print(f"{'bloque':15s}{'aciertos':>11s}{'seg/caso':>11s}   qué mide")
 for b, que in QUE_MIDE.items():
@@ -388,14 +454,28 @@ for b, que in QUE_MIDE.items():
     if n:
         print(f"{b:15s}{ok:>7d}/{n:<3d}{seg:>11.1f}   {que}")
     else:
-        print(f"{b:15s}{'—':>11s}{'—':>11s}   {que}  (sin imágenes)")
+        print(f"{b:15s}{'—':>11s}{'—':>11s}   {que}  (sin fotos)")
 print("-" * 78)
 if len(evaluados):
     print(f"{'TOTAL':15s}{int(evaluados.acierto.sum()):>7d}/{len(evaluados):<3d}"
           f"{evaluados.segundos_total.mean():>11.1f}")
-    print(f"{'alucinaciones':15s}{int(evaluados.alucino.sum()):>11d}")
-    print(f"{'abstenciones':15s}{int(evaluados.abstuvo.sum()):>11d}")
+    print(f"{'alucinaciones':15s}{int(evaluados.alucino.sum()):>11d}   "
+          "concluyó algo concreto y equivocado")
+    print(f"{'abstenciones':15s}{int(evaluados.abstuvo.sum()):>11d}   "
+          f"de las cuales acertadas: {int(evaluados.abstuvo_bien.sum())}")
+    print(f"{'sin conclusión':15s}{int(evaluados.sin_conclusion.sum()):>11d}   "
+          "no emitió la línea `Diagnóstico:`")
 print("=" * 78)
+
+# El fallo de formato se reporta aparte porque tiene arreglo distinto: si domina,
+# el problema es que la LoRA de M1 arrastra al modelo a continuar el procedimiento
+# en vez de emitir un veredicto, y se ataca con el prompt o con entrenamiento, no
+# con un modelo mayor.
+sin_conc = int(evaluados.sin_conclusion.sum())
+if sin_conc:
+    print(f"\nAVISO: {sin_conc} de {len(evaluados)} respuestas no traen conclusión.")
+    print("Si son la mayoría, lo que se está midiendo es el formato de salida y no el")
+    print("criterio del tutor. Antes de leer el scorecard, mirar una respuesta completa.")
 
 print("\nFUENTE DEL FALLO · solo los casos fallados")
 if len(fallos):
@@ -406,6 +486,17 @@ if len(fallos):
     print("  diagnostico -> la transcripción llegó bien y el tutor falló igual")
 else:
     print("  (sin fallos)")
+
+print("\nLA EXPLICACIÓN, medida aparte · no decide ningún acierto")
+coh = evaluados.explicacion_justifica.astype(bool)
+print(f"  argumentan su conclusión : {int(coh.sum())}/{len(evaluados)}")
+print("    (la explicación habla del paso que concluyó, o no menciona ninguno)")
+incoh = evaluados[~coh]
+if len(incoh):
+    print("  conclusiones sin argumentar en el texto:")
+    for _, f in incoh.iterrows():
+        print(f"    {f['id']:8s} concluyó {str(f['conclusion']):16s} "
+              f"y la explicación habla de los pasos [{f['explicacion_pasos']}]")
 
 Path("m4").mkdir(exist_ok=True)
 M4.to_csv("m4/scorecard_m4.csv", index=False)
@@ -425,12 +516,17 @@ sc_regresion = harness(eval_set, lambda p: sistema_multimodal(p, None),
                        nombre="M4 · sin imagen")
 imprimir_scorecard(sc_regresion)
 
-print("\nMismo eval set de 21 casos, dos corridas del mismo sistema:")
-print(f"  en M3 · {REFERENCIA_M3['nombre']:22s} {REFERENCIA_M3['aciertos']}/21")
-print(f"  ahora · M4                         {sc_regresion['aciertos']}/21")
-print("\nLectura: si coinciden, la visión no tocó lo que ya funcionaba. Si bajó, hay que")
-print("decir en qué caso y por qué ANTES de hablar de lo que se ganó en imagen. Con")
-print("n = 21, una diferencia de un caso es ruido; de tres o más, hay que mirarla.")
+if EVAL_M2_COMPARABLE:
+    print("\nMismo eval set de 21 casos, dos corridas del mismo sistema:")
+    print(f"  en M3 · {REFERENCIA_M3['nombre']:22s} {REFERENCIA_M3['aciertos']}/21")
+    print(f"  ahora · M4                         {sc_regresion['aciertos']}/21")
+    print("\nLectura: si coinciden, la visión no tocó lo que ya funcionaba. Si bajó, hay")
+    print("que decir en qué caso y por qué ANTES de hablar de lo que se ganó en imagen.")
+    print("Con n = 21, una diferencia de un caso es ruido; de tres o más, hay que mirarla.")
+else:
+    print(f"\nM4 sin imagen: {sc_regresion['aciertos']}/21  —  NO COMPARABLE con M3.")
+    print("El eval set en disco no es el que midió M3 (ver la guarda de la sección 3.2).")
+    print("Esta cifra sirve para ver si el sistema responde, no para comparar con nada.")
 '''
 
 
@@ -443,9 +539,11 @@ peor = (fallos.iloc[0]["id"] if len(fallos) else "sin fallos")
 
 DELTA = pd.DataFrame([
     {"grupo": "casos sin imagen · eval set de M2 (21 casos)",
-     "M3": f"{REFERENCIA_M3['aciertos']}/21",
+     "M3": (f"{REFERENCIA_M3['aciertos']}/21" if EVAL_M2_COMPARABLE
+            else "no comparable: otro eval set en disco"),
      "M4": f"{sc_regresion['aciertos']}/21",
-     "qué significa": "REGRESIÓN: ¿se rompió lo que ya funcionaba?"},
+     "qué significa": ("REGRESIÓN: ¿se rompió lo que ya funcionaba?" if EVAL_M2_COMPARABLE
+                       else "NO comparable: el eval set en disco no es el de M3")},
     {"grupo": "casos con imagen · eval set de M4 (tarea nueva)",
      "M3": "no aplica: M3 no recibe imágenes",
      "M4": f"{int(con_img.acierto.sum())}/{len(con_img)}",
@@ -492,7 +590,14 @@ json.dump({
                      "alucinaciones": int(evaluados.alucino.sum()),
                      "abstenciones": int(evaluados.abstuvo.sum())},
     "fuente_del_fallo": (fallos.fuente_del_fallo.value_counts().to_dict() if len(fallos) else {}),
+    "eval_m2_comparable_con_m3": bool(EVAL_M2_COMPARABLE),
     "regresion_m2": {k: v for k, v in sc_regresion.items() if k != "detalle"},
+    "conclusiones": {str(k): int(v) for k, v in
+                     evaluados.conclusion.fillna("sin_conclusion").value_counts().items()},
+    "sin_conclusion": int(evaluados.sin_conclusion.sum()),
+    "abstuvo_bien": int(evaluados.abstuvo_bien.sum()),
+    "explicacion_justifica": int(evaluados.explicacion_justifica.astype(bool).sum()),
+    "archivos_leidos": {k: v.get("archivo", k) for k, v in lecturas.items()},
     "latencia_total_s": round(float(evaluados.segundos_total.mean()), 2),
     "latencia_lectura_s": round(float(evaluados.segundos_lectura.mean()), 2),
 }, open("m4/resultados_m4.json", "w", encoding="utf-8"),
@@ -573,8 +678,10 @@ leer las fotos, que es la parte lenta.
 ---
 ## 0 · Preparación del entorno
 
-> **Activen la GPU (T4).** El notebook carga dos modelos grandes, pero **en
-> momentos distintos**: la celda de liberación que va entre ellos no es opcional.
+> **Activen una GPU.** Sirve cualquiera con CUDA —T4, G4, L4, A100, RTX—; el
+> notebook imprime la que detecte y no exige ningún modelo concreto. Carga dos
+> modelos grandes, pero **en momentos distintos**: la celda de liberación que va
+> entre ellos no es opcional, y con menos de 14 GB es imprescindible.
 """))
     c.append(code('''
 %pip install -q "transformers>=4.45" "peft>=0.12" "accelerate>=0.33" \\
@@ -596,12 +703,20 @@ transformers.set_seed(SEMILLA)
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"transformers {transformers.__version__} | torch {torch.__version__} | {DEVICE}")
+
+# Sirve CUALQUIER GPU CUDA: T4, G4, L4, A100, RTX… No se comprueba el modelo,
+# solo que haya CUDA, y se imprime el dispositivo detectado. La corrida del 22-10
+# usó una RTX PRO 6000 de 102 GB; exigir "Tesla T4" habría sido un falso bloqueo.
 if DEVICE == "cuda":
-    print(f"GPU: {torch.cuda.get_device_name(0)} "
-          f"({torch.cuda.get_device_properties(0).total_memory / 1e9:.0f} GB)")
+    props = torch.cuda.get_device_properties(0)
+    VRAM_GB = props.total_memory / 1e9
+    print(f"GPU detectada: {props.name} ({VRAM_GB:.0f} GB)")
+    if VRAM_GB < 14:
+        print(f"  Aviso: con {VRAM_GB:.0f} GB conviene no tener los dos modelos a la vez. "
+              "La celda que libera el VLM (5.2) es obligatoria.")
 else:
     print("Sin GPU: el notebook corre, pero leer 11 imágenes en CPU tarda mucho. "
-          "Activen el entorno de ejecución con T4.")
+          "Activen un entorno de ejecución con GPU (cualquiera con CUDA sirve).")
 '''))
     c.extend(celda_drive())
 
@@ -628,6 +743,7 @@ el notebook.
 """))
     c.extend(celdas_modulos(["vision"], con_descripcion=False))
     c.extend(celda_eval_set(prefijo="3.2"))
+    c.append(code(CODIGO_GUARDA_EVAL_M2))
     c.extend(celda_eval_m4(prefijo="3.3"))
 
     c.append(md("""
@@ -640,6 +756,11 @@ ella.
 Las hojas para escribir a mano están en `m4/eval_set/HOJAS_PARA_ESCRIBIR.md`: cada
 una dice qué copiar y, en los casos con error, **qué error cometer a propósito**.
 Las fotos van en `m4/eval_set/imagenes/` con exactamente los nombres del eval set.
+
+El emparejamiento es por **nombre base**: el eval set dice `vis-10.jpg` y un
+archivo `vis-10.jpeg` o `vis-10.png` lo satisface igual. Si hay **dos** archivos
+con el mismo nombre base, la celda se detiene en vez de elegir uno: si las fotos
+fueran distintas, la corrida mediría una hoja y el informe hablaría de la otra.
 
 Si falta alguna, el notebook sigue y marca esos casos como `sin_imagen`. **No
 entran en ninguna media**: una foto que no se subió no es un fallo del sistema, y
@@ -695,7 +816,28 @@ Corpus, chunking y retrieval idénticos a S07/S08; el agente con herramientas,
 idéntico a S10. El código sale de `scripts/agente/*.py`, donde está probado con
 `pytest`: lo que se prueba es exactamente lo que se ejecuta.
 
-Lo único nuevo es que la pregunta llega acompañada de lo que se leyó en la foto.
+Lo único nuevo es que la pregunta llega acompañada de lo que se leyó en la foto,
+y que **se le exige una conclusión explícita**.
+
+### El formato de salida, y por qué se cambió
+
+En la corrida del 22-10 (archivada en `m4/corridas/corrida-01_2026-10-22/`) el
+tutor no revisaba: **reescribía** el procedimiento en el formato `Paso 1: …
+Respuesta final: …` con el que se entrenó la LoRA de M1. Ante la hoja de `vis-02`
+respondió el ejercicio bien resuelto, sin decir nunca qué paso estaba mal.
+
+Así que ahora la última línea tiene que ser una de estas cinco:
+
+| Conclusión | Cuándo | Bloque del eval set |
+|---|---|---|
+| `Diagnóstico: Paso N` | un paso está mal | `localizacion`, `compensado` |
+| `Diagnóstico: sin error` | todos los pasos están bien | `sin_error` |
+| `Diagnóstico: ilegible` | la hoja no se puede leer | `adversarial` (`vis-10`) |
+| `Diagnóstico: fuera de dominio` | la hoja no es matemáticas | `adversarial` (`vis-11`) |
+| `Diagnóstico: dato no disponible` | se pide algo que no está escrito | `adversarial` (`vis-12`) |
+
+**El criterio lee solo esa línea.** La explicación se conserva y se mide aparte,
+nunca como acierto: era lo que invalidaba la corrida anterior.
 """))
     c.append(code(CODIGO_CORPUS))
     c.append(code(CODIGO_CHUNKING))

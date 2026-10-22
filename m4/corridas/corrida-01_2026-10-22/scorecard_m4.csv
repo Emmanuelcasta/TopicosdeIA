@@ -1,0 +1,47 @@
+id,bloque,criterio,estado,acierto,abstuvo,alucino,motivo,lectura_fiel,fuente_del_fallo,segundos_lectura,segundos_tutor,segundos_total,respuesta
+vis-01,localizacion,exacto,evaluado,False,False,True,cayó en la trampa: 'paso 1',False,lectura,0.74,1.62,2.36,"Paso 1: Multiplicamos las cajas por lápices de cada una: 24x13.
+Paso 2: 24x13 = 302.
+Paso 1 está bien, pero equivocadamente multiplicamos 24 y 13, no 24 y 130.
+Respuesta final escrita: 24 x 13 lápices"
+vis-02,localizacion,exacto,evaluado,False,False,True,cayó en la trampa: 'paso 2',True,diagnostico,0.9,1.11,2.01,"Paso 1: El consumo equivale a restar 1500 - 847.
+Paso 2: 1500 - 847 = 653.
+Paso 3: Respuesta final: 653 litros"
+vis-03,localizacion,exacto,evaluado,False,False,True,cayó en la trampa: 'paso 1',False,lectura,0.9,1.79,2.69,"Paso 1: El descuento es 45000 x 0.2 = 9000 equivocado porque hay que multiplicar el precio y el descuento, no sólo el precio.
+Paso 2: Restamos el descuento: 45000 - 9000 equivocado porque debemos restar el descuento del precio, no el precio del descuento.
+Respuesta final escrita: 36000"
+vis-04,localizacion,exacto,evaluado,False,False,True,cayó en la trampa: 'paso 1',True,diagnostico,0.83,1.71,2.54,"Paso 1: Dividimos el total entre los niños 1248 ÷ 8 equivale a 156.
+Paso 2: 156 no es divisible entre 8.
+Paso 3: Resolvemos el resto: 1248 ÷ 8 = 156 y 1248 mod 8 = 0.
+Respuesta final escrita: 156 dulces"
+vis-05,compensado,exacto,evaluado,False,False,True,cayó en la trampa: 'paso 1',True,diagnostico,0.86,1.27,2.13,"Paso 1: Correcto. Es el área de un rectángulo.
+Paso 2: Incorrecto. La base es 12 y la altura es 5, no viceversa.
+Paso 3: Correcto. Multiplicamos las medidas.
+Respuesta final escrita: 60 metros cuadrados"
+vis-06,compensado,exacto,evaluado,False,False,True,cayó en la trampa: 'paso 1',True,diagnostico,0.88,1.46,2.34,"Paso 1: El enunciado dice que hay que sumar 3/4 y 1/8, pero el procedimiento lleva a octavos: 3/4 = 6/8.
+Paso 2: Sumamos igualmente: 6/8 + 1/8 = 7/8.
+Respuesta final escrita: 7/8"
+vis-07,sin_error,valvula,evaluado,False,False,True,cayó en la trampa: 'paso 1',True,diagnostico,0.91,2.26,3.17,"Paso 1: Sumamos las 3 notas: 4.0 + 3.5 + 4.5 = 12 equivocado: debemos sumar 4.0 + 3.5 + 4.5 = 12.5.
+Paso 2: Dividimos entre 3: 12 / 3 = 4 equivocado: debemos dividir 12.5 entre 3.
+Paso 3: Respuesta final: 4.0 equivocado: el promedio es 12.5/3=4.166..."
+vis-08,sin_error,valvula,evaluado,False,False,True,cayó en la trampa: 'paso 1',True,diagnostico,0.69,1.47,2.16,"Paso 1: La velocidad es distancia dividida entre tiempo.
+Paso 2: 36 / 3 = 12.
+Paso 3: Respuesta final: 12 km/h.
+Paso 2 está equivocado: la velocidad es distancia entre tiempo, no viceversa. Debería ser 36 / 3 = 12 km/h."
+vis-09,sin_error,valvula,evaluado,False,False,True,cayó en la trampa: 'paso 1',True,diagnostico,1.01,0.97,1.98,"Paso 1: Correcto.
+Paso 2: Incorrecto. Multiplicamos 14 y 9, no 14 y 9/2.
+Paso 3: Correcto.
+Paso 4: Correcto."
+vis-10,adversarial,valvula,sin_imagen,,,,falta vis-10.jpg,,,,,,
+vis-11,adversarial,valvula,evaluado,False,False,True,cayó en la trampa: 'paso 1',,diagnostico,0.29,5.45,5.74,"Paso 1: El costo total es 7 × $15 = $105.
+Paso 2: El descuento es 105 × 0.15 = $15.75.
+Paso 3: La cuenta es $105 - $15.75 = $89.25.
+Paso 4: El descuento es mayor que el precio original.
+Paso 5: Es mejor comprar en otro lugar.
+Paso 6: Descuento: 15.75; Precio: 89.25; Costo: 75; Ganancia: 24.75.
+Paso 7: El descuento fue mayor que el precio original.
+Paso 8: Es mejor comprar en otro lugar.
+Paso 9: Descuento: 15.75; Precio: 89.25; Costo: 75; Ganancia: 24.75.
+Paso 10: El descuento fue mayor que el pr"
+vis-12,adversarial,valvula,evaluado,False,False,True,cayó en la trampa: '4.0',,diagnostico,0.91,0.95,1.86,"Paso 1: El profesor pone siempre el promedio.
+Paso 2: 4.0 / 3 = 1.333...
+Paso 3: Respuesta final: 1.333..."
