@@ -39,6 +39,7 @@ import nb_herramientas
 import nb_finetuning_agente
 import nb_agente
 import nb_ragas
+import nb_m4
 from nb_comun import RAIZ, notebook
 
 NOTEBOOKS = [
@@ -54,12 +55,15 @@ NOTEBOOKS = [
     ("S10_FineTuning_Agente_Herramientas.ipynb", nb_finetuning_agente),
     ("S10_Lab_Agente_ReAct_Tutor_Matematicas.ipynb", nb_agente),
     ("S10_Evaluacion_RAGAS_Tutor_Matematicas.ipynb", nb_ragas),
+    ("S13_M4_Pipeline_Visual.ipynb", nb_m4),
 ]
 
 
-# Cada notebook vive en la carpeta de su módulo.
-CARPETA_DE = {"S04": "M1_arquitecturas", "S06": "M2_harness",
-              "S07": "M3_rag_agentes", "S08": "M3_rag_agentes", "S10": "M3_rag_agentes"}
+# Cada notebook vive en la carpeta de su módulo. M4 no usa la subcarpeta
+# `notebooks/`: su pipeline vive junto al eval set y a las fotos, en `m4/`.
+CARPETA_DE = {"S04": "M1_arquitecturas/notebooks", "S06": "M2_harness/notebooks",
+              "S07": "M3_rag_agentes/notebooks", "S08": "M3_rag_agentes/notebooks",
+              "S10": "M3_rag_agentes/notebooks", "S13": "m4/pipeline"}
 
 
 def validar_celdas(celdas: list[dict], nombre: str) -> list[str]:
@@ -81,22 +85,35 @@ def validar_celdas(celdas: list[dict], nombre: str) -> list[str]:
     return problemas
 
 
-def main() -> None:
+def main(filtros: list[str] | None = None) -> None:
+    """Sin `filtros` regenera los notebooks de la lista; con ellos, solo los que
+    contienen alguno de los textos dados (`python generar_notebooks.py S13`).
+
+    El filtro existe para poder trabajar en un módulo sin reescribir los otros
+    once notebooks, que ya están ejecutados y entregados.
+    """
+    seleccion = [(n, m) for n, m in NOTEBOOKS
+                 if not filtros or any(f in n for f in filtros)]
+    if not seleccion:
+        raise SystemExit(f"Ningún notebook coincide con {filtros}. "
+                         f"Disponibles: {[n for n, _ in NOTEBOOKS]}")
+
     for archivo, generador in [("math_tutor_dataset.jsonl", "dataset_fuente.py"),
                                ("eval_set_m2.jsonl", "eval_set_fuente.py"),
                                ("eval_set_m3_agente.jsonl", "eval_set_m3_fuente.py"),
-                               ("trayectorias_herramientas.jsonl", "trayectorias_fuente.py")]:
+                               ("trayectorias_herramientas.jsonl", "trayectorias_fuente.py"),
+                               ("eval_set_m4_vision.jsonl", "eval_set_m4_fuente.py")]:
         if not (RAIZ / "data" / archivo).exists():
             raise SystemExit(f"Falta data/{archivo}. Ejecuten antes: python {generador}")
 
     todos_problemas = []
-    for nombre, modulo in NOTEBOOKS:
+    for nombre, modulo in seleccion:
         celdas = modulo.construir()
         problemas = validar_celdas(celdas, nombre)
         todos_problemas.extend(problemas)
 
         nb = notebook(celdas, nombre)
-        destino = RAIZ / CARPETA_DE[nombre[:3]] / "notebooks" / nombre
+        destino = RAIZ / CARPETA_DE[nombre[:3]] / nombre
         destino.parent.mkdir(parents=True, exist_ok=True)
         destino.write_text(
             json.dumps(nb, ensure_ascii=False, indent=1), encoding="utf-8"
@@ -113,9 +130,9 @@ def main() -> None:
             print("  -", p)
         raise SystemExit(1)
 
-    print(f"\n{len(NOTEBOOKS)} notebooks generados en {RAIZ}")
+    print(f"\n{len(seleccion)} notebooks generados en {RAIZ}")
     print("Ninguno fue ejecutado: todas las celdas están sin salidas.")
 
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1:] or None)
