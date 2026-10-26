@@ -91,29 +91,46 @@ else:
 
 
 CODIGO_GUARDA_EVAL_M2 = r'''
-# GUARDA: ¿es este el mismo eval set con el que se midió M3?
+# GUARDA · ¿es este el mismo eval set con el que se midió M3?
 #
-# La corrida del 22-10 imprimió `SHA coincide: False` y nadie se detuvo. Eso
-# significa que en Drive había una copia distinta de `data/eval_set_m2.jsonl`
-# —la de antes de corregir el criterio de `adv-02`— así que su 15/21 NO es
-# comparable con el 13/21 de M3, que se midió con la versión corregida.
+# Las corridas del 22-10 y del 22-10 (tarde) imprimieron las dos `SHA coincide:
+# False`: en Drive había una copia distinta de `data/eval_set_m2.jsonl` —la de
+# antes de corregir el criterio de `adv-02`— así que su 15/21 NO era comparable
+# con el 13/21 de M3. No se compara contra un número lo que no se midió con la
+# misma vara.
 #
-# No se compara contra un número de M3 lo que no se midió con la misma vara.
+# Ahora la celda lo CORRIGE sola, sin borrar nada: aparta la copia que no cuadra
+# con un nombre que dice por qué, escribe la copia embebida y verificada, y
+# recarga el eval set. La guarda se mantiene: si tras eso el hash sigue sin
+# cuadrar, la comparación queda marcada como no válida.
+import shutil
+
+if sha_real != SHA_EVAL:
+    descartada = RUTA_EVAL.with_name(f"eval_set_m2.NO_COINCIDE-{sha_real[:12]}.jsonl")
+    if not descartada.exists():
+        shutil.copy2(RUTA_EVAL, descartada)      # se conserva como evidencia
+    RUTA_EVAL.write_bytes(gzip.decompress(base64.b64decode(_BLOB_EVAL)))
+    eval_set = [json.loads(l) for l in RUTA_EVAL.read_text(encoding="utf-8").splitlines()]
+    sha_real = hashlib.sha256(RUTA_EVAL.read_bytes()).hexdigest()
+    print("La copia de Drive no coincidía con la del repositorio. Se corrigió:")
+    print(f"  la anterior se conservó en {descartada.name}")
+    print(f"  ahora SHA-256: {sha_real[:16]}…  coincide: {sha_real == SHA_EVAL}")
+    print(f"  casos recargados: {len(eval_set)}")
+    print()
+
 EVAL_M2_COMPARABLE = (sha_real == SHA_EVAL)
 if EVAL_M2_COMPARABLE:
-    print("El eval set de M2 es el mismo con el que se midió M3: la regresión es comparable.")
+    print("El eval set de M2 es el mismo con el que se midió M3: la regresión es")
+    print("comparable, y la fila de regresión de la tabla de delta es válida.")
 else:
     print("=" * 78)
-    print("ATENCIÓN · el eval set de M2 en disco NO es el que se usó para medir M3.")
+    print("ATENCIÓN · el eval set de M2 sigue sin coincidir con el del repositorio.")
     print("=" * 78)
     print(f"  esperado (embebido): {SHA_EVAL[:16]}…")
     print(f"  encontrado en disco: {sha_real[:16]}…")
     print()
     print("La sección 8 se ejecutará igual, pero su cifra queda marcada como NO")
     print("comparable y no se pone al lado de la de M3.")
-    print()
-    print("Para arreglarlo: borren data/eval_set_m2.jsonl y vuelvan a ejecutar la celda")
-    print("anterior, que reescribe la copia embebida y verificada.")
 '''
 
 CODIGO_VER = r'''
@@ -141,19 +158,191 @@ print("\nInstrucción de lectura:\n", INSTRUCCION_VER)
 
 
 @torch.no_grad()
-def ver(imagen, instruccion=INSTRUCCION_VER, max_new_tokens=320):
-    """imagen -> (texto crudo, dict o None, segundos). La etapa 1 del pipeline."""
+def ver(imagen, instruccion=INSTRUCCION_VER, max_new_tokens=320, muestrear=False):
+    """imagen -> (texto crudo, dict o None, segundos). La etapa 1 del pipeline.
+
+    Con `muestrear=True` genera con temperatura en vez de greedy: es la segunda
+    opinión que usa `leer_dos_veces`.
+    """
     t0 = time.perf_counter()
     msgs = [{"role": "user", "content": [{"type": "image"},
                                          {"type": "text", "text": instruccion}]}]
     prompt = vlm_proc.apply_chat_template(msgs, tokenize=False, add_generation_prompt=True)
     ent = vlm_proc(text=[prompt], images=[imagen], return_tensors="pt").to(vlm.device)
-    out = vlm.generate(**ent, max_new_tokens=max_new_tokens, do_sample=False)
+    kwargs = (dict(do_sample=True, temperature=0.8, top_p=0.95) if muestrear
+              else dict(do_sample=False))
+    out = vlm.generate(**ent, max_new_tokens=max_new_tokens,
+                       return_dict_in_generate=True, output_scores=True, **kwargs)
+    nuevos = out.sequences[:, ent["input_ids"].shape[1]:]
+    texto = vlm_proc.batch_decode(nuevos, skip_special_tokens=True)[0].strip()
+
+    # Confianza del modelo en los tokens que son NÚMEROS. Un dígito leído de una
+    # cifra nítida sale con más probabilidad que uno rellenado de memoria, así que
+    # esto es una señal sobre la lectura que no depende de mirar la imagen.
+    confianza = None
+    try:
+        scores = vlm.compute_transition_scores(out.sequences, out.scores,
+                                               normalize_logits=True)[0]
+        tok = vlm_proc.tokenizer
+        de_numeros = [float(s) for s, i in zip(scores, nuevos[0])
+                      if any(c.isdigit() for c in tok.decode([int(i)]))]
+        confianza = sum(de_numeros) / len(de_numeros) if de_numeros else None
+    except Exception as e:                      # nunca tumbar la lectura por esto
+        print(f"    (sin confianza de tokens: {type(e).__name__})")
+
+    return texto, json_de(texto), time.perf_counter() - t0, confianza
+
+
+# Una pregunta distinta, en una llamada aparte: no se le pide transcribir, solo
+# juzgar si la hoja se lee. Separar las dos preguntas es el punto — en la corrida
+# del 24-10 la transcripción venía arrastrada por el prior del ejercicio y el
+# modelo rellenó los números; preguntado sin transcribir, el prior no tiene dónde
+# agarrarse igual.
+INSTRUCCION_LEGIBILIDAD = (
+    "Mira esta foto de una hoja escrita a mano. NO la transcribas. Juzga solo si "
+    "se puede leer con claridad cada cifra y cada renglón.\n"
+    "Responde SOLO un JSON: {\"legible\": true|false, \"motivo\": \"...\"}\n"
+    "Pon `legible: false` si la foto está movida, desenfocada, con reflejos o "
+    "demasiado lejos para distinguir los números con seguridad."
+)
+
+
+@torch.no_grad()
+def preguntar_legibilidad(imagen):
+    """-> (legible: bool|None, motivo). None si la respuesta no se pudo parsear."""
+    msgs = [{"role": "user", "content": [{"type": "image"},
+                                         {"type": "text", "text": INSTRUCCION_LEGIBILIDAD}]}]
+    prompt = vlm_proc.apply_chat_template(msgs, tokenize=False, add_generation_prompt=True)
+    ent = vlm_proc(text=[prompt], images=[imagen], return_tensors="pt").to(vlm.device)
+    out = vlm.generate(**ent, max_new_tokens=80, do_sample=False)
     texto = vlm_proc.batch_decode(out[:, ent["input_ids"].shape[1]:],
                                   skip_special_tokens=True)[0].strip()
-    return texto, json_de(texto), time.perf_counter() - t0
+    js = json_de(texto) or {}
+    legible = js.get("legible")
+    return (bool(legible) if isinstance(legible, bool) else None,
+            str(js.get("motivo", ""))[:200])
+
+
+def leer_dos_veces(imagen, archivo):
+    """La salvaguarda contra la lectura inventada.
+
+    Se lee la foto dos veces: una greedy (la que se usa) y otra con muestreo. Si
+    las dos no coinciden en el número de pasos y en los números transcritos, la
+    lectura no es de fiar y el tutor recibirá "la hoja NO se pudo leer" en vez de
+    un procedimiento inventado.
+
+    Por qué así y no con una métrica de nitidez de la imagen: un umbral de
+    desenfoque habría que calibrarlo, y calibrarlo con estas 11 fotos sería
+    ajustarlo al eval set. Que dos muestreos del mismo modelo sobre la misma foto
+    discrepen es una señal del propio modelo —está inventando— y no necesita
+    ninguna constante elegida a mano.
+    """
+    crudo, js, seg, confianza = ver(imagen)
+    lectura = {"crudo": crudo, "json": js, "segundos": round(seg, 2),
+               "ok": js is not None, "archivo": archivo,
+               "confianza_numeros": confianza}
+
+    # Señal 2 · la misma pregunta, otra vez, con muestreo.
+    _, js2, seg2, _ = ver(imagen, muestrear=True)
+    lectura["consistente"] = lecturas_consistentes(lectura, {"json": js2})
+    lectura["json_segunda"] = js2
+
+    # Señal 3 · otra pregunta: ¿se lee? Sin transcribir.
+    legible, motivo = preguntar_legibilidad(imagen)
+    lectura["legible_declarada"] = legible
+    lectura["motivo_legibilidad"] = motivo
+
+    lectura["segundos_verificacion"] = round(seg2, 2)
+    return lectura
 '''
 
+
+CODIGO_CALIBRACION = r'''
+# CALIBRACIÓN de la detección de hojas ilegibles · con datos que NO son el eval set.
+#
+# Por qué aquí y no mirando `vis-10`: la detección tiene un umbral (la confianza
+# en los tokens numéricos, marcada con mediana − k·MAD). Ajustar ese umbral
+# mirando `vis-10` convertiría un caso de evaluación en conjunto de calibración, y
+# entonces el 0/3 adversarial dejaría de significar nada.
+#
+# El conjunto lo genera `scripts/calibracion_legibilidad_fuente.py`: 6 hojas × 3
+# versiones (nítida, borrosa leve, borrosa fuerte). La leve es la que importa: es
+# el análogo de `vis-10`, donde el VLM alcanza a leer parte y rellena el resto.
+#
+# LÍMITE, y es grande: son hojas con texto IMPRESO. Un buen resultado aquí NO
+# autoriza a decir que la salvaguarda funciona con letra manuscrita. La validación
+# de verdad necesita fotos de las hojas dev-* escritas a mano, nítidas y
+# desenfocadas, y mientras no existan la salvaguarda está sin validar.
+DIR_CALIBRACION = Path("m4/eval_set/calibracion")
+MANIFIESTO = DIR_CALIBRACION / "manifiesto.json"
+
+if not MANIFIESTO.exists():
+    print("No está el conjunto de calibración. Genérenlo con")
+    print("  python scripts/calibracion_legibilidad_fuente.py")
+    print("y súbanlo a Drive. Sin él, la salvaguarda queda sin medir.")
+else:
+    pares = json.loads(MANIFIESTO.read_text(encoding="utf-8"))["pares"]
+    cal = {}
+    for r in pares:
+        cal[r["archivo"]] = leer_dos_veces(cargar_imagen(DIR_CALIBRACION / r["archivo"]),
+                                           r["archivo"])
+        cal[r["archivo"]]["etiqueta"] = r["etiqueta"]
+
+    # El criterio de atípicos se calcula DENTRO del conjunto de calibración.
+    conf = {k: v["confianza_numeros"] for k, v in cal.items()
+            if v.get("confianza_numeros") is not None}
+    at = atipicos_por_mad(conf)
+    for k in cal:
+        cal[k]["confianza_atipica"] = k in at
+
+    print(f"{'archivo':28s}{'etiqueta':17s}{'conf.núm':>10s}{'¿se lee?':>10s}   detectada")
+    filas_cal = []
+    for k in sorted(cal):
+        v = cal[k]
+        no_fiable, _ = lectura_no_fiable(v)
+        c = v.get("confianza_numeros")
+        filas_cal.append({"archivo": k, "etiqueta": v["etiqueta"],
+                          "legible": v["etiqueta"] == "legible",
+                          "confianza": c, "atipica": v["confianza_atipica"],
+                          "legible_declarada": v.get("legible_declarada"),
+                          "consistente": v.get("consistente"),
+                          "detectada_no_fiable": no_fiable})
+        print(f"{k:28s}{v['etiqueta']:17s}"
+              f"{(f'{c:.3f}' if c is not None else '—'):>10s}"
+              f"{({True: 'sí', False: 'NO', None: '?'}[v.get('legible_declarada')]):>10s}"
+              f"   {'NO FIABLE' if no_fiable else 'ok'}")
+
+    CAL = pd.DataFrame(filas_cal)
+    CAL.to_csv("m4/calibracion_legibilidad.csv", index=False)
+
+    ileg = CAL[~CAL.legible]
+    leg = CAL[CAL.legible]
+    print()
+    print("=" * 78)
+    print("QUÉ TAN BIEN SEPARA · sobre calibración, nunca sobre el eval set")
+    print("=" * 78)
+    print(f"  ilegibles detectadas   : {int(ileg.detectada_no_fiable.sum())}/{len(ileg)}"
+          "   (cuantas más, mejor)")
+    for nivel in ("ilegible_leve", "ilegible_fuerte"):
+        g = CAL[CAL.etiqueta == nivel]
+        if len(g):
+            print(f"      {nivel:16s}: {int(g.detectada_no_fiable.sum())}/{len(g)}")
+    print(f"  legibles marcadas mal  : {int(leg.detectada_no_fiable.sum())}/{len(leg)}"
+          "   (cuantas menos, mejor)")
+    print("=" * 78)
+    print()
+    print("Cómo leerlo:")
+    print("  · Si NO caza las `ilegible_fuerte`, la salvaguarda no funciona en absoluto.")
+    print("  · Si caza las fuertes pero no las leves, cazará lo evidente y dejará pasar")
+    print("    justo el caso que importa, que es el de `vis-10`.")
+    print("  · Si marca legibles, el coste es real: a una hoja buena se le dirá que no")
+    print("    se pudo leer y su caso fallará por la salvaguarda.")
+    print()
+    print("Y el límite que no se puede saltar: esto es texto IMPRESO. Con letra")
+    print("manuscrita el problema es más difícil incluso en nítido. Mientras no haya")
+    print("fotos a mano de las hojas dev-*, la salvaguarda sigue SIN VALIDAR y así hay")
+    print("que reportarla.")
+'''
 
 CODIGO_PUERTA_PILOTO = r'''
 # PUERTA PILOTO · tres imágenes antes de gastar la corrida completa.
@@ -177,11 +366,15 @@ for cid, que_prueba in PILOTO.items():
     if real is None:
         print(f"      falta la foto de {logico}\n")
         continue
-    crudo, js, seg = ver(cargar_imagen(DIR_IMAGENES / real))
-    lectura = {"crudo": crudo, "json": js, "segundos": round(seg, 2),
-               "ok": js is not None, "archivo": real}
+    lectura = leer_dos_veces(cargar_imagen(DIR_IMAGENES / real), real)
+    js, seg = lectura["json"], lectura["segundos"]
     lecturas_piloto[logico] = lectura
-    print(f"      archivo: {real} | {seg:.1f}s | json parseado: {js is not None}")
+    print(f"      archivo: {real} | {seg:.1f}s | json parseado: {js is not None}"
+          f" | dos lecturas coinciden: {lectura['consistente']}")
+    no_fiable, motivo = lectura_no_fiable(lectura)
+    if no_fiable:
+        print(f"      LECTURA NO FIABLE -> {motivo}")
+        print("      el tutor recibirá 'la hoja NO se pudo leer', no un procedimiento")
 
     # Se imprimen los pasos YA NUMERADOS, que es exactamente lo que verá el tutor.
     # La numeración incluye la respuesta final como último paso, igual que el eval
@@ -236,13 +429,61 @@ if len(FALTAN) == len(PEDIDAS):
 # lecturas no cambia de forma si mañana la foto llega con otra extensión.
 lecturas.update(lecturas_piloto)        # el piloto ya leyó tres: no se repiten
 
+# La caché se reusa solo si trae la verificación de consistencia: una lectura
+# guardada antes de la salvaguarda no se puede dar por fiable, así que se relee.
 for logico, info in sorted(PEDIDAS.items()):
-    if logico in lecturas or info["archivo"] is None:
+    if info["archivo"] is None:
         continue
-    crudo, js, seg = ver(cargar_imagen(DIR_IMAGENES / info["archivo"]))
-    lecturas[logico] = {"crudo": crudo, "json": js, "segundos": round(seg, 2),
-                        "ok": js is not None, "archivo": info["archivo"]}
-    print(f"  {info['archivo']:14s} {seg:5.1f}s  {'json ok' if js else 'SIN json'}")
+    previa = lecturas.get(logico)
+    if previa is not None and "consistente" in previa:
+        continue
+    lecturas[logico] = leer_dos_veces(cargar_imagen(DIR_IMAGENES / info["archivo"]),
+                                      info["archivo"])
+    l = lecturas[logico]
+    marca = "json ok" if l["ok"] else "SIN json"
+    aviso = "" if l["consistente"] else "  <-- LAS DOS LECTURAS NO COINCIDEN"
+    print(f"  {info['archivo']:14s} {l['segundos']:5.1f}s  {marca}{aviso}")
+
+# Señal 4 · confianza atípica en los números, RELATIVA al resto del conjunto.
+# El criterio es mediana − 3·MAD, la convención robusta de siempre. No hay ningún
+# umbral calibrado con estas fotos, y no debe calibrarse con ellas: `vis-10` es un
+# caso de evaluación, no de ajuste.
+confianzas = {k: v["confianza_numeros"] for k, v in lecturas.items()
+              if v.get("confianza_numeros") is not None}
+atipicas = atipicos_por_mad(confianzas)
+for k in lecturas:
+    lecturas[k]["confianza_atipica"] = k in atipicas
+
+RUTA_LECTURA.write_text(json.dumps(lecturas, ensure_ascii=False, indent=2), encoding="utf-8")
+
+print("\nLAS CUATRO SEÑALES DE FIABILIDAD, foto por foto")
+print(f"{'foto':14s}{'conf.núm':>10s}{'atípica':>9s}{'2ª lectura':>12s}"
+      f"{'¿se lee?':>10s}   veredicto")
+for k in sorted(lecturas):
+    v = lecturas[k]
+    c = v.get("confianza_numeros")
+    no_fiable, motivo = lectura_no_fiable(v)
+    print(f"{k:14s}{(f'{c:.3f}' if c is not None else '—'):>10s}"
+          f"{('sí' if v.get('confianza_atipica') else 'no'):>9s}"
+          f"{('coincide' if v.get('consistente') else 'DISCREPA'):>12s}"
+          f"{({True: 'sí', False: 'NO', None: '?'}[v.get('legible_declarada')]):>10s}"
+          f"   {'NO FIABLE' if no_fiable else 'ok'}")
+
+print("\nLa columna de confianza se imprime para que la vean, no para ajustar nada:")
+print("si quieren saber si separa las fotos ilegibles, hace falta un conjunto de")
+print("calibración aparte (ver el README de la corrida 03). Mover el criterio hasta")
+print("que una foto del eval set caiga del lado deseado la convierte en ajuste.")
+
+no_fiables = [k for k, v in lecturas.items() if lectura_no_fiable(v)[0]]
+if no_fiables:
+    print(f"\nLecturas NO fiables: {', '.join(sorted(no_fiables))}")
+    print("En esos casos el tutor recibirá 'la hoja NO se pudo leer' en lugar de una")
+    print("transcripción. No se acredita ningún caso por esto: solo se evita juzgar")
+    print("al tutor sobre un procedimiento que el VLM se inventó.")
+else:
+    print("\nNinguna lectura se marcó como no fiable.")
+    print("Si alguna de las fotos era ilegible a propósito, esto es un FALSO NEGATIVO")
+    print("de la salvaguarda y hay que decirlo: ese caso no mide al tutor.")
 
 RUTA_LECTURA.write_text(json.dumps(lecturas, ensure_ascii=False, indent=2), encoding="utf-8")
 leidas = sum(1 for v in lecturas.values() if v["ok"])
@@ -291,6 +532,43 @@ print("Índice:", coleccion.count(), "chunks (mismo corpus y mismo chunking que 
 '''
 
 
+CODIGO_ADAPTADOR_DIAGNOSTICO = r'''
+# El adaptador de diagnóstico, con una comprobación REAL de la ruta.
+#
+# `CODIGO_LLM` es compartido con los notebooks de S10 y solo carga `m1` y
+# `agente`; este de M4 necesita además el de diagnóstico, así que se carga aquí.
+#
+# En la corrida del 25-10 esta carga no existía y la celda siguiente imprimía
+# "No está adaptadores/qwen-lora-diagnostico" con los dos archivos presentes en
+# Drive: el mensaje afirmaba algo que nadie había comprobado. Ahora se mira el
+# disco y se dice qué falta.
+import os
+
+DIR_LORA_DIAGNOSTICO = "adaptadores/qwen-lora-diagnostico"
+DIAGNOSTICO_OK, DIAGNOSTICO_MOTIVO = revisar_adaptador(DIR_LORA_DIAGNOSTICO)
+
+print("Directorio de trabajo:", os.getcwd())
+print("Ruta efectiva        :", Path(DIR_LORA_DIAGNOSTICO).resolve())
+print("Comprobación         :", DIAGNOSTICO_MOTIVO)
+
+if DIAGNOSTICO_OK:
+    for f in sorted(Path(DIR_LORA_DIAGNOSTICO).iterdir()):
+        print(f"   {f.name:34s} {f.stat().st_size / 1e6:8.1f} MB")
+    if "diagnostico" not in ADAPTADORES:
+        # `load_adapter` AÑADE un adaptador con su propio nombre: no reemplaza
+        # `m1` ni `agente`, que siguen cargados y seleccionables.
+        modelo.load_adapter(DIR_LORA_DIAGNOSTICO, adapter_name="diagnostico")
+        ADAPTADORES.append("diagnostico")
+
+# Que los dos de siempre sigan ahí no se da por supuesto: se comprueba.
+assert "m1" in modelo.peft_config, "se perdió el adaptador de M1"
+if "agente" in ADAPTADORES:
+    assert "agente" in modelo.peft_config, "se perdió el adaptador del agente"
+
+print("\nAdaptadores en el modelo:", list(modelo.peft_config.keys()))
+print("ADAPTADORES             :", ADAPTADORES)
+'''
+
 CODIGO_RESPONDER_M3 = r'''
 # `responder_m3`: el sistema que se entregó en M3, sin reescribirlo.
 #
@@ -320,16 +598,50 @@ agente_m3 = AgenteTutor(
     max_rondas=6, max_pasos=8, verificar=True,
     extraer_contextos=chunks_de_resultado, nombre="tutor M3")
 
+# La vía visual usa el adaptador de diagnóstico si está; la de texto sigue con el
+# de S10. Son dos vías con dos adaptadores a propósito:
+#
+#   · la regresión de M2 tiene que medir el MISMO sistema que midió M3, o la fila
+#     deja de ser una regresión;
+#   · la tarea visual necesita un modelo que sepa dictaminar, que es justo lo que
+#     el de S10 no sabe.
+#
+# El precio es que la fila de regresión ya no describe el modelo que responde las
+# fotos. Queda dicho aquí y en el artefacto.
+ADAPTADOR_DIAGNOSTICO = elegir_adaptador(ADAPTADORES, "diagnostico", ADAPTADOR_TUTOR)
+if ADAPTADOR_DIAGNOSTICO == "diagnostico":
+    print(f"\nVía visual   -> {ADAPTADOR_DIAGNOSTICO!r} (entrenado para dictaminar)")
+    print(f"Vía de texto -> {ADAPTADOR_TUTOR!r} (el de S10, para que la regresión siga "
+          "midiendo lo mismo)")
+else:
+    # El motivo sale de la comprobación de la celda anterior, no de una suposición.
+    print(f"\nLa vía visual usará {ADAPTADOR_TUTOR!r}, no el de diagnóstico.")
+    print(f"Motivo: {DIAGNOSTICO_MOTIVO}")
+    print("Es el sistema de la corrida del 25-10, que contestó 'paso 2' a los 12 casos.")
+
+agente_diagnostico = AgenteTutor(
+    crear_llm(ADAPTADOR_DIAGNOSTICO, 320), SYSTEM_C5_AGENTE, registro=REGISTRO_M4,
+    max_rondas=6, max_pasos=8, verificar=True,
+    extraer_contextos=chunks_de_resultado, nombre="tutor diagnóstico")
+
 TRAZAS_M4 = {}
 
 
-def responder_m3(pregunta):
+def responder_sin_imagen(pregunta):
+    """La vía de texto: el sistema de M3, sin tocar. Es la de la regresión."""
     salida = agente_m3(pregunta)
     TRAZAS_M4[pregunta[:160]] = salida
     return salida.respuesta
 
 
-print(f"{len(REGISTRO_M4)} herramientas disponibles para el tutor.")
+def responder_diagnostico(pregunta):
+    """La vía visual: el adaptador entrenado para emitir un veredicto."""
+    salida = agente_diagnostico(pregunta)
+    TRAZAS_M4[pregunta[:160]] = salida
+    return salida.respuesta
+
+
+print(f"\n{len(REGISTRO_M4)} herramientas disponibles para el tutor.")
 '''
 
 
@@ -342,27 +654,84 @@ CODIGO_SISTEMA_MULTIMODAL = r'''
 # `INSTRUCCION_REVISION` y `pasos_como_texto` vienen del módulo `vision.py`.
 
 
-def sistema_multimodal(pregunta, lectura=None):
+REINTENTOS = {}        # qué casos necesitaron una segunda pasada
+
+
+def sistema_multimodal(pregunta, lectura=None, clave=None):
     """pregunta (+ lo que se leyó de la foto) -> respuesta del tutor.
 
     Sin `lectura` es exactamente el sistema de M3: la misma función responde los
     21 casos de la regresión, que no llevan imagen. Que sea la MISMA función es lo
     que hace legítima esa fila.
+
+    Con `lectura`, además del prompt nuevo hay **un** reintento acotado: si la
+    respuesta no trae una conclusión válida, se le devuelve su propia explicación
+    y se le pide solo la línea. Queda registrado en `REINTENTOS`, porque contestar
+    en dos pasadas no es lo mismo que contestar en una.
     """
     if lectura is None:
-        return responder_m3(pregunta)
-    return responder_m3(f"{INSTRUCCION_REVISION}\n\n{pasos_como_texto(lectura)}\n\n"
-                        f"Pregunta: {pregunta}")
+        return responder_sin_imagen(pregunta)
+    respuesta = responder_diagnostico(prompt_revision(pregunta, lectura))
+    respuesta, reintento = asegurar_diagnostico(respuesta, responder_diagnostico)
+    REINTENTOS[clave or pregunta[:60]] = reintento
+    return respuesta
 
 
 print("sistema_multimodal() listo.")
-print("  con imagen -> ver() + M3   |   sin imagen -> M3 tal cual")
-print("\nAsí ve el tutor una transcripción (ejemplo con datos inventados):\n")
-print(pasos_como_texto({"json": {"enunciado": "Una caja trae 24 lápices...",
-                                 "pasos": ["24 × 13.", "24 × 13 = 302."],
-                                 "respuesta_final": "302"}}))
+print("  con imagen -> ver() + M3 + un reintento si falta la conclusión")
+print("  sin imagen -> M3 tal cual")
+print("\nEl prompt completo que recibe el tutor (con una hoja de ejemplo):\n")
+print("-" * 78)
+print(prompt_revision("Revisa mi procedimiento: ¿en qué paso me equivoqué?",
+                      {"ok": True, "consistente": True,
+                       "json": {"enunciado": "Una caja trae 24 lápices...",
+                                "pasos": ["24 × 13.", "24 × 13 = 302."],
+                                "respuesta_final": "302"}}))
+print("-" * 78)
+print("\nLo ÚLTIMO que lee antes de generar es la exigencia del formato. En la")
+print("corrida del 22-10 lo último era la respuesta final del estudiante, y ocho de")
+print("once respuestas terminaron copiando esa etiqueta en vez de concluir.")
 '''
 
+
+CODIGO_ENSAYO_DEV = r'''
+# ENSAYO sobre los 3 casos de DESARROLLO · antes de tocar los 12 de evaluación.
+#
+# Para qué: la pregunta "¿el tutor emite la línea `Diagnóstico:`?" es de formato,
+# y responderla mirando los 12 casos de evaluación es el camino directo al
+# sobreajuste: se acaba retocando el prompt hasta que esos 12 salgan bien.
+#
+# Los casos `dev-*` existen para esto. No tienen foto, así que la transcripción se
+# construye a partir de los pasos que el propio eval set declara: no se mide la
+# lectura, se mide **si el formato se sostiene**. Son 3 casos: es una señal, no una
+# medición, y por eso no entra en ningún scorecard.
+def lectura_sintetica(caso):
+    """La transcripción que el VLM habría producido si hubiera leído perfecto."""
+    return {"ok": True, "consistente": True, "crudo": "(sintética)", "segundos": 0.0,
+            "json": {"enunciado": caso["enunciado"], "pasos": list(caso["pasos"]),
+                     "respuesta_final": caso["valor_final_escrito"]}}
+
+
+print("Ensayo de formato sobre los casos de desarrollo (no entra en el scorecard)\n")
+conclusiones = []
+for caso in dev_m4:
+    respuesta = sistema_multimodal(caso["pregunta"], lectura_sintetica(caso),
+                                   clave=caso["id"])
+    ev = calificar_m4(caso, respuesta)
+    conclusiones.append((caso["id"], ev["conclusion"]))
+    print(f"  {caso['id']:8s} {caso['bloque']:13s} esperaba {ev['esperado']!r:18s} "
+          f"concluyó {str(ev['conclusion'])!r:18s} "
+          f"{'(reintento)' if REINTENTOS.get(caso['id']) else ''}")
+
+PUERTA_DEV = revisar_puerta_dev(conclusiones)
+print(f"\nConclusión válida en {PUERTA_DEV['validos']}/{PUERTA_DEV['total']} "
+      "casos de desarrollo.\n")
+
+# Y ahora la puerta DETIENE. En la corrida del 24-10 esto era un `print`: dio 0/3,
+# dijo "PAREN AQUÍ" y la ejecución siguió hasta evaluar los 12 casos.
+exigir_puerta_dev(PUERTA_DEV, permitir_sin_puerta=globals().get("PERMITIR_SIN_PUERTA", False))
+print("El formato se sostiene en desarrollo. Sigan a los 12 casos de evaluación.")
+'''
 
 CODIGO_CALIFICAR = r'''
 # Cómo se obtiene el resultado de cada caso.
@@ -380,6 +749,12 @@ CODIGO_CALIFICAR = r'''
 # Se siguen registrando tres señales independientes, como en M2 y M3, más dos
 # sobre la explicación que son diagnóstico y nunca deciden el acierto.
 
+# La puerta, otra vez y aquí: así la parada no depende de cómo el entorno trate
+# una excepción en otra celda. Si alguien ejecuta esta celda directamente sin
+# haber pasado el ensayo, se detiene igual.
+exigir_puerta_dev(globals().get("PUERTA_DEV"),
+                  permitir_sin_puerta=globals().get("PERMITIR_SIN_PUERTA", False))
+
 filas = []
 for caso in eval_m4:
     logico = archivo_de(caso)
@@ -393,7 +768,7 @@ for caso in eval_m4:
 
     lectura = lecturas.get(logico)
     t0 = time.perf_counter()
-    respuesta = sistema_multimodal(caso["pregunta"], lectura)
+    respuesta = sistema_multimodal(caso["pregunta"], lectura, clave=caso["id"])
     seg_tutor = time.perf_counter() - t0
 
     ev = calificar_m4(caso, respuesta)
@@ -404,6 +779,9 @@ for caso in eval_m4:
         "esperado": ev["esperado"], "conclusion": ev["conclusion"],
         "acierto": ev["acierto"], "abstuvo": ev["abstuvo"], "abstuvo_bien": ev["abstuvo_bien"],
         "alucino": ev["alucino"], "sin_conclusion": ev["sin_conclusion"],
+        "conclusion_invalida": ev["conclusion_invalida"],
+        "reintento": bool(REINTENTOS.get(caso["id"])),
+        "lectura_no_fiable": lectura_no_fiable(lectura)[0],
         "motivo": ev["motivo"],
         # La explicación, medida aparte: nunca decide el acierto.
         "explicacion_pasos": " ".join(map(str, ev["explicacion_pasos"])),
@@ -465,17 +843,37 @@ if len(evaluados):
           f"de las cuales acertadas: {int(evaluados.abstuvo_bien.sum())}")
     print(f"{'sin conclusión':15s}{int(evaluados.sin_conclusion.sum()):>11d}   "
           "no emitió la línea `Diagnóstico:`")
+    print(f"{'no válida':15s}{int(evaluados.conclusion_invalida.sum()):>11d}   "
+          "la emitió en texto libre, fuera de las cinco categorías")
+    print(f"{'con reintento':15s}{int(evaluados.reintento.sum()):>11d}   "
+          "necesitaron una segunda pasada para concluir")
+    print(f"{'lectura dudosa':15s}{int(evaluados.lectura_no_fiable.sum()):>11d}   "
+          "el tutor recibió 'no se pudo leer', no un procedimiento")
 print("=" * 78)
 
 # El fallo de formato se reporta aparte porque tiene arreglo distinto: si domina,
 # el problema es que la LoRA de M1 arrastra al modelo a continuar el procedimiento
 # en vez de emitir un veredicto, y se ataca con el prompt o con entrenamiento, no
 # con un modelo mayor.
-sin_conc = int(evaluados.sin_conclusion.sum())
-if sin_conc:
-    print(f"\nAVISO: {sin_conc} de {len(evaluados)} respuestas no traen conclusión.")
-    print("Si son la mayoría, lo que se está midiendo es el formato de salida y no el")
-    print("criterio del tutor. Antes de leer el scorecard, mirar una respuesta completa.")
+sin_forma = int((evaluados.sin_conclusion | evaluados.conclusion_invalida).sum())
+if sin_forma:
+    print(f"\nAVISO: {sin_forma} de {len(evaluados)} respuestas no dan una conclusión")
+    print("válida ni después del reintento. Mientras eso pase, el total mide en parte el")
+    print("formato de salida y no el criterio del tutor: miren una respuesta completa")
+    print("antes de leer el scorecard.")
+
+# Un predictor constante acierta por construcción los casos cuya respuesta es la
+# que repite siempre. Si eso pasa, el total no es evidencia de capacidad.
+conc = evaluados[evaluados.conclusion.notna()].conclusion
+if len(conc):
+    top, veces = conc.value_counts().index[0], conc.value_counts().iloc[0]
+    if veces >= 0.6 * len(conc):
+        print(f"\nAVISO: {veces} de {len(conc)} conclusiones son {top!r}.")
+        print("El tutor está respondiendo casi siempre lo mismo, así que los aciertos")
+        print("coinciden con los casos cuya respuesta es justamente esa. Cuenten cuántos")
+        print("acertaría un sistema que contestara siempre eso antes de leer el total:")
+        baseline = int((evaluados.esperado == top).sum())
+        print(f"  un predictor constante {top!r} acertaría {baseline}/{len(evaluados)}.")
 
 print("\nFUENTE DEL FALLO · solo los casos fallados")
 if len(fallos):
@@ -579,6 +977,8 @@ json.dump({
     "max_pixels": MAX_PIXELS,
     "lado_mayor_px": LADO_MAYOR,
     "adaptador_tutor": ADAPTADOR_TUTOR,
+    "adaptador_via_visual": ADAPTADOR_DIAGNOSTICO,
+    "adaptador_diagnostico": DIAGNOSTICO_MOTIVO,
     "referencia_m3": REFERENCIA_M3,
     "n_casos": len(eval_m4),
     "n_imagenes_necesarias": len(PEDIDAS),
@@ -594,7 +994,12 @@ json.dump({
     "regresion_m2": {k: v for k, v in sc_regresion.items() if k != "detalle"},
     "conclusiones": {str(k): int(v) for k, v in
                      evaluados.conclusion.fillna("sin_conclusion").value_counts().items()},
+    "puerta_dev": ("superada" if (globals().get("PUERTA_DEV") or {}).get("ok")
+                   else "NO superada"),
     "sin_conclusion": int(evaluados.sin_conclusion.sum()),
+    "conclusion_invalida": int(evaluados.conclusion_invalida.sum()),
+    "reintentos": int(evaluados.reintento.sum()),
+    "lecturas_no_fiables": sorted(evaluados[evaluados.lectura_no_fiable].id),
     "abstuvo_bien": int(evaluados.abstuvo_bien.sum()),
     "explicacion_justifica": int(evaluados.explicacion_justifica.astype(bool).sum()),
     "archivos_leidos": {k: v.get("archivo", k) for k, v in lecturas.items()},
@@ -790,7 +1195,19 @@ error que había que encontrar desaparece antes de llegar al tutor.
     c.append(code(CODIGO_VER))
 
     c.append(md("""
-### 5.1 · Puerta piloto · tres imágenes
+### 5.1 · Calibración de la detección de hojas ilegibles
+
+Con un conjunto **aparte del eval set**: 6 hojas sintéticas × 3 versiones
+(nítida, borrosa leve, borrosa fuerte). Mide si la salvaguarda separa, sin
+convertir `vis-10` en dato de ajuste.
+
+El límite es grande y está dicho en la celda: es texto **impreso**. Un buen
+resultado aquí no autoriza a afirmar que funciona con letra manuscrita.
+"""))
+    c.append(code(CODIGO_CALIBRACION))
+
+    c.append(md("""
+### 5.2 · Puerta piloto · tres imágenes
 
 Antes de gastar la corrida completa. El riesgo que puede costar la entrega es que
 un modelo de 2B no lea letra manuscrita; más vale descubrirlo en tres fotos que a
@@ -800,7 +1217,7 @@ una forma distinta, y la celda dice qué hacer en cada caso.
     c.append(code(CODIGO_PUERTA_PILOTO))
 
     c.append(md("""
-### 5.2 · Transcripción completa
+### 5.3 · Transcripción completa
 
 Se guarda en disco **antes** de soltar el VLM: si Colab se desconecta no se pierde
 nada, y la fase de diagnóstico se puede repetir sin volver a leer las fotos.
@@ -845,12 +1262,34 @@ nunca como acierto: era lo que invalidaba la corrida anterior.
     c.extend(celdas_modulos(["registro", "herramientas", "nucleo", "documentos", "prompts"],
                             con_descripcion=False))
     c.append(code(CODIGO_LLM))
+    c.append(md("""
+### 6.1 · El adaptador de diagnóstico
+
+`CODIGO_LLM` es compartido con los notebooks de S10 y solo carga `m1` y
+`agente`. El de diagnóstico se carga aquí, **comprobando el disco**: en la
+corrida del 25-10 la celda siguiente afirmaba que no estaba, con los dos
+archivos presentes en Drive, porque la condición miraba si estaba *cargado* y
+nadie lo cargaba.
+"""))
+    c.append(code(CODIGO_ADAPTADOR_DIAGNOSTICO))
     c.append(code(CODIGO_RESPONDER_M3))
     c.append(code(CODIGO_SISTEMA_MULTIMODAL))
 
     c.append(md("""
 ---
 ## 7 · Evaluación de los casos con imagen
+"""))
+    c.append(md("""
+### 7.1 · Ensayo de formato sobre los casos de desarrollo
+
+Primero los 3 casos `dev-*`, con transcripción sintética. Mide **solo si el
+formato se sostiene**, y no entra en ningún scorecard: es la forma de decidir
+sobre el prompt sin convertir los 12 casos de evaluación en conjunto de
+entrenamiento.
+"""))
+    c.append(code(CODIGO_ENSAYO_DEV))
+    c.append(md("""
+### 7.2 · Los 12 casos de evaluación
 """))
     c.append(code(CODIGO_CALIFICAR))
     c.append(code(CODIGO_SCORECARD))

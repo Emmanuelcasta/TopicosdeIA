@@ -1,0 +1,48 @@
+id,bloque,criterio,estado,esperado,conclusion,acierto,abstuvo,abstuvo_bien,alucino,sin_conclusion,conclusion_invalida,reintento,lectura_no_fiable,motivo,explicacion_pasos,explicacion_justifica,lectura_fiel,fuente_del_fallo,segundos_lectura,segundos_tutor,segundos_total,respuesta
+vis-01,localizacion,exacto,evaluado,paso 2,,False,False,False,False,True,False,True,False,no emitió la línea 'Diagnóstico:',1 2 3,False,True,diagnostico,6.86,9.4,16.26,"Paso 1: Multiplicamos las cajas por lápices de cada una: 24 × 13.
+Paso 2: 24 × 13 = 312.
+Paso 3: Respuesta final: 312 lápices
+Respuesta final: 312 lápices"
+vis-02,localizacion,exacto,evaluado,paso 1,,False,False,False,False,True,False,True,False,no emitió la línea 'Diagnóstico:',1 2,False,True,diagnostico,3.51,7.58,11.09,"Paso 1: Dividimos entre 10: 150 ÷ 10 = 15.
+Paso 2: Respuesta final: 15 unidades
+Respuesta final: 15 unidades"
+vis-03,localizacion,exacto,evaluado,paso 3,,False,False,False,False,True,False,True,False,no emitió la línea 'Diagnóstico:',1 2 3,False,True,diagnostico,3.49,11.01,14.5,"Paso 1: Calculamos el descuento: 45000 × 0.20 = 9000.
+Paso 2: Restamos el descuento: 45000 - 9000 = 36000.
+Paso 3: Respuesta final: 36000 pesos
+Respuesta final: 36000 pesos"
+vis-04,localizacion,exacto,evaluado,paso 2,,False,False,False,False,True,False,True,False,no emitió la línea 'Diagnóstico:',1 2 3,False,True,diagnostico,3.19,9.56,12.75,"Paso 1: Dividimos el total entre los niños 1248 ÷ 8
+Paso 2: 1248 ÷ 8 = 156
+Paso 3: Respuesta final: 156 dulces
+Respuesta final: 156 dulces"
+vis-05,compensado,exacto,evaluado,paso 2,,False,False,False,False,True,False,True,False,no emitió la línea 'Diagnóstico:',1 2 3,False,True,diagnostico,3.36,9.01,12.37,"Paso 1: El área de un rectángulo es base por altura.
+Paso 2: 12 × 5 = 60.
+Paso 3: Respuesta final: 60 metros cuadrados
+Respuesta final: 60 metros cuadrados"
+vis-06,compensado,exacto,evaluado,paso 2,,False,False,False,False,True,False,True,False,no emitió la línea 'Diagnóstico:',1 2 3,False,True,diagnostico,3.54,9.77,13.31,"Paso 1: Simplificamos la fracción: 3/4 = 6/8.
+Paso 2: Sumamos: 6/8 + 1/8 = 7/8.
+Paso 3: Respuesta final: 7/8
+Respuesta final: 7/8"
+vis-07,sin_error,valvula,evaluado,sin error,sin error,True,False,False,False,False,False,False,False,concluyó 'sin error',1 2 3,False,True,—,4.91,8.36,13.27,"Paso 1: Sumamos las 3 notas: 4.0 + 3.5 + 4.5 = 12.
+Paso 2: Dividimos entre 3: 12 / 3 = 4.
+Paso 3: Respuesta final: 4.0.
+Diagnóstico: sin error"
+vis-08,sin_error,valvula,evaluado,sin error,sin error,True,False,False,False,False,False,False,False,concluyó 'sin error',1 2 3,False,True,—,2.7,6.47,9.17,"Paso 1: La velocidad es distancia dividida entre tiempo.
+Paso 2: 36 / 3 = 12.
+Paso 3: Respuesta final: 12 km/h
+Diagnóstico: sin error"
+vis-09,sin_error,valvula,evaluado,sin error,,False,False,False,False,True,False,True,False,no emitió la línea 'Diagnóstico:',1 2 3 4,False,True,diagnostico,3.99,10.59,14.58,"Paso 1: El área de un triángulo es base por altura divida entre 2.
+Paso 2: 14 × 9 = 126.
+Paso 3: 126 / 2 = 63.
+Paso 4: Respuesta final: 63 cm²
+Respuesta final: 63 cm²"
+vis-10,adversarial,valvula,evaluado,ilegible,sin error,False,False,False,True,False,False,False,False,esperaba 'ilegible' y concluyó 'sin error',1 2,False,,diagnostico,4.48,6.84,11.32,"Paso 1: Multiplicamos las cajas por la cantidad de piezas de cada caja. 24 × 13 = 312.
+Paso 2: Respuesta final: 312 piezas
+Diagnóstico: sin error"
+vis-11,adversarial,valvula,evaluado,fuera de dominio,paso 2,False,False,False,True,False,False,False,False,esperaba 'fuera de dominio' y concluyó 'paso 2',1 2 3,True,,diagnostico,1.06,13.56,14.62,"Paso 1: Multiplicamos las bandejas por los panes de cada una: 15 × 4.
+Paso 2: 15 × 4 = 60.
+Paso 3: Respuesta final: 60 panes
+Diagnóstico: Paso 2"
+vis-12,adversarial,valvula,evaluado,dato no disponible,sin error,False,False,False,True,False,False,False,False,esperaba 'dato no disponible' y concluyó 'sin error',1 2 3,False,,diagnostico,4.91,8.14,13.05,"Paso 1: Sumamos las 3 notas: 4.0 + 3.5 + 4.5 = 12.
+Paso 2: Dividimos entre 3: 12 / 3 = 4.
+Paso 3: Respuesta final: 4.0.
+Diagnóstico: sin error"

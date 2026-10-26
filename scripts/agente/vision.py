@@ -40,6 +40,7 @@ from __future__ import annotations
 import json
 import re
 import unicodedata
+from pathlib import Path
 
 # `vis-12` reutiliza a propósito la hoja de `vis-07` con otra pregunta: se pide un
 # dato que no está escrito en ella. El eval set guarda el nombre lógico y el alias
@@ -161,9 +162,130 @@ def pasos_numerados(lectura) -> list:
     js = (lectura or {}).get("json") or {}
     pasos = [_PREFIJO_PASO.sub("", str(p)).strip() for p in (js.get("pasos") or [])]
     final = js.get("respuesta_final")
-    if final is not None and not any(_MENCIONA_FINAL.search(p) for p in pasos):
+    # Solo se añade la respuesta final si HAY pasos. Con `pasos: []` —la lista de
+    # mercado de `vis-11`— añadirla fabricaba un "Paso 1: Respuesta final: Arroz"
+    # y al tutor se le presentaba un procedimiento de un paso donde la hoja no
+    # tenía ninguno, lo que hace casi imposible concluir "fuera de dominio".
+    if pasos and final is not None and not any(_MENCIONA_FINAL.search(p) for p in pasos):
         pasos.append(f"Respuesta final: {final}")
     return pasos
+
+
+# --------------------------------------------------------------------------
+# ¿Es fiable esta lectura?
+# --------------------------------------------------------------------------
+
+_PAT_NUMERO = re.compile(r"-?\d+(?:[.,]\d+)?(?:/\d+)?")
+
+
+def numeros_de(texto: str) -> list:
+    """Los números de un texto, normalizados. La huella de una transcripción."""
+    return [n.replace(",", ".") for n in _PAT_NUMERO.findall(texto or "")]
+
+
+def huella_lectura(lectura) -> tuple:
+    """Lo que tiene que coincidir entre dos lecturas de la MISMA foto: cuántos
+    pasos y qué números. La redacción puede variar; los números, no."""
+    js = (lectura or {}).get("json") or {}
+    if js.get("ilegible"):
+        return ("ilegible",)
+    pasos = js.get("pasos") or []
+    texto = " ".join(map(str, pasos)) + " " + str(js.get("respuesta_final", ""))
+    return (len(pasos), tuple(numeros_de(texto)))
+
+
+def lecturas_consistentes(a, b) -> bool:
+    """¿Dos lecturas de la misma foto dicen lo mismo?
+
+    **Necesaria pero NO suficiente, y hay prueba.** En la corrida del 24-10 esta
+    señal falló exactamente donde tenía que servir: ante la foto desenfocada de
+    `vis-10` el VLM inventó `24 x 13 = 306` (la hoja dice 302) y lo inventó **las
+    dos veces**. La invención no era ruido de muestreo: estaba anclada en el
+    prior del modelo —la hoja es una versión borrosa de un ejercicio de 24 × 13—
+    y por eso es estable.
+
+    Se conserva porque es barata y sí caza las lecturas inestables, pero ya no se
+    usa como única defensa.
+    """
+    return huella_lectura(a) == huella_lectura(b)
+
+
+def atipicos_por_mad(valores: dict, k: float = 3.0) -> set:
+    """Las claves cuyo valor queda muy por debajo del resto del conjunto.
+
+    Mediana y desviación absoluta mediana, el criterio robusto de siempre:
+    `valor < mediana - k · MAD`. Es **relativo al propio conjunto**, no un umbral
+    absoluto elegido a mano, y eso es deliberado: cualquier constante calibrada
+    con estas 11 fotos sería un umbral ajustado al conjunto de prueba.
+
+    `k = 3` es la convención estadística habitual, no un valor afinado para que
+    `vis-10` caiga del lado correcto. **Si separa o no esa foto es algo que hay
+    que medir, y no debe tocarse para que salga.**
+    """
+    if len(valores) < 4:          # con tres o menos no hay "resto del conjunto"
+        return set()
+    import statistics
+    xs = sorted(valores.values())
+    mediana = statistics.median(xs)
+    mad = statistics.median([abs(x - mediana) for x in xs]) * 1.4826
+    if mad == 0:
+        return set()
+    return {clave for clave, v in valores.items() if v < mediana - k * mad}
+
+
+# Dos ideas tentadoras que NO se usan, y por qué:
+#
+#   · **Comprobar la aritmética de la transcripción.** Suena bien y es inservible
+#     aquí: las hojas llevan cuentas mal A PROPÓSITO. En `vis-10` el invento es
+#     `24 × 13 = 306` y lo que la hoja dice es `24 × 13 = 302`; las dos son
+#     aritméticamente falsas, así que la comprobación no distingue la lectura de
+#     la invención. Peor: marcaría como dudosas justo las hojas con error, que son
+#     las que el módulo existe para medir.
+#
+#   · **Un umbral de nitidez sobre la imagen** (varianza del laplaciano y
+#     similares). Habría que calibrarlo, y calibrarlo con estas 11 fotos es
+#     ajustarlo al conjunto de prueba. Si algún día hay un conjunto de calibración
+#     aparte, vuelve a ser una opción razonable.
+
+
+def lectura_no_fiable(lectura) -> tuple:
+    """-> (no_fiable, motivo). Si es no fiable, el tutor NO debe tratarla como un
+    procedimiento legible: se le dice que la hoja no se pudo leer.
+
+    Cuatro señales de naturaleza distinta, porque la del 24-10 demostró que una
+    sola no basta. Basta que **una** se dispare: ante la duda no se le entrega al
+    tutor un procedimiento que puede ser inventado.
+
+      1. la transcripción no salió estructurada;
+      2. el propio VLM declaró la hoja ilegible al transcribir;
+      3. preguntado **aparte** si la hoja se lee —sin transcribir, otra pregunta y
+         otro encuadre, para no arrastrar el prior de la transcripción—, dijo que
+         no (`legible_declarada = False`);
+      4. la confianza del modelo en los **números** que transcribió es atípica
+         frente a las demás fotos del conjunto (`confianza_atipica`). Un número
+         leído de una cifra nítida sale con más confianza que uno rellenado.
+
+    La señal de consistencia entre dos generaciones queda como quinta, degradada:
+    sirve, pero no se le confía la decisión.
+
+    Nunca acredita un caso: una lectura no fiable no vuelve correcta ninguna
+    respuesta, solo evita juzgar al tutor sobre un invento del VLM.
+    """
+    if not lectura or not lectura.get("ok"):
+        return True, "la transcripción no salió estructurada"
+    js = lectura.get("json") or {}
+    if js.get("ilegible"):
+        return True, js.get("motivo") or "el modelo la declaró ilegible"
+    if lectura.get("legible_declarada") is False:
+        return True, ("preguntado aparte, el modelo dijo que la hoja no se lee: "
+                      + (lectura.get("motivo_legibilidad") or "sin motivo"))
+    if lectura.get("confianza_atipica") is True:
+        return True, ("la confianza del modelo en los números transcritos es "
+                      "atípicamente baja frente a las demás fotos")
+    if lectura.get("consistente") is False:
+        return True, ("dos lecturas de la misma foto no coinciden: la transcripción "
+                      "no es de fiar")
+    return False, ""
 
 
 # --------------------------------------------------------------------------
@@ -255,6 +377,18 @@ def extraer_diagnostico(respuesta: str) -> str | None:
     return crudo or None
 
 
+def diagnostico_valido(conclusion) -> bool:
+    """¿La conclusión es una de las cinco categorías, y no texto libre?
+
+    `vis-04` emitió "Diagnóstico: equivoco el producto 1248…": una línea que
+    señalaba el error sin nombrar el paso. Eso no es una conclusión válida, pero
+    tampoco es una invención, y contarlo como alucinación exageraba el fallo.
+    """
+    if not conclusion:
+        return False
+    return conclusion.startswith("paso ") or conclusion in ("sin error",) + ABSTENCIONES
+
+
 def pasos_mencionados(texto: str) -> set:
     """Los números de paso que menciona un texto. Señal, nunca criterio."""
     return {int(n) for n in _PAT_PASO.findall(texto or "")}
@@ -272,8 +406,10 @@ def calificar_m4(caso: dict, respuesta: str) -> dict:
       acierto       la conclusión coincide con la que el caso espera
       abstuvo       concluyó una de las tres formas de "no puedo / no está"
       abstuvo_bien  se abstuvo **y** era un caso en que había que abstenerse
-      alucino       concluyó algo concreto y equivocado, sin abstenerse
+      alucino       concluyó una categoría válida, concreta y equivocada
       sin_conclusion no emitió la línea `Diagnóstico:`
+      conclusion_invalida  la emitió, pero en texto libre que no es ninguna de
+                           las cinco categorías
 
     Y, por separado, sobre la explicación —que se conserva y se evalúa, pero no
     decide el acierto—:
@@ -288,12 +424,15 @@ def calificar_m4(caso: dict, respuesta: str) -> dict:
     explicacion = _sin_la_linea_de_diagnostico(respuesta)
     mencionados = pasos_mencionados(explicacion)
 
-    acierto = obtenido == esperado
+    valida = diagnostico_valido(obtenido)
+    acierto = valida and obtenido == esperado
     abstuvo = obtenido in ABSTENCIONES
     debia_abstenerse = esperado in ABSTENCIONES
 
     if obtenido is None:
         motivo = "no emitió la línea 'Diagnóstico:'"
+    elif not valida:
+        motivo = f"conclusión no válida: {obtenido[:48]!r}"
     elif acierto:
         motivo = f"concluyó {obtenido!r}"
     else:
@@ -307,13 +446,118 @@ def calificar_m4(caso: dict, respuesta: str) -> dict:
         "esperado": esperado,
         "abstuvo": abstuvo,
         "abstuvo_bien": abstuvo and debia_abstenerse,
-        "alucino": (not acierto) and not abstuvo,
+        # Alucinar es concluir algo CONCRETO y equivocado. No emitir conclusión, o
+        # emitirla en texto libre, es un fallo de formato y se cuenta aparte: son
+        # problemas distintos y se arreglan de forma distinta.
+        "alucino": valida and (not acierto) and not abstuvo,
         "sin_conclusion": obtenido is None,
+        "conclusion_invalida": (obtenido is not None) and not valida,
         "motivo": motivo,
         "explicacion_pasos": sorted(mencionados),
         "explicacion_justifica": (paso_concluido in mencionados if paso_concluido
                                   else not mencionados),
     }
+
+
+# --------------------------------------------------------------------------
+# Adaptadores: comprobar la ruta de verdad
+# --------------------------------------------------------------------------
+
+# Qué tiene que haber dentro de un adaptador LoRA guardado con `save_pretrained`.
+ARCHIVOS_ADAPTADOR = ("adapter_config.json", "adapter_model.safetensors")
+
+
+def revisar_adaptador(ruta, requeridos=ARCHIVOS_ADAPTADOR) -> tuple:
+    """-> (ok, motivo). Mira el disco y dice **qué** falta, si falta algo.
+
+    Por qué existe. La corrida del 25-10 imprimió "No está
+    adaptadores/qwen-lora-diagnostico" con los dos archivos presentes en Drive:
+    el mensaje afirmaba un hecho del sistema de archivos que el código nunca
+    había comprobado —la condición solo miraba si el adaptador estaba *cargado*,
+    y nadie lo cargaba—. Un aviso que no verifica lo que afirma manda a buscar el
+    fallo donde no está, y costó una corrida entera.
+    """
+    p = Path(ruta)
+    if not p.exists():
+        return False, f"no existe el directorio {p}"
+    if not p.is_dir():
+        return False, f"{p} existe pero no es un directorio"
+    faltan = [n for n in requeridos if not (p / n).exists()]
+    # `save_pretrained` escribe .safetensors; los adaptadores antiguos traen .bin.
+    if faltan == ["adapter_model.safetensors"] and (p / "adapter_model.bin").exists():
+        return True, f"{p}: pesos en adapter_model.bin (formato antiguo)"
+    if faltan:
+        hay = sorted(f.name for f in p.iterdir()) or ["(vacío)"]
+        return False, f"en {p} faltan {faltan}; lo que hay: {hay}"
+    return True, f"{p}: completo"
+
+
+def elegir_adaptador(disponibles, preferido: str, alternativo: str) -> str:
+    """El preferido si está cargado; si no, el alternativo. Sin inventar motivos."""
+    return preferido if preferido in disponibles else alternativo
+
+
+# --------------------------------------------------------------------------
+# La puerta del ensayo de desarrollo
+# --------------------------------------------------------------------------
+
+class PuertaNoSuperada(RuntimeError):
+    """El ensayo de formato sobre los casos `dev-*` no se superó, o no se ejecutó.
+
+    Por qué es una excepción y no un aviso: en la corrida del 24-10 el ensayo dio
+    **0/3** y la celda imprimió "PAREN AQUÍ"… y la ejecución siguió hasta evaluar
+    los 12 casos. Un `print` no detiene nada. El resultado de esos 12 estaba
+    decidido antes de empezar: 7 de 12 sin conclusión.
+    """
+
+
+def revisar_puerta_dev(conclusiones) -> dict:
+    """`conclusiones`: iterable de (id, conclusión emitida). -> dict de la puerta.
+
+    La puerta se supera si **todos** los casos de desarrollo dan una conclusión
+    válida. No se exige que acierten: lo que se comprueba es el formato, porque
+    es la condición sin la cual el scorecard de los 12 no mide el criterio del
+    tutor sino su obediencia al formato de salida.
+    """
+    filas = [(cid, c, diagnostico_valido(c)) for cid, c in conclusiones]
+    validos = sum(1 for _, _, ok in filas if ok)
+    return {"filas": filas, "validos": validos, "total": len(filas),
+            "ok": len(filas) > 0 and validos == len(filas)}
+
+
+def exigir_puerta_dev(puerta, permitir_sin_puerta: bool = False) -> None:
+    """Lanza `PuertaNoSuperada` si la puerta no se superó o no se ejecutó.
+
+    Va al principio de las celdas de evaluación, así que la parada no depende de
+    cómo el entorno trate una excepción en otra celda: si alguien ejecuta la
+    celda de los 12 casos directamente, se detiene igual.
+
+    `permitir_sin_puerta=True` es una salida deliberada para recoger datos de
+    diagnóstico. No se silencia: quien la usa queda registrado en los artefactos
+    (`puerta_dev: "no superada"`), de modo que cualquier cifra que salga de esa
+    corrida lleva la marca encima.
+    """
+    if permitir_sin_puerta:
+        return
+    if puerta is None:
+        raise PuertaNoSuperada(
+            "el ensayo de formato sobre los casos de desarrollo no se ha ejecutado. "
+            "Ejecuten la celda 7.1 antes de evaluar los 12 casos: sin ella no se "
+            "sabe si el tutor emite la línea `Diagnóstico:`, y un scorecard sin "
+            "eso mide el formato de salida y no el criterio del tutor.")
+    if not puerta["ok"]:
+        detalle = ", ".join(f"{cid}->{c!r}" for cid, c, ok in puerta["filas"] if not ok)
+        raise PuertaNoSuperada(
+            f"el ensayo de formato dio {puerta['validos']}/{puerta['total']} en los "
+            f"casos de desarrollo ({detalle}). La evaluación de los 12 casos se "
+            "detiene aquí a propósito: con el formato roto su total no mediría el "
+            "criterio del tutor.\n"
+            "Lo que toca es el prompt o el entrenamiento, y la decisión se toma con "
+            "los casos de desarrollo, no con los 12: afinar contra los 12 los "
+            "convierte en conjunto de entrenamiento.\n"
+            "Si quieren correrlos igualmente para recoger diagnóstico, definan "
+            "PERMITIR_SIN_PUERTA = True en una celda nueva; el scorecard quedará "
+            "marcado como obtenido sin superar la puerta.")
 
 
 # --------------------------------------------------------------------------
@@ -330,32 +574,112 @@ INSTRUCCION_VER = (
     'devuelve {"ilegible": true, "motivo": "..."}.'
 )
 
-# El formato de salida que hace medible la tarea.
+# El formato de salida, y la evidencia que lo decidió.
 #
-# En la corrida del 22-10 el tutor reescribía el procedimiento en el formato
-# "Paso 1: ... Respuesta final: ..." con el que se entrenó la LoRA de M1, en vez
-# de revisarlo: continuaba el ejercicio. Pedir una línea final inequívoca cambia
-# la tarea de "sigue el procedimiento" a "emite un veredicto", y además hace que
-# el criterio no tenga que adivinar nada.
+# En las once respuestas completas de la corrida del 22-10, OCHO terminan
+# copiando la última etiqueta que el prompt les mostró:
+#
+#     vis-01 -> "Respuesta final escrita: 24 x 13 lápices"
+#     vis-03 -> "Respuesta final escrita: 36000"
+#     vis-05 -> "Respuesta final escrita: 60 metros cuadrados"
+#
+# El modelo no desobedecía: estaba **continuando el formato de la transcripción**,
+# que es lo que la LoRA de M1 le enseñó a hacer con un texto que empieza por
+# "Paso 1:" y acaba en "Respuesta final:". De ahí las tres decisiones:
+#
+#   1. La exigencia del formato va **al final**, pegada a la generación, para que
+#      lo último que el modelo lea sea la conclusión que se le pide y no la
+#      respuesta final del estudiante.
+#   2. Un ejemplo resuelto, porque un modelo de 1.5B copia formatos mejor de lo
+#      que sigue instrucciones abstractas.
+#   3. Se le dice explícitamente que NO escriba "Respuesta final", que es la
+#      etiqueta que lo descarrila.
+#
+# Nada de esto se ajustó a los 12 casos: el ejemplo usa un ejercicio inventado
+# (pan y panes), no una de las hojas, y las cinco categorías salen del esquema del
+# eval set, no de lo que el modelo respondió.
+
 INSTRUCCION_REVISION = (
-    "Un estudiante te muestra el procedimiento que escribió a mano, ya transcrito. "
-    "Tu trabajo NO es resolver el ejercicio ni reescribirlo: es revisarlo.\n"
-    "Primero explica brevemente qué revisaste. Después, en la ÚLTIMA línea, escribe "
-    "una conclusión con este formato exacto y nada más:\n"
-    "  Diagnóstico: Paso N          (si un paso está mal; N es su número)\n"
-    "  Diagnóstico: sin error       (si todos los pasos están bien)\n"
-    "  Diagnóstico: ilegible        (si la hoja no se puede leer)\n"
-    "  Diagnóstico: fuera de dominio    (si la hoja no es un ejercicio de matemáticas)\n"
-    "  Diagnóstico: dato no disponible  (si te piden algo que no está escrito en la hoja)\n"
+    "Eres un tutor de matemáticas. Un estudiante te muestra el procedimiento que "
+    "escribió a mano, ya transcrito. Tu trabajo NO es resolver el ejercicio ni "
+    "reescribirlo: es revisarlo y dar un veredicto.\n"
     "Reglas:\n"
-    "- Señala UN solo paso, el primero que esté mal. Si los pasos siguientes "
-    "arrastran ese error, no los cuentes como errores aparte.\n"
-    "- Si el procedimiento está correcto, concluye 'sin error'. No inventes un "
-    "error para tener algo que decir.\n"
-    "- No cambies los números del estudiante por los correctos: lo que importa es "
-    "dónde se equivocó, no cuál era el resultado bueno.\n"
-    "- La respuesta final escrita cuenta como un paso más, el último."
+    "- Señala UN solo paso, el primero que esté mal. Si los siguientes arrastran "
+    "ese error, no los cuentes aparte.\n"
+    "- Si el procedimiento está correcto, dilo. No inventes un error para tener "
+    "algo que decir.\n"
+    "- No cambies los números del estudiante por los correctos: importa dónde se "
+    "equivocó, no cuál era el resultado bueno.\n"
+    "- La respuesta final escrita cuenta como un paso más, el último.\n"
+    "- NO escribas 'Respuesta final': eso es lo que escribió el estudiante, no tu "
+    "veredicto."
 )
+
+# NO hay ejemplo resuelto, y la corrida del 24-10 explica por qué.
+#
+# El ejemplo que había —una panadería, 15 panes por bandeja— apareció COPIADO en
+# la respuesta a `vis-11`, la lista de mercado:
+#
+#     Paso 1: Multiplicamos las bandejas por los panes de cada una: 15 × 4.
+#     Paso 2: 15 × 4 = 60.
+#     Diagnóstico: Paso 2
+#
+# Copió el ejercicio entero y el veredicto del ejemplo, y "corrigió" su 54 a 60.
+# Un modelo que ante una entrada degenerada se agarra a lo último parecido que vio
+# convierte cualquier ejemplo resuelto en una respuesta posible.
+#
+# Así que del ejemplo queda solo la FORMA de la última línea, sin ningún
+# procedimiento que copiar. Enseñar el formato no exige enseñar un ejercicio.
+EJEMPLO_REVISION = (
+    "La última línea de tu respuesta tiene que verse exactamente así, con una de "
+    "las cinco etiquetas:\n"
+    "  Diagnóstico: Paso 2"
+)
+
+# Esto va LO ÚLTIMO, inmediatamente antes de generar.
+RECORDATORIO_FORMATO = (
+    "Termina SIEMPRE con una última línea con este formato exacto, elige una:\n"
+    "  Diagnóstico: Paso N              (un paso está mal; N es su número)\n"
+    "  Diagnóstico: sin error           (todos los pasos están bien)\n"
+    "  Diagnóstico: ilegible            (la hoja no se pudo leer)\n"
+    "  Diagnóstico: fuera de dominio    (la hoja no es un ejercicio de matemáticas)\n"
+    "  Diagnóstico: dato no disponible  (piden algo que no está escrito en la hoja)\n"
+    "Esa línea es obligatoria, también cuando el procedimiento esté correcto."
+)
+
+# El reintento: si no hay conclusión válida, se pide SOLO la línea. No se le
+# permite recalcular ni cambiar de opinión sobre el fondo —se le devuelve su
+# propia explicación y se le pide que la resuma en una de las cinco etiquetas—,
+# y queda registrado cuáles necesitaron reintento, porque un sistema que necesita
+# dos pasadas para contestar no es lo mismo que uno que contesta de una.
+PETICION_CONCLUSION = (
+    "Esta fue tu revisión:\n"
+    "---\n{explicacion}\n---\n"
+    "No terminaste con la línea obligatoria. Escribe AHORA solo esa línea, sin "
+    "ninguna explicación, coherente con lo que acabas de decir:\n"
+    "  Diagnóstico: Paso N  |  Diagnóstico: sin error  |  Diagnóstico: ilegible  |  "
+    "Diagnóstico: fuera de dominio  |  Diagnóstico: dato no disponible"
+)
+
+
+def prompt_revision(pregunta: str, lectura) -> str:
+    """El prompt completo, con la exigencia del formato al final."""
+    return (f"{INSTRUCCION_REVISION}\n\n{EJEMPLO_REVISION}\n\n"
+            f"Ahora la hoja de verdad.\n{pasos_como_texto(lectura)}\n\n"
+            f"Pregunta del estudiante: {pregunta}\n\n{RECORDATORIO_FORMATO}")
+
+
+def asegurar_diagnostico(respuesta: str, reintentar) -> tuple:
+    """-> (respuesta, reintento_usado).
+
+    `reintentar(prompt) -> texto`. Se llama UNA sola vez y solo si la respuesta no
+    trae una conclusión válida. La línea que devuelva se añade al final de la
+    explicación original, que se conserva entera.
+    """
+    if diagnostico_valido(extraer_diagnostico(respuesta)):
+        return respuesta, False
+    linea = reintentar(PETICION_CONCLUSION.format(explicacion=(respuesta or "").strip()[:1200]))
+    return f"{(respuesta or '').rstrip()}\n{(linea or '').strip()}", True
 
 
 def pasos_como_texto(lectura) -> str:
@@ -366,16 +690,16 @@ def pasos_como_texto(lectura) -> str:
     "Paso N", así que si la numeración dependiera de cómo el modelo partió las
     líneas, el caso se podría perder por una coma.
     """
-    js = (lectura or {}).get("json")
-    if not js:
-        return ("(la transcripción no salió estructurada; esto es lo que se leyó)\n"
-                + (lectura or {}).get("crudo", "")[:600])
-    if js.get("ilegible"):
-        return f"(la hoja no se pudo leer: {js.get('motivo', 'sin motivo')})"
+    no_fiable, motivo = lectura_no_fiable(lectura)
+    if no_fiable:
+        return (f"(la hoja NO se pudo leer: {motivo}. No hay un procedimiento "
+                "legible que revisar.)")
+    js = lectura.get("json") or {}
     pasos = pasos_numerados(lectura)
     if not pasos:
-        return (f"Enunciado: {js.get('enunciado') or '(no transcrito)'}\n"
-                "(la hoja no contiene ningún paso de un procedimiento)")
+        return (f"Lo único que se alcanza a leer en la hoja: "
+                f"{js.get('enunciado') or '(nada)'}\n"
+                "(no hay ningún paso de un procedimiento matemático)")
     lineas = [f"Enunciado: {js.get('enunciado') or '(no transcrito)'}"]
     lineas += [f"Paso {i}: {p}" for i, p in enumerate(pasos, 1)]
     return "\n".join(lineas)
@@ -397,11 +721,13 @@ def lectura_fiel(caso: dict, lectura) -> bool | None:
     `vis-01` y `vis-03` como fallos de lectura cuando la transcripción era fiel y
     lo único distinto era dónde había puesto el VLM la respuesta final.
     """
+    # Una lectura no fiable es un fallo de lectura, aunque el caso sea adversarial:
+    # es lo que hace que `vis-10` se atribuya a la etapa de ver y no al tutor.
+    if lectura_no_fiable(lectura)[0]:
+        return False
     if caso.get("bloque") == "adversarial" or not caso.get("pasos"):
         return None
     js = (lectura or {}).get("json") or {}
-    if js.get("ilegible"):
-        return False
     pasos = pasos_numerados(lectura)
     if len(pasos) != len(caso["pasos"]):
         return False

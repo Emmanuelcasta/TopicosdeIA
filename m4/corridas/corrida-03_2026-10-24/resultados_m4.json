@@ -1,0 +1,88 @@
+{
+  "patron": "input",
+  "vlm": "Qwen/Qwen2-VL-2B-Instruct",
+  "max_pixels": 1048576,
+  "lado_mayor_px": 1024,
+  "adaptador_tutor": "agente",
+  "referencia_m3": {
+    "nombre": "C5-FT · entrenado",
+    "aciertos": 13,
+    "segundos": 14.1
+  },
+  "n_casos": 12,
+  "n_imagenes_necesarias": 11,
+  "imagenes_faltantes": [],
+  "n_evaluados": 12,
+  "visual_por_bloque": {
+    "localizacion": {
+      "n": 4,
+      "aciertos": 0
+    },
+    "compensado": {
+      "n": 2,
+      "aciertos": 0
+    },
+    "sin_error": {
+      "n": 3,
+      "aciertos": 2
+    },
+    "adversarial": {
+      "n": 3,
+      "aciertos": 0
+    }
+  },
+  "visual_total": {
+    "n": 12,
+    "aciertos": 2,
+    "alucinaciones": 3,
+    "abstenciones": 0
+  },
+  "fuente_del_fallo": {
+    "diagnostico": 10
+  },
+  "eval_m2_comparable_con_m3": true,
+  "regresion_m2": {
+    "nombre": "M4 · sin imagen",
+    "n": 21,
+    "exactitud_calculo": 0.6666666666666666,
+    "sim_embeddings": 0.7938095238095235,
+    "juez_promedio": 2.9523809523809526,
+    "aciertos": 15,
+    "aciertos_calculo": 8,
+    "aciertos_conocimiento": 3,
+    "aciertos_adversarial": 4,
+    "n_calculo": 12,
+    "n_conocimiento": 4,
+    "n_adversarial": 5,
+    "alucinaciones": 6,
+    "abstenciones": 1,
+    "formato_valido": 0.9523809523809523,
+    "palabras_media": 27.714285714285715
+  },
+  "conclusiones": {
+    "sin_conclusion": 7,
+    "sin error": 4,
+    "paso 2": 1
+  },
+  "sin_conclusion": 7,
+  "conclusion_invalida": 0,
+  "reintentos": 7,
+  "lecturas_no_fiables": [],
+  "abstuvo_bien": 0,
+  "explicacion_justifica": 1,
+  "archivos_leidos": {
+    "vis-01.jpg": "vis-01.jpg",
+    "vis-02.jpg": "vis-02.jpg",
+    "vis-03.jpg": "vis-03.jpg",
+    "vis-04.jpg": "vis-04.jpg",
+    "vis-05.jpg": "vis-05.jpg",
+    "vis-06.jpg": "vis-06.jpg",
+    "vis-07.jpg": "vis-07.jpg",
+    "vis-08.jpg": "vis-08.jpg",
+    "vis-09.jpg": "vis-09.jpg",
+    "vis-11.jpg": "vis-11.jpg",
+    "vis-10.jpg": "vis-10.jpeg"
+  },
+  "latencia_total_s": 13.02,
+  "latencia_lectura_s": 3.83
+}

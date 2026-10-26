@@ -8,13 +8,6 @@ tal cual, aunque veas que está mal: eso es lo que el sistema tiene que encontra
 que se vea solo el procedimiento. Guarda cada foto con el nombre que indica cada bloque
 en `m4/eval_set/imagenes/`.
 
-**Formato del archivo:** vale `.jpg`, `.jpeg` o `.png` — el notebook empareja por el
-**nombre base**, así que `vis-10.jpeg` sirve para el bloque que dice `vis-10.jpg`. Lo que
-no vale es `.heic` (conviértelo antes) ni tener **dos** archivos con el mismo nombre base:
-si existen `vis-10.jpg` y `vis-10.jpeg` a la vez, el notebook se detiene en lugar de
-adivinar cuál es. No hace falta recortar ni reducir: se corrige la rotación de los
-metadatos EXIF y se limita el lado mayor a 1024 px al leerla.
-
 **Privacidad:** sin nombres, sin datos personales, sin caras. Letra tuya o de alguien
 que haya dado permiso.
 

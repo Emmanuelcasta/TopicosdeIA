@@ -40,6 +40,7 @@ import nb_finetuning_agente
 import nb_agente
 import nb_ragas
 import nb_m4
+import nb_m4_diagnostico
 from nb_comun import RAIZ, notebook
 
 NOTEBOOKS = [
@@ -56,6 +57,7 @@ NOTEBOOKS = [
     ("S10_Lab_Agente_ReAct_Tutor_Matematicas.ipynb", nb_agente),
     ("S10_Evaluacion_RAGAS_Tutor_Matematicas.ipynb", nb_ragas),
     ("S13_M4_Pipeline_Visual.ipynb", nb_m4),
+    ("S13_M4_FineTuning_Diagnostico.ipynb", nb_m4_diagnostico),
 ]
 
 
@@ -85,7 +87,30 @@ def validar_celdas(celdas: list[dict], nombre: str) -> list[str]:
     return problemas
 
 
-def main(filtros: list[str] | None = None) -> None:
+def tiene_salidas(ruta: Path) -> bool:
+    """¿Este .ipynb guarda salidas de una ejecución?
+
+    Un notebook con salidas es **evidencia de una corrida**, no un archivo
+    generado: regenerarlo encima la destruye. Pasó dos veces, las dos con el
+    mismo mecanismo —un filtro que coincidía con más archivos de los previstos—
+    y la segunda sin haberlo archivado antes.
+    """
+    if not ruta.exists():
+        return False
+    try:
+        nb = json.loads(ruta.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        return False        # si no se puede leer, no se afirma que tenga salidas
+    return any(c.get("outputs") or c.get("execution_count")
+               for c in nb.get("cells", []))
+
+
+def revisar_destinos(destinos: list[Path]) -> list[Path]:
+    """Los destinos que NO se pueden sobrescribir porque tienen salidas."""
+    return [d for d in destinos if tiene_salidas(d)]
+
+
+def main(filtros: list[str] | None = None, forzar: bool = False) -> None:
     """Sin `filtros` regenera los notebooks de la lista; con ellos, solo los que
     contienen alguno de los textos dados (`python generar_notebooks.py S13`).
 
@@ -102,9 +127,31 @@ def main(filtros: list[str] | None = None) -> None:
                                ("eval_set_m2.jsonl", "eval_set_fuente.py"),
                                ("eval_set_m3_agente.jsonl", "eval_set_m3_fuente.py"),
                                ("trayectorias_herramientas.jsonl", "trayectorias_fuente.py"),
-                               ("eval_set_m4_vision.jsonl", "eval_set_m4_fuente.py")]:
+                               ("eval_set_m4_vision.jsonl", "eval_set_m4_fuente.py"),
+                               ("trayectorias_diagnostico.jsonl",
+                                "trayectorias_diagnostico_fuente.py")]:
         if not (RAIZ / "data" / archivo).exists():
             raise SystemExit(f"Falta data/{archivo}. Ejecuten antes: python {generador}")
+
+    # Antes de escribir NADA: ningún destino puede tener salidas guardadas.
+    # Se comprueba el lote entero primero, para no dejar la mitad regenerada.
+    destinos = [RAIZ / CARPETA_DE[n[:3]] / n for n, _ in seleccion]
+    protegidos = revisar_destinos(destinos)
+    if protegidos and not forzar:
+        print("NO se regeneró nada. Estos destinos tienen salidas guardadas:")
+        for d in protegidos:
+            print(f"  {d.relative_to(RAIZ)}")
+        print()
+        print("Un notebook con salidas es la evidencia de una corrida. Antes de")
+        print("regenerarlo, cópienlo a m4/corridas/ o renómbrenlo (por ejemplo")
+        print("`..._ejecutado.ipynb`), que ningún generador toca.")
+        print("Si de verdad quieren perder esas salidas: --forzar")
+        raise SystemExit(2)
+    if protegidos and forzar:
+        print("--forzar: se sobrescriben estos notebooks CON salidas:")
+        for d in protegidos:
+            print(f"  {d.relative_to(RAIZ)}")
+        print()
 
     todos_problemas = []
     for nombre, modulo in seleccion:
@@ -135,4 +182,7 @@ def main(filtros: list[str] | None = None) -> None:
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:] or None)
+    argumentos = sys.argv[1:]
+    _forzar = "--forzar" in argumentos
+    _filtros = [a for a in argumentos if not a.startswith("--")]
+    main(_filtros or None, forzar=_forzar)

@@ -1,0 +1,276 @@
+{
+  "vis-01.jpg": {
+    "crudo": "{\"enunciado\": \"Una caja tiene 24 lápices. ¿Cuántos lápices hay en 13 cajas?\", \"pasos\": [\"Multiplicamos las cajas por lápices de cada una: 24x13\", \"24x13 = 302\"], \"respuesta_final\": \"302 lápices\"}",
+    "json": {
+      "enunciado": "Una caja tiene 24 lápices. ¿Cuántos lápices hay en 13 cajas?",
+      "pasos": [
+        "Multiplicamos las cajas por lápices de cada una: 24x13",
+        "24x13 = 302"
+      ],
+      "respuesta_final": "302 lápices"
+    },
+    "segundos": 6.86,
+    "ok": true,
+    "archivo": "vis-01.jpg",
+    "consistente": true,
+    "json_segunda": {
+      "enunciado": "Una caja tiene 24 lápices. ¿Cuántos lápices hay en 13 cajas?",
+      "pasos": [
+        "Multiplicamos las cajas por lápices de cada una: 24x13",
+        "24x13 = 302"
+      ],
+      "respuesta_final": "302 lápices"
+    },
+    "segundos_verificacion": 4.25
+  },
+  "vis-02.jpg": {
+    "crudo": "{\"enunciado\": \"Un tanque tiene 1500 litros y consume 847 litros. ¿Cuántos litros quedan?\", \"pasos\": [\"Lo que queda se obtiene sumando 1500 + 847\", \"1500 + 847 = 2347\", \"Respuesta final: 2347 litros\"], \"respuesta_final\": \"2347 litros\"}",
+    "json": {
+      "enunciado": "Un tanque tiene 1500 litros y consume 847 litros. ¿Cuántos litros quedan?",
+      "pasos": [
+        "Lo que queda se obtiene sumando 1500 + 847",
+        "1500 + 847 = 2347",
+        "Respuesta final: 2347 litros"
+      ],
+      "respuesta_final": "2347 litros"
+    },
+    "segundos": 3.51,
+    "ok": true,
+    "archivo": "vis-02.jpg",
+    "consistente": true,
+    "json_segunda": {
+      "enunciado": "Un tanque tiene 1500 litros y consume 847 litros. ¿Cuántos litros quedan?",
+      "pasos": [
+        "Lo que queda se obtiene sumando 1500 + 847",
+        "1500 + 847 = 2347",
+        "Respuesta final: 2347 litros"
+      ],
+      "respuesta_final": "2347 litros"
+    },
+    "segundos_verificacion": 3.63
+  },
+  "vis-03.jpg": {
+    "crudo": "{\"enunciado\": \"Un artículo cuesta 45000 pesos y tiene 20% de descuento. ¿cuánto se paga?\", \"pasos\": [\"El descuento es 45000 x 0.2 = 9000\", \"Restamos el descuento: 45000 - 9000 = 36000\"], \"respuesta_final\": \"35000\"}",
+    "json": {
+      "enunciado": "Un artículo cuesta 45000 pesos y tiene 20% de descuento. ¿cuánto se paga?",
+      "pasos": [
+        "El descuento es 45000 x 0.2 = 9000",
+        "Restamos el descuento: 45000 - 9000 = 36000"
+      ],
+      "respuesta_final": "35000"
+    },
+    "segundos": 3.49,
+    "ok": true,
+    "archivo": "vis-03.jpg",
+    "consistente": true,
+    "json_segunda": {
+      "enunciado": "Un artículo cuesta 45000 pesos y tiene 20% de descuento. ¿cuánto se paga?",
+      "pasos": [
+        "El descuento es 45000 x 0.2 = 9000",
+        "Restamos el descuento: 45000 - 9000 = 36000"
+      ],
+      "respuesta_final": "35000"
+    },
+    "segundos_verificacion": 3.54
+  },
+  "vis-04.jpg": {
+    "crudo": "{\"enunciado\": \"Se reparten 1248 dulces en partes iguales entre 8 niños. ¿Cuántos recibe cada uno?\", \"pasos\": [\"Dividimos el total entre los niños 1248 ÷ 8\", \"1248 ÷ 8 = 146\", \"Respuesta final 146 dulces\"], \"respuesta_final\": 146}",
+    "json": {
+      "enunciado": "Se reparten 1248 dulces en partes iguales entre 8 niños. ¿Cuántos recibe cada uno?",
+      "pasos": [
+        "Dividimos el total entre los niños 1248 ÷ 8",
+        "1248 ÷ 8 = 146",
+        "Respuesta final 146 dulces"
+      ],
+      "respuesta_final": 146
+    },
+    "segundos": 3.19,
+    "ok": true,
+    "archivo": "vis-04.jpg",
+    "consistente": true,
+    "json_segunda": {
+      "enunciado": "Se reparten 1248 dulces en partes iguales entre 8 niños. ¿Cuántos recibe cada uno?",
+      "pasos": [
+        "Dividimos el total entre los niños 1248 ÷ 8",
+        "1248 ÷ 8 = 146",
+        "Respuesta final 146 dulces"
+      ],
+      "respuesta_final": 146
+    },
+    "segundos_verificacion": 3.33
+  },
+  "vis-05.jpg": {
+    "crudo": "{\"enunciado\": \"Un terreno rectangular mide 12m por 5m. ¿Por cuál es su área?\", \"pasos\": [\"Paso 1: El área de un rectángulo es base por altura.\", \"Paso 2: 12x5=70\", \"Paso 3: Respuesta final: 60 metros cuadrados\"], \"respuesta_final\": \"60 metros cuadrados\"}",
+    "json": {
+      "enunciado": "Un terreno rectangular mide 12m por 5m. ¿Por cuál es su área?",
+      "pasos": [
+        "Paso 1: El área de un rectángulo es base por altura.",
+        "Paso 2: 12x5=70",
+        "Paso 3: Respuesta final: 60 metros cuadrados"
+      ],
+      "respuesta_final": "60 metros cuadrados"
+    },
+    "segundos": 3.36,
+    "ok": true,
+    "archivo": "vis-05.jpg",
+    "consistente": true,
+    "json_segunda": {
+      "enunciado": "Un terreno rectangular mide 12m por 5m. ¿Por cuál es su área?",
+      "pasos": [
+        "Paso 1: El área de un rectángulo es base por altura.",
+        "Paso 2: 12x5=70",
+        "Paso 3: Respuesta final: 60 metros cuadrados"
+      ],
+      "respuesta_final": "60 metros cuadrados"
+    },
+    "segundos_verificacion": 3.48
+  },
+  "vis-06.jpg": {
+    "crudo": "```json\n{\n  \"enunciado\": \"¿cuanto es 3/4 + 1/8?\",\n  \"pasos\": [\"Paso 1: llevamos a octavos: 3/4 = 6/8\", \"Paso 2: 6/8 + 1/8 = 8/8\", \"Paso 3: respuesta final 7/8\"],\n  \"respuesta_final\": \"7/8\"\n}\n```",
+    "json": {
+      "enunciado": "¿cuanto es 3/4 + 1/8?",
+      "pasos": [
+        "Paso 1: llevamos a octavos: 3/4 = 6/8",
+        "Paso 2: 6/8 + 1/8 = 8/8",
+        "Paso 3: respuesta final 7/8"
+      ],
+      "respuesta_final": "7/8"
+    },
+    "segundos": 3.54,
+    "ok": true,
+    "archivo": "vis-06.jpg",
+    "consistente": true,
+    "json_segunda": {
+      "enunciado": "¿cuanto es 3/4 + 1/8?",
+      "pasos": [
+        "Paso 1: llevamos a octavos: 3/4 = 6/8",
+        "Paso 2: 6/8 + 1/8 = 8/8",
+        "Paso 3: respuesta final 7/8"
+      ],
+      "respuesta_final": "7/8"
+    },
+    "segundos_verificacion": 3.6
+  },
+  "vis-07.jpg": {
+    "crudo": "{\"enunciado\": \"Las notas de Ana son 4.0, 3.5, 4.5. ¿Cuál es su promedio?\", \"pasos\": [\"Sumamos las 3 notas: 4.0 + 3.5 + 4.5 = 12\", \"Dividimos entre 3: 12 / 3 = 4\", \"Respuesta final: 4.0\"], \"respuesta_final\": 4.0}",
+    "json": {
+      "enunciado": "Las notas de Ana son 4.0, 3.5, 4.5. ¿Cuál es su promedio?",
+      "pasos": [
+        "Sumamos las 3 notas: 4.0 + 3.5 + 4.5 = 12",
+        "Dividimos entre 3: 12 / 3 = 4",
+        "Respuesta final: 4.0"
+      ],
+      "respuesta_final": 4.0
+    },
+    "segundos": 4.91,
+    "ok": true,
+    "archivo": "vis-07.jpg",
+    "consistente": true,
+    "json_segunda": {
+      "enunciado": "Las notas de Ana son 4.0, 3.5, 4.5. ¿Cuál es su promedio?",
+      "pasos": [
+        "Sumamos las 3 notas: 4.0 + 3.5 + 4.5 = 12",
+        "Dividimos entre 3: 12 / 3 = 4",
+        "Respuesta final: 4.0"
+      ],
+      "respuesta_final": 4.0
+    },
+    "segundos_verificacion": 4.94
+  },
+  "vis-08.jpg": {
+    "crudo": "{\"enunciado\": \"Un ciclista recorre 36 kilómetros en 3 horas. ¿Cuál es su velocidad media?\", \"pasos\": [\"La velocidad es distancia dividida entre tiempo\", \"36 / 3 = 12\", \"Respuesta final: 12 km/h\"], \"respuesta_final\": \"12 km/h\"}",
+    "json": {
+      "enunciado": "Un ciclista recorre 36 kilómetros en 3 horas. ¿Cuál es su velocidad media?",
+      "pasos": [
+        "La velocidad es distancia dividida entre tiempo",
+        "36 / 3 = 12",
+        "Respuesta final: 12 km/h"
+      ],
+      "respuesta_final": "12 km/h"
+    },
+    "segundos": 2.7,
+    "ok": true,
+    "archivo": "vis-08.jpg",
+    "consistente": true,
+    "json_segunda": {
+      "enunciado": "Un ciclista recorre 36 kilómetros en 3 horas. ¿Cuál es su velocidad media?",
+      "pasos": [
+        "La velocidad es distancia dividida entre tiempo",
+        "36 / 3 = 12",
+        "Respuesta final: 12 km/h"
+      ],
+      "respuesta_final": "12 km/h"
+    },
+    "segundos_verificacion": 2.76
+  },
+  "vis-09.jpg": {
+    "crudo": "{\"enunciado\": \"Un triángulo tiene base 14 cm y altura 9 cm. ¿Cuál es su área?\", \"pasos\": [\"Paso 1: El área de triángulo es base por altura dividido entre 2.\", \"Paso 2: 14 x 9 = 12G\", \"Paso 3: 12G / 2 = 63\", \"Paso 4: Respuesta Final: 63 cm\"], \"respuesta_final\": \"63 cm\"}",
+    "json": {
+      "enunciado": "Un triángulo tiene base 14 cm y altura 9 cm. ¿Cuál es su área?",
+      "pasos": [
+        "Paso 1: El área de triángulo es base por altura dividido entre 2.",
+        "Paso 2: 14 x 9 = 12G",
+        "Paso 3: 12G / 2 = 63",
+        "Paso 4: Respuesta Final: 63 cm"
+      ],
+      "respuesta_final": "63 cm"
+    },
+    "segundos": 3.99,
+    "ok": true,
+    "archivo": "vis-09.jpg",
+    "consistente": true,
+    "json_segunda": {
+      "enunciado": "Un triángulo tiene base 14 cm y altura 9 cm. ¿Cuál es su área?",
+      "pasos": [
+        "Paso 1: El área de triángulo es base por altura dividido entre 2.",
+        "Paso 2: 14 x 9 = 12G",
+        "Paso 3: 12G / 2 = 63",
+        "Paso 4: Respuesta Final: 63 cm"
+      ],
+      "respuesta_final": "63 cm"
+    },
+    "segundos_verificacion": 4.15
+  },
+  "vis-11.jpg": {
+    "crudo": "{\"enunciado\": \"Arroz (7 paquetes)\", \"pasos\": [], \"respuesta_final\": \"Arroz\"}",
+    "json": {
+      "enunciado": "Arroz (7 paquetes)",
+      "pasos": [],
+      "respuesta_final": "Arroz"
+    },
+    "segundos": 1.06,
+    "ok": true,
+    "archivo": "vis-11.jpg",
+    "consistente": true,
+    "json_segunda": {
+      "enunciado": "Arroz (7 paquetes)",
+      "pasos": [],
+      "respuesta_final": "Arroz"
+    },
+    "segundos_verificacion": 1.08
+  },
+  "vis-10.jpg": {
+    "crudo": "{\"enunciado\": \"¿Cuántas piezas hay en 13 cajas?\", \"pasos\": [\"Paso 1: Multiplicamos las cajas por la cantidad de piezas de cada caja. 24 x 13 = 306\", \"Paso 2: Responda finalmente 306 piezas\"], \"respuesta_final\": \"306 piezas\"}",
+    "json": {
+      "enunciado": "¿Cuántas piezas hay en 13 cajas?",
+      "pasos": [
+        "Paso 1: Multiplicamos las cajas por la cantidad de piezas de cada caja. 24 x 13 = 306",
+        "Paso 2: Responda finalmente 306 piezas"
+      ],
+      "respuesta_final": "306 piezas"
+    },
+    "segundos": 4.48,
+    "ok": true,
+    "archivo": "vis-10.jpeg",
+    "consistente": true,
+    "json_segunda": {
+      "enunciado": "¿Cuántas piezas hay en 13 cajas?",
+      "pasos": [
+        "Paso 1: Multiplicamos las cajas por la cantidad de piezas de cada caja. 24 x 13 = 306",
+        "Paso 2: Responda finalmente 306 piezas"
+      ],
+      "respuesta_final": "306 piezas"
+    },
+    "segundos_verificacion": 4.64
+  }
+}
