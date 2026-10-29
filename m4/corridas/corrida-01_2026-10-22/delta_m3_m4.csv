@@ -1,0 +1,6 @@
+grupo,M3,M4,qué significa
+casos sin imagen · eval set de M2 (21 casos),13/21,15/21,REGRESIÓN: ¿se rompió lo que ya funcionaba?
+casos con imagen · eval set de M4 (tarea nueva),no aplica: M3 no recibe imágenes,0/9,CAPACIDAD NUEVA: no hay baseline comparable
+adversariales visuales,no aplica,0/2,¿se negó cuando la hoja era ilegible o no era matemáticas?
+latencia por caso,14.1 s,2.6 s (0.8 s son del VLM),el precio de ver
+peor caso,—,vis-01,se explica en m4/README.md

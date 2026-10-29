@@ -1,0 +1,19 @@
+config,adaptador,id,familia,esperada,predicha,formato_valido,acierto,n_herramientas,herramientas,pasos_llm,terminacion,reintento,respuesta
+B · diagnostico + prompt Paso N,diagnostico,dg-a06,paso_aritmetico,paso 3,paso 1,True,False,0,—,1,respuesta,False,"El planteamiento está bien pero el paso 1 copia mal el resultado: era 364 y quedó escrito 354.
+Diagnóstico: Paso 1"
+B · diagnostico + prompt Paso N,diagnostico,dg-a12,paso_aritmetico,paso 2,paso 2,True,True,0,—,1,respuesta,False,"El planteamiento está bien pero el paso 2 copia mal el resultado: era 4730 y quedó escrito 4630.
+Diagnóstico: Paso 2"
+B · diagnostico + prompt Paso N,diagnostico,dg-a18,paso_aritmetico,paso 3,paso 2,True,False,0,—,1,respuesta,False,"El planteamiento está bien pero el paso 2 copia mal el resultado: era 150 y quedó escrito 160.
+Diagnóstico: Paso 2"
+B · diagnostico + prompt Paso N,diagnostico,dg-b06,compensado,paso 2,paso 1,True,False,0,—,1,respuesta,False,"El planteamiento está bien pero el resultado no: 84 ÷ 12 da 7, no 8.
+Diagnóstico: Paso 1"
+B · diagnostico + prompt Paso N,diagnostico,dg-c04,sin_error,sin error,paso 2,True,False,0,—,1,respuesta,False,"El planteamiento está bien pero el paso 2 copia mal el resultado: era 1035 y quedó escrito 1420−385=1035.
+Diagnóstico: Paso 2"
+B · diagnostico + prompt Paso N,diagnostico,dg-c08,sin_error,sin error,paso 2,True,False,0,—,1,respuesta,False,"El planteamiento está bien pero el paso 2 da el resultado equivocado: 240 ÷ 15 da 16, pero hay que quedarnos con los 15.
+Diagnóstico: Paso 2"
+B · diagnostico + prompt Paso N,diagnostico,dg-d03,ilegible,ilegible,ilegible,True,True,0,—,1,respuesta,False,"Lo siento, pero no puedo revisar el planteamiento porque la hoja no se lee.
+Diagnóstico: ilegible"
+B · diagnostico + prompt Paso N,diagnostico,dg-e03,fuera_de_dominio,fuera de dominio,paso 1,True,False,0,—,1,respuesta,False,"El planteamiento del planteamiento está bien pero falta el paso siguiente: aquí hay 2 tazas de harina y ahí quedaron 3.
+Diagnóstico: Paso 1"
+B · diagnostico + prompt Paso N,diagnostico,dg-f03,dato_no_disponible,dato no disponible,paso 1,True,False,0,—,1,respuesta,False,"El planteamiento está bien pero el paso 1 copia mal el resultado: era 360 y quedó escrito 45×8=360.
+Diagnóstico: Paso 1"

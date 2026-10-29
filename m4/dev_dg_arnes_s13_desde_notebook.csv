@@ -1,0 +1,10 @@
+id,familia,esperada,predicha,formato_valido,acierto
+dg-a06,paso_aritmetico,paso 3,paso 2,True,False
+dg-a12,paso_aritmetico,paso 2,paso 2,True,True
+dg-a18,paso_aritmetico,paso 3,paso 2,True,False
+dg-b06,compensado,paso 2,paso 2,True,True
+dg-c04,sin_error,sin error,paso 1,True,False
+dg-c08,sin_error,sin error,paso 2,True,False
+dg-d03,ilegible,ilegible,ilegible,True,True
+dg-e03,fuera_de_dominio,fuera de dominio,paso 1,True,False
+dg-f03,dato_no_disponible,dato no disponible,paso 1,True,False

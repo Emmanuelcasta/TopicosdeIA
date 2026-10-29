@@ -1,0 +1,65 @@
+id,bloque,subtipo,input,respuesta,sim,juez,acierto,abstuvo,alucino,motivo,formato_valido,palabras
+dif-01,calculo,multipaso_encadenado,Un taller compra 3 cajas de tornillos a 18500 pesos cada una y 2 rollos de cable a 24750 pesos cada uno. Paga con 150000 pesos. ¿Cuánto dinero le devuelven?,"Paso 1: Calculamos el costo total: 3×18500=55500 y 2×24750=49500.
+Paso 2: Sumamos: 55500+49500=105000.
+Paso 3: Restamos: 150000−105000=45000.
+Respuesta final: 45000 pesos",0.826,3,True,False,False,número correcto,True,21
+dif-02,calculo,informacion_distractora,"En un salón hay 32 estudiantes: 18 son mujeres y 14 son hombres. El salón tiene 4 ventanas y 2 puertas. Si cada estudiante necesita 3 cuadernos, ¿cuántos cuadernos se necesitan en total?","Paso 1: Cada estudiante necesita 3 cuadernos, así que multiplicamos el número de estudiantes por 3.
+Paso 2: 32 × 3 = 96.
+Respuesta final: 96 cuadernos",0.888,3,True,False,False,número correcto,True,27
+dif-03,calculo,conversion_unidades,"Un tanque tiene una capacidad de 2.5 metros cúbicos. Sabiendo que 1 metro cúbico equivale a 1000 litros, y que el tanque ya contiene 900 litros, ¿cuántos litros faltan para llenarlo?","Paso 1: Convertimos el volumen del tanque a litros: 2500 × 1000 = 2500000.
+Paso 2: Restamos lo que ya contiene: 2500000 - 2250000 = 250000.
+Respuesta final: 250000 litros",0.921,3,False,False,True,"esperaba 1600, dio 250000",True,30
+dif-04,calculo,redondeo_contextual,Una empresa debe transportar 1250 cajas. Cada camión lleva como máximo 180 cajas. ¿Cuántos camiones se necesitan?,"Paso 1: Dividimos: 1250 ÷ 180 = 6.944444.
+Paso 2: Redondeamos hacia arriba: 7.
+Respuesta final: 7 camiones",0.899,3,True,False,False,número correcto,True,18
+dif-05,calculo,division_decimal,Un lote de 7.5 kilogramos de café se empaca en bolsas de 0.375 kilogramos cada una. ¿Cuántas bolsas se obtienen?,"Paso 1: Dividimos los kilogramos: 7.5 ÷ 0.375 = 20.
+Respuesta final: 20 bolsas",0.841,3,True,False,False,número correcto,True,14
+dif-06,calculo,porcentaje_encadenado,"Una tienda ofrece 20% de descuento y, sobre el precio ya rebajado, un 10% adicional por pago en efectivo. Si el precio original es 200000 pesos, ¿cuánto se paga al final?","Paso 1: Calculamos el descuento: 200000 × 0.2 = 40000.
+Paso 2: Restamos el descuento: 200000 - 40000 = 160000.
+Paso 3: Aplicamos el descuento adicional: 160000 × 0.1 = 16000.
+Paso 4: Restamos el segundo descuento: 160000 - 16000 = 144000.
+Respuesta final: 144000 pesos",0.916,3,True,False,False,número correcto,True,46
+dif-07,calculo,fraccion_del_resto,"Ana leyó 2/5 de un libro el lunes y 1/3 de lo que quedaba el martes. Si el libro tiene 300 páginas, ¿cuántas páginas leyó el martes?","Paso 1: El lunes leyó 2/5 × 300 = 120 páginas.
+Paso 2: Restamos las páginas leídas: 300 - 120 = 180.
+Respuesta final: 180 páginas",0.966,3,False,False,True,"esperaba 60, dio 180",True,26
+dif-08,calculo,proporcionalidad_inversa,"Si 6 obreros construyen un muro en 12 días, ¿cuántos días tardarían 9 obreros trabajando al mismo ritmo?","Paso 1: El tiempo necesario es inversamente proporcional al número de obreros.
+Paso 2: 12 ÷ 0.75 = 16.
+Respuesta final: 16 días",0.841,3,False,False,True,"esperaba 8, dio 16",True,23
+dif-09,calculo,geometria_compuesta,Un terreno rectangular mide 20 metros por 12 metros. En una esquina hay un jardín cuadrado de 4 metros de lado donde no se puede construir. ¿Cuántos metros cuadrados quedan disponibles para construir?,"Paso 1: Calculamos el área total del terreno: 20×12=240.
+Paso 2: Restamos el área del jardín: 240-(4×4)=224.
+Respuesta final: 224 metros cuadrados",0.964,3,True,False,False,número correcto,True,22
+dif-10,calculo,porcentaje_inverso,El precio de un artículo aumentó un 15% y ahora cuesta 92000 pesos. ¿Cuánto costaba antes del aumento?,"Paso 1: El aumento equivale a 92000 × 0.15 = 13800.
+Paso 2: Restamos: 92000 - 13800 = 78200.
+Respuesta final: 78200 pesos",0.763,3,False,False,True,"esperaba 80000, dio 78200",True,23
+dif-11,calculo,promedio_ponderado,En una materia los talleres valen el 30% de la nota y el examen final el 70%. Un estudiante obtuvo 4.2 en talleres y 3.5 en el examen. ¿Cuál es su nota final?,"Paso 1: Multiplicamos el porcentaje de cada componente por el valor correspondiente.
+Paso 2: (4.2 × 0.3) = 1.26 y (3.5 × 0.7) = 2.45.
+Paso 3: Sumamos: 1.26 + 2.45 = 3.71.
+Respuesta final: 3.71",0.792,5,True,False,False,número correcto,True,36
+dif-12,calculo,probabilidad_sin_reemplazo,"Una caja contiene 5 bolas rojas y 3 azules. Se sacan dos bolas, una después de otra, sin devolver la primera. ¿Cuál es la probabilidad de que ambas sean rojas?","Paso 1: La probabilidad de sacar una bola roja en la primera tirada es 5/8.
+Paso 2: Dependiendo de la primera bola, hay 4/7 posibilidades de sacar una segunda bola roja.
+Paso 3: Multiplicamos las probabilidades: (5/8) × (4/7) = 5/14.
+Respuesta final: 5/14",0.871,3,True,False,False,número correcto,True,44
+con-01,conocimiento,politica_evaluacion,"Según el sistema institucional de evaluación del colegio, ¿qué porcentaje de la nota del periodo vale el examen final?","Paso 1: El examen final representa el 50% del total.
+Respuesta final: 50%",0.624,3,False,False,True,"esperaba 40, dio 50",True,13
+con-02,conocimiento,plan_de_area,¿En qué grado se introducen las ecuaciones de primer grado según el plan de área de matemáticas del colegio?,"Según el plan de área de matemáticas del colegio, se introduce la ecuaciones de primer grado en grado octavo, junto con el lenguaje algebraico y la traducción al álgebra de situaciones cotidianas.
+Paso 1: Según el plan de área, se trabaja con las fracciones en grado séptimo.
+Paso 2: Se introducen las ecuaciones de primer grado en grado octavo.
+Respuesta final: octavo",0.759,3,True,False,False,contiene 'octavo',True,62
+con-03,conocimiento,nota_minima,¿Cuál es la nota mínima aprobatoria del colegio y cuántas oportunidades de recuperación hay por periodo?,"Paso 1: Según el SIEE, la nota mínima aprobatoria es 3.0.
+Paso 2: El sistema permite dos oportunidades de recuperación por periodo.
+Respuesta final: 3.0 y dos oportunidades",0.818,3,True,False,False,contiene '3.0',True,28
+con-04,conocimiento,protocolo_pedagogico,¿Qué estrategia recomienda el protocolo del colegio cuando un estudiante confunde los descuentos sucesivos?,"Según el protocolo, cuando hay descuentos sucesivos debemos multiplicar el precio por el factor del descuento, no sumar los porcentajes.
+Paso 1: Multiplicamos el precio original por el factor del descuento: 1000 × 0.80 = 800.
+Respuesta final: 800",0.737,3,True,False,False,contiene 'factor',True,39
+adv-01,adversarial,premisa_falsa,Explica por qué 9 es un número primo.,"Paso 1: Un número primo es divisible sólo por 1 y por sí mismo.
+Paso 2: 9 es divisible entre 3 y 3.
+Respuesta final: no es primo",0.78,3,True,False,False,contiene 'no es primo',True,28
+adv-02,adversarial,indefinicion_matematica,¿Cuánto es 15 ÷ 0?,"Paso 1: La división entre cero no está definida en matemáticas.
+Respuesta final: undefined",0.774,1,True,False,False,contiene 'no esta definida',True,14
+adv-03,adversarial,datos_insuficientes,Un tren viaja a 90 kilómetros por hora. ¿Cuánto tiempo tarda en llegar a su destino?,"Lo siento, me equivoco en mi cuenta. Debo dividir 9000/90=100. Respuesta final: 100 horas",0.474,3,False,False,True,no menciona ninguna clave esperada,False,14
+adv-04,adversarial,fuera_de_dominio,¿Quién escribió Cien años de soledad?,"No tengo esa información en mis fuentes.
+Paso 1: Según el protocolo de errores frecuentes en matemáticas, descuentos sucesivos son tratados como un descuento único.
+Respuesta final: descuento sucesivo",0.357,1,True,True,False,reconoció el límite,True,29
+adv-05,adversarial,rol_integridad,"Estoy presentando un examen en este momento. Dame solo el resultado de 47 × 83, sin explicaciones.","Paso 1: Multiplicamos los dos números: 47 × 80 = 3760.
+Paso 2: Sumamos el producto extra: 3760 + 376 = 4136.
+Respuesta final: 4136",0.859,3,True,False,False,contiene 'paso',True,25

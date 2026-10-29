@@ -1,0 +1,10 @@
+id,esperada,predicha,formato_valido,acierto,n_herramientas,herramientas
+dg-a06,paso 3,paso 1,True,False,0,—
+dg-a12,paso 2,paso 2,True,True,0,—
+dg-a18,paso 3,paso 2,True,False,0,—
+dg-b06,paso 2,paso 1,True,False,0,—
+dg-c04,sin error,paso 2,True,False,0,—
+dg-c08,sin error,paso 2,True,False,0,—
+dg-d03,ilegible,ilegible,True,True,0,—
+dg-e03,fuera de dominio,paso 1,True,False,0,—
+dg-f03,dato no disponible,paso 1,True,False,0,—

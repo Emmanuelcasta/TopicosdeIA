@@ -1,0 +1,222 @@
+{
+  "aviso": "Conjunto de calibración SINTÉTICO, con texto impreso. Sirve para comprobar que la detección funciona, NO para afirmar que funciona con letra manuscrita. La validación real necesita fotos de las hojas dev-* escritas a mano, nítidas y desenfocadas.",
+  "no_es_eval_set": "Ninguna hoja sale de los 12 casos vis-*. Las dev-* no se fotografían nunca, así que usarlas aquí no toca ningún caso de evaluación.",
+  "pares": [
+    {
+      "archivo": "cal-01-legible.png",
+      "hoja": "cal-01",
+      "etiqueta": "legible",
+      "legible": true,
+      "enunciado": "Un ramo trae 13 flores. ¿Cuántas flores hay en 6 ramos?",
+      "pasos": [
+        "Multiplicamos: 13 × 6.",
+        "13 × 6 = 78.",
+        "Respuesta final: 78 flores"
+      ]
+    },
+    {
+      "archivo": "cal-01-ilegible_leve.png",
+      "hoja": "cal-01",
+      "etiqueta": "ilegible_leve",
+      "legible": false,
+      "enunciado": "Un ramo trae 13 flores. ¿Cuántas flores hay en 6 ramos?",
+      "pasos": [
+        "Multiplicamos: 13 × 6.",
+        "13 × 6 = 78.",
+        "Respuesta final: 78 flores"
+      ]
+    },
+    {
+      "archivo": "cal-01-ilegible_fuerte.png",
+      "hoja": "cal-01",
+      "etiqueta": "ilegible_fuerte",
+      "legible": false,
+      "enunciado": "Un ramo trae 13 flores. ¿Cuántas flores hay en 6 ramos?",
+      "pasos": [
+        "Multiplicamos: 13 × 6.",
+        "13 × 6 = 78.",
+        "Respuesta final: 78 flores"
+      ]
+    },
+    {
+      "archivo": "cal-02-legible.png",
+      "hoja": "cal-02",
+      "etiqueta": "legible",
+      "legible": true,
+      "enunciado": "Se reparten 540 fichas entre 18 cajas. ¿Cuántas por caja?",
+      "pasos": [
+        "Dividimos: 540 ÷ 18.",
+        "540 ÷ 18 = 30.",
+        "Respuesta final: 30 fichas"
+      ]
+    },
+    {
+      "archivo": "cal-02-ilegible_leve.png",
+      "hoja": "cal-02",
+      "etiqueta": "ilegible_leve",
+      "legible": false,
+      "enunciado": "Se reparten 540 fichas entre 18 cajas. ¿Cuántas por caja?",
+      "pasos": [
+        "Dividimos: 540 ÷ 18.",
+        "540 ÷ 18 = 30.",
+        "Respuesta final: 30 fichas"
+      ]
+    },
+    {
+      "archivo": "cal-02-ilegible_fuerte.png",
+      "hoja": "cal-02",
+      "etiqueta": "ilegible_fuerte",
+      "legible": false,
+      "enunciado": "Se reparten 540 fichas entre 18 cajas. ¿Cuántas por caja?",
+      "pasos": [
+        "Dividimos: 540 ÷ 18.",
+        "540 ÷ 18 = 30.",
+        "Respuesta final: 30 fichas"
+      ]
+    },
+    {
+      "archivo": "cal-03-legible.png",
+      "hoja": "cal-03",
+      "etiqueta": "legible",
+      "legible": true,
+      "enunciado": "Un bidón tiene 1250 mililitros y se usan 480. ¿Cuánto queda?",
+      "pasos": [
+        "Restamos: 1250 − 480.",
+        "1250 − 480 = 770.",
+        "Respuesta final: 770 ml"
+      ]
+    },
+    {
+      "archivo": "cal-03-ilegible_leve.png",
+      "hoja": "cal-03",
+      "etiqueta": "ilegible_leve",
+      "legible": false,
+      "enunciado": "Un bidón tiene 1250 mililitros y se usan 480. ¿Cuánto queda?",
+      "pasos": [
+        "Restamos: 1250 − 480.",
+        "1250 − 480 = 770.",
+        "Respuesta final: 770 ml"
+      ]
+    },
+    {
+      "archivo": "cal-03-ilegible_fuerte.png",
+      "hoja": "cal-03",
+      "etiqueta": "ilegible_fuerte",
+      "legible": false,
+      "enunciado": "Un bidón tiene 1250 mililitros y se usan 480. ¿Cuánto queda?",
+      "pasos": [
+        "Restamos: 1250 − 480.",
+        "1250 − 480 = 770.",
+        "Respuesta final: 770 ml"
+      ]
+    },
+    {
+      "archivo": "dev-01-legible.png",
+      "hoja": "dev-01",
+      "etiqueta": "legible",
+      "legible": true,
+      "enunciado": "Un libro cuesta 18500 pesos. ¿Cuánto cuestan 4 libros?",
+      "pasos": [
+        "Multiplicamos: 18500 × 4.",
+        "18500 × 4 = 72000.",
+        "Respuesta final: 72000 pesos"
+      ]
+    },
+    {
+      "archivo": "dev-01-ilegible_leve.png",
+      "hoja": "dev-01",
+      "etiqueta": "ilegible_leve",
+      "legible": false,
+      "enunciado": "Un libro cuesta 18500 pesos. ¿Cuánto cuestan 4 libros?",
+      "pasos": [
+        "Multiplicamos: 18500 × 4.",
+        "18500 × 4 = 72000.",
+        "Respuesta final: 72000 pesos"
+      ]
+    },
+    {
+      "archivo": "dev-01-ilegible_fuerte.png",
+      "hoja": "dev-01",
+      "etiqueta": "ilegible_fuerte",
+      "legible": false,
+      "enunciado": "Un libro cuesta 18500 pesos. ¿Cuánto cuestan 4 libros?",
+      "pasos": [
+        "Multiplicamos: 18500 × 4.",
+        "18500 × 4 = 72000.",
+        "Respuesta final: 72000 pesos"
+      ]
+    },
+    {
+      "archivo": "dev-02-legible.png",
+      "hoja": "dev-02",
+      "etiqueta": "legible",
+      "legible": true,
+      "enunciado": "¿Cuánto es 250 + 175?",
+      "pasos": [
+        "Sumamos unidades, decenas y centenas: 250 + 175.",
+        "250 + 175 = 425.",
+        "Respuesta final: 425"
+      ]
+    },
+    {
+      "archivo": "dev-02-ilegible_leve.png",
+      "hoja": "dev-02",
+      "etiqueta": "ilegible_leve",
+      "legible": false,
+      "enunciado": "¿Cuánto es 250 + 175?",
+      "pasos": [
+        "Sumamos unidades, decenas y centenas: 250 + 175.",
+        "250 + 175 = 425.",
+        "Respuesta final: 425"
+      ]
+    },
+    {
+      "archivo": "dev-02-ilegible_fuerte.png",
+      "hoja": "dev-02",
+      "etiqueta": "ilegible_fuerte",
+      "legible": false,
+      "enunciado": "¿Cuánto es 250 + 175?",
+      "pasos": [
+        "Sumamos unidades, decenas y centenas: 250 + 175.",
+        "250 + 175 = 425.",
+        "Respuesta final: 425"
+      ]
+    },
+    {
+      "archivo": "dev-03-legible.png",
+      "hoja": "dev-03",
+      "etiqueta": "legible",
+      "legible": true,
+      "enunciado": "Un cuadrado tiene lado 7 cm. ¿Cuál es su perímetro?",
+      "pasos": [
+        "El perímetro del cuadrado es 4 por el lado.",
+        "4 × 7 = 32.",
+        "Respuesta final: 28 centímetros"
+      ]
+    },
+    {
+      "archivo": "dev-03-ilegible_leve.png",
+      "hoja": "dev-03",
+      "etiqueta": "ilegible_leve",
+      "legible": false,
+      "enunciado": "Un cuadrado tiene lado 7 cm. ¿Cuál es su perímetro?",
+      "pasos": [
+        "El perímetro del cuadrado es 4 por el lado.",
+        "4 × 7 = 32.",
+        "Respuesta final: 28 centímetros"
+      ]
+    },
+    {
+      "archivo": "dev-03-ilegible_fuerte.png",
+      "hoja": "dev-03",
+      "etiqueta": "ilegible_fuerte",
+      "legible": false,
+      "enunciado": "Un cuadrado tiene lado 7 cm. ¿Cuál es su perímetro?",
+      "pasos": [
+        "El perímetro del cuadrado es 4 por el lado.",
+        "4 × 7 = 32.",
+        "Respuesta final: 28 centímetros"
+      ]
+    }
+  ]
+}

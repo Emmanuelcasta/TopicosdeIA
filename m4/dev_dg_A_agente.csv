@@ -1,0 +1,26 @@
+config,adaptador,id,familia,esperada,predicha,formato_valido,acierto,n_herramientas,herramientas,pasos_llm,terminacion,reintento,respuesta
+A · agente + prompt original,agente,dg-a06,paso_aritmetico,paso 3,paso 2,True,False,0,—,1,respuesta,False,"Diagnóstico: Paso 2              (equivocado: 26 × 14 = 364, no 354)
+  Diagnóstico: sin error         (todos los pasos están bien)"
+A · agente + prompt original,agente,dg-a12,paso_aritmetico,paso 2,paso 2,True,True,0,—,1,respuesta,False,"Diagnóstico: Paso 2
+Paso 2: 3250 + 1480 = 4730.
+Paso 3: Respuesta final: 4730"
+A · agente + prompt original,agente,dg-a18,paso_aritmetico,paso 3,paso 2,True,False,0,—,1,respuesta,False,"Diagnóstico: Paso 2
+Paso 2: 2100 ÷ 14 = 150.
+Paso 3: Respuesta final: 150"
+A · agente + prompt original,agente,dg-b06,compensado,paso 2,paso 2,True,True,0,—,1,respuesta,False,"Diagnóstico: Paso 2              (dividimos equivocadamente: 84 ÷ 12 = 7).
+Paso 1: Dividimos: 84 ÷ 12."
+A · agente + prompt original,agente,dg-c04,sin_error,sin error,paso 2,True,False,0,—,1,respuesta,False,"Diagnóstico: Paso 2
+Paso 2: 1420 − 385 = 1035.
+Paso 3: Respuesta final: 1035"
+A · agente + prompt original,agente,dg-c08,sin_error,sin error,paso 2,True,False,0,—,1,respuesta,False,"Diagnóstico: Paso 2              (dividimos equivocadamente: 240 ÷ 15 = 16, pero debemos multiplicar).
+Paso 1: Dividimos: 240 ÷ 15."
+A · agente + prompt original,agente,dg-d03,ilegible,ilegible,sin error,True,False,2,buscar_documentos|buscar_documentos,3,respuesta,False,"Pensamiento: es un ejercicio de matemáticas; uso la herramienta para buscar el sistema de evaluación.
+Diagnóstico: sin error"
+A · agente + prompt original,agente,dg-e03,fuera_de_dominio,fuera de dominio,,False,False,2,evaluar_expresion|multiplicar,3,respuesta,True,"Paso 1: Multiplicamos ambos lados por 6.
+Paso 2: Dividimos entre 6.
+Respuesta final: x = 5/6
+Paso 1: Multiplicamos ambos lados por 6.
+Paso 2: Dividimos entre 6.
+Respuesta final: x = 5/6"
+A · agente + prompt original,agente,dg-f03,dato_no_disponible,dato no disponible,paso 2,True,False,0,—,1,respuesta,False,"Diagnóstico: Paso 2              (equivocado: 45 × 8 = 360, no 3600)
+  Diagnóstico: sin error         (todos los pasos están bien)"

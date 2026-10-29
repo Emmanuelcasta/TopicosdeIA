@@ -1,0 +1,10 @@
+id,familia,esperada,evaluable,marcado,tipo,acierto,falso_positivo,detalle
+dg-a06,paso_aritmetico,paso 3,True,paso 3,traslado,True,False,el paso 3 copia mal el resultado: era 364 y está escrito 354
+dg-a12,paso_aritmetico,paso 2,True,paso 2,calculo,True,False,"el paso 2 no cuadra: 3250 + 1480 da 4730, y está escrito 4630"
+dg-a18,paso_aritmetico,paso 3,True,paso 3,traslado,True,False,el paso 3 copia mal el resultado: era 150 y está escrito 160
+dg-b06,compensado,paso 2,True,paso 2,calculo,True,False,"el paso 2 no cuadra: 84 ÷ 12 da 7, y está escrito 8"
+dg-c04,sin_error,sin error,True,sin error,ninguno,True,False,todas las cuentas escritas cuadran
+dg-c08,sin_error,sin error,True,sin error,ninguno,True,False,todas las cuentas escritas cuadran
+dg-d03,ilegible,ilegible,False,no evaluable,no_evaluable,False,False,la hoja no tiene pasos que revisar
+dg-e03,fuera_de_dominio,fuera de dominio,False,no evaluable,no_evaluable,False,False,la hoja no tiene pasos que revisar
+dg-f03,dato_no_disponible,dato no disponible,False,sin error,ninguno,False,False,todas las cuentas escritas cuadran

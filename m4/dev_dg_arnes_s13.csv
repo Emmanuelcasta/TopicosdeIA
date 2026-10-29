@@ -1,0 +1,19 @@
+id,familia,esperada,conclusion,valida,acierto,reintento,reescribe,pasos_llm,terminacion,herramientas,respuesta
+dg-a06,paso_aritmetico,paso 3,paso 2,True,False,False,False,1,respuesta,—,"El planteamiento está bien pero el paso 2 copia mal el resultado: era 364 y quedó escrito 354.
+Diagnóstico: Paso 2"
+dg-a12,paso_aritmetico,paso 2,paso 2,True,True,False,False,1,respuesta,—,"El planteamiento está bien pero el paso 2 copia mal el resultado: era 4730 y quedó escrito 4630.
+Diagnóstico: Paso 2"
+dg-a18,paso_aritmetico,paso 3,paso 2,True,False,False,False,1,respuesta,—,"El planteamiento está bien pero el paso 2 copia mal el resultado: era 150 y quedó escrito 160.
+Diagnóstico: Paso 2"
+dg-b06,compensado,paso 2,paso 2,True,True,False,False,1,respuesta,—,"El planteamiento del problema está bien, pero el paso 2 copia mal el resultado: era 8 y quedó escrito 84.
+Diagnóstico: Paso 2"
+dg-c04,sin_error,sin error,paso 1,True,False,False,False,1,respuesta,—,"El planteamiento del problema está bien, pero el paso 1 copia mal el resultado: ahí estaba escrito 1420−385=1035, pero el resultado correcto sería 1035.
+Diagnóstico: Paso 1"
+dg-c08,sin_error,sin error,paso 2,True,False,False,False,1,respuesta,—,"El planteamiento está bien pero el paso 2 copia mal el resultado: era 16 y quedó escrito 240.
+Diagnóstico: Paso 2"
+dg-d03,ilegible,ilegible,ilegible,True,True,False,False,1,respuesta,—,"Lo siento, pero no puedo revisar el planteamiento porque la hoja no se lee.
+Diagnóstico: ilegible"
+dg-e03,fuera_de_dominio,fuera de dominio,paso 1,True,False,False,False,1,respuesta,—,"El planteamiento del planteamiento está bien pero falta el paso 1: aquí dice 2 tazas de harina, pero ahí piden 2 tazas de azúcar.
+Diagnóstico: Paso 1"
+dg-f03,dato_no_disponible,dato no disponible,paso 1,True,False,False,False,1,respuesta,—,"El planteamiento está bien pero el paso 1 copia mal el resultado: 45 × 8 da 360 y ahí quedó escrito 45 × 8 = 360.
+Diagnóstico: Paso 1"
