@@ -1,0 +1,20 @@
+# Dependencias del notebook S13_M4_Pipeline_Visual.
+#
+# transformers queda FIJO en la versión con la que corrió la ejecución final
+# (S13_M4_Pipeline_Visual_n, Tesla T4, 25-10-2026: "transformers 5.20.2 | torch
+# 2.11.0+cu130"). Con ">=4.45" cada sesión de Colab instala la última y el
+# procesador de Qwen2-VL ya avisa que `max_pixels` desaparece en 5.23.
+# torch no se reinstala: se usa el de Colab (anoten la versión que imprime la
+# celda de entorno).
+transformers==5.20.2
+peft>=0.12
+accelerate>=0.33
+sentence-transformers
+chromadb
+rank_bm25
+scikit-learn>=1.3
+sympy
+pandas
+pillow
+qwen-vl-utils
+pytest

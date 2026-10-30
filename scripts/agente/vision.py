@@ -233,6 +233,60 @@ def atipicos_por_mad(valores: dict, k: float = 3.0) -> set:
     return {clave for clave, v in valores.items() if v < mediana - k * mad}
 
 
+# --------------------------------------------------------------------------
+# Caché de lecturas y señal 4 con UNA sola foto
+# --------------------------------------------------------------------------
+
+# Lo que una lectura guardada debe traer para que las cuatro señales decidan.
+# La corrida del 25-10 (Visual_n, celda 34) reusó `m4/lecturas_m4.json`, escrito
+# antes de la salvaguarda: tenía `consistente` pero no `confianza_numeros` ni
+# `legible_declarada`. Solo las 3 fotos del piloto se releyeron, la señal 3 quedó
+# en "?" para 8 fotos y la 4 no pudo decidir (necesita ≥ 4 valores): `vis-10`
+# pasó como "ok".
+LLAVES_LECTURA_VIGENTE = ("consistente", "confianza_numeros", "legible_declarada")
+
+
+def lectura_vigente(lectura) -> bool:
+    """¿Se puede reusar esta lectura de la caché sin volver a pasar el VLM?
+
+    Solo si trae todas las señales. Una lectura de un esquema anterior se relee:
+    reusarla apaga la salvaguarda sin avisar.
+    """
+    return isinstance(lectura, dict) and all(k in lectura for k in LLAVES_LECTURA_VIGENTE)
+
+
+def referencia_de_confianza(valores, k: float = 3.0) -> dict:
+    """La distribución de referencia para la señal 4 cuando llega UNA foto.
+
+    `atipicos_por_mad` compara cada foto con el resto de su lote; en la demo o en
+    producción llega una foto sola y no hay lote. La referencia se construye con
+    la confianza de fotos **nítidas, escritas a mano, con la misma cámara** y que
+    **no** son del eval set (por ejemplo, las hojas `dev-*` escritas a mano).
+
+    No sirve el conjunto de calibración impreso: con Qwen2-VL-2B las hojas
+    impresas salen con confianzas casi nulas y una MAD muy pequeña, y contra esa
+    referencia cinco hojas manuscritas legibles del eval set quedaban marcadas
+    como no fiables.
+    """
+    import statistics
+    xs = sorted(float(v) for v in valores if v is not None)
+    if len(xs) < 4:
+        raise ValueError(f"hacen falta al menos 4 fotos de referencia; hay {len(xs)}")
+    mediana = statistics.median(xs)
+    mad = statistics.median([abs(x - mediana) for x in xs]) * 1.4826
+    return {"mediana": mediana, "mad": mad, "k": k, "n": len(xs),
+            "umbral": mediana - k * mad}
+
+
+def confianza_atipica_frente_a(valor, referencia) -> bool | None:
+    """Señal 4 para una foto suelta: ¿su confianza cae bajo `mediana − k·MAD` de
+    la referencia? `None` si no hay con qué decidir (sin valor, sin referencia o
+    MAD nula): en ese caso la señal no se dispara y deciden las otras tres."""
+    if valor is None or not referencia or not referencia.get("mad"):
+        return None
+    return float(valor) < referencia["mediana"] - referencia["k"] * referencia["mad"]
+
+
 # Dos ideas tentadoras que NO se usan, y por qué:
 #
 #   · **Comprobar la aritmética de la transcripción.** Suena bien y es inservible
@@ -740,8 +794,78 @@ def lectura_fiel(caso: dict, lectura) -> bool | None:
     return esperado.replace(" ", "") in escrito
 
 
+def numeros_fieles(caso: dict, lectura) -> bool | None:
+    """¿Están TODOS los números de la hoja, en orden, en lo que leyó el VLM?
+
+    Complementa a `lectura_fiel`, que solo mira cuántos pasos hay y el valor final
+    escrito: con esa regla `vis-09` cuenta como fiel aunque `14 × 9 = 126` se leyó
+    `14 x 9 = 12G`. Aquí se comparan los valores (`0.2` = `0.20`); las fracciones,
+    tal como están escritas (`6/8` no es `3/4` en una hoja que las iguala). None cuando no hay procedimiento esperado (adversariales).
+    """
+    from fractions import Fraction
+
+    if caso.get("bloque") == "adversarial" or not caso.get("pasos"):
+        return None
+    if ((lectura or {}).get("json") or {}).get("ilegible"):
+        return False
+    def valor(n):        # 0.2 = 0.20; una fracción se compara tal cual: 6/8 ≠ 3/4
+        return n if "/" in n else Fraction(n)
+
+    leidos = iter(valor(n) for n in numeros_de(" ".join(pasos_numerados(lectura))))
+    return all(any(n == m for m in leidos)
+               for n in (valor(x) for x in numeros_de(" ".join(caso["pasos"]))))
+
+
 def fuente_del_fallo(acierto: bool, fiel: bool | None) -> str:
     """A qué etapa se le atribuye un fallo. El resultado principal de M4."""
     if acierto:
         return "—"
     return "lectura" if fiel is False else "diagnostico"
+
+
+# --------------------------------------------------------------------------
+# Punto de entrada único: foto -> diagnóstico (o "no pude leer tu hoja")
+# --------------------------------------------------------------------------
+
+MENSAJE_NO_PUDE_LEER = (
+    "No pude leer tu hoja con seguridad ({motivo}). Para no señalarte un error "
+    "que no escribiste, prefiero no diagnosticar todavía: toma otra foto de "
+    "frente, con buena luz y sin que se mueva."
+)
+
+
+def revisar_foto(imagen, pregunta: str, *, leer, diagnosticar,
+                 referencia=None, archivo: str = "foto") -> dict:
+    """Una foto y una pregunta -> lo que se le muestra al estudiante.
+
+    Encadena lo que el notebook ya tiene, en el orden en que debe ocurrir con una
+    foto suelta: leer (`leer_dos_veces`), decidir si la lectura es fiable
+    (`lectura_no_fiable`) y solo entonces diagnosticar (`sistema_multimodal`).
+    Las dos funciones se inyectan para poder probar el flujo sin GPU.
+
+    Con una sola foto la señal 4 necesita `referencia` (ver
+    `referencia_de_confianza`); sin ella deciden las otras tres y el resultado lo
+    dice en `senal_4`.
+    """
+    import time
+    t0 = time.perf_counter()
+    lectura = leer(imagen, archivo)
+    if referencia is not None:
+        atipica = confianza_atipica_frente_a(lectura.get("confianza_numeros"), referencia)
+        lectura["confianza_atipica"] = atipica is True
+        senal_4 = "sin decidir" if atipica is None else ("atípica" if atipica else "normal")
+    else:
+        senal_4 = "sin referencia"
+    t_lectura = time.perf_counter() - t0
+    no_fiable, motivo = lectura_no_fiable(lectura)
+    salida = {"archivo": archivo, "lectura": pasos_numerados(lectura),
+              "senal_4": senal_4, "segundos_lectura": round(t_lectura, 2)}
+    if no_fiable:
+        salida.update(estado="no_pude_leer", motivo=motivo, diagnostico="ilegible",
+                      respuesta=MENSAJE_NO_PUDE_LEER.format(motivo=motivo))
+    else:
+        respuesta = diagnosticar(pregunta, lectura)
+        salida.update(estado="diagnostico", motivo="",
+                      diagnostico=extraer_diagnostico(respuesta), respuesta=respuesta)
+    salida["segundos_total"] = round(time.perf_counter() - t0, 2)
+    return salida

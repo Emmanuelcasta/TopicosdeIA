@@ -143,10 +143,13 @@ from transformers import AutoProcessor, Qwen2VLForConditionalGeneration
 VLM_ID = "Qwen/Qwen2-VL-2B-Instruct"
 MAX_PIXELS = 1024 * 1024          # tope de tokens visuales por imagen
 
-vlm_proc = AutoProcessor.from_pretrained(VLM_ID, max_pixels=MAX_PIXELS)
+# `size=` en vez de `max_pixels=`: transformers 5.20 avisa que `min_pixels` y
+# `max_pixels` se eliminan en 5.23. Es el mismo tope (mismo `image_grid_thw`).
+vlm_proc = AutoProcessor.from_pretrained(
+    VLM_ID, size={"shortest_edge": 56 * 56, "longest_edge": MAX_PIXELS})
 vlm = Qwen2VLForConditionalGeneration.from_pretrained(
     VLM_ID,
-    torch_dtype=torch.float16 if DEVICE == "cuda" else torch.float32,
+    dtype=torch.float16 if DEVICE == "cuda" else torch.float32,
     device_map="auto" if DEVICE == "cuda" else None).eval()
 print("VLM cargado:", VLM_ID)
 if DEVICE == "cuda":
@@ -394,6 +397,7 @@ for cid, que_prueba in PILOTO.items():
               + ("  <-- NO COINCIDE" if vistos != len(esperados) else ""))
         print(f"      diagnóstico esperado: {diagnostico_esperado(caso)!r}")
         print(f"      ¿transcripción fiel?: {lectura_fiel(caso, lectura)}")
+        print(f"      ¿todos los números de la hoja?: {numeros_fieles(caso, lectura)}")
     else:
         print(f"      diagnóstico esperado: {diagnostico_esperado(caso)!r} (caso adversarial)")
     print()
@@ -429,13 +433,14 @@ if len(FALTAN) == len(PEDIDAS):
 # lecturas no cambia de forma si mañana la foto llega con otra extensión.
 lecturas.update(lecturas_piloto)        # el piloto ya leyó tres: no se repiten
 
-# La caché se reusa solo si trae la verificación de consistencia: una lectura
-# guardada antes de la salvaguarda no se puede dar por fiable, así que se relee.
+# La caché se reusa solo si trae LAS CUATRO señales (`lectura_vigente`). Antes se
+# miraba solo `consistente`, y el 25-10 se reusaron 8 lecturas de un esquema
+# anterior: sin confianza ni "¿se lee?", la salvaguarda no pudo marcar `vis-10`.
 for logico, info in sorted(PEDIDAS.items()):
     if info["archivo"] is None:
         continue
     previa = lecturas.get(logico)
-    if previa is not None and "consistente" in previa:
+    if lectura_vigente(previa):
         continue
     lecturas[logico] = leer_dos_veces(cargar_imagen(DIR_IMAGENES / info["archivo"]),
                                       info["archivo"])
@@ -451,6 +456,9 @@ for logico, info in sorted(PEDIDAS.items()):
 confianzas = {k: v["confianza_numeros"] for k, v in lecturas.items()
               if v.get("confianza_numeros") is not None}
 atipicas = atipicos_por_mad(confianzas)
+if len(confianzas) < 4:
+    print(f"ATENCIÓN · solo {len(confianzas)} fotos traen confianza: la señal 4 no puede "
+          "decidir con menos de 4. Borren m4/lecturas_m4.json y vuelvan a leer.")
 for k in lecturas:
     lecturas[k]["confianza_atipica"] = k in atipicas
 
@@ -495,11 +503,19 @@ print(f"Latencia media de lectura: {np.mean([v['segundos'] for v in lecturas.val
 CODIGO_LIBERAR = r'''
 # Liberar la GPU antes de cargar el tutor. La transcripción ya está en disco, así
 # que el VLM no vuelve a hacer falta en esta corrida.
+#
+# Para la demo (sección 12) los dos modelos tienen que convivir: pongan
+# MANTENER_VLM = True antes de esta celda y no carguen el juez.
 import gc
 
-del vlm, vlm_proc
+if globals().get("MANTENER_VLM"):
+    print("MANTENER_VLM = True: el VLM se queda en memoria para `revisar_foto_demo`.")
+else:
+    del vlm, vlm_proc
 gc.collect()
-if torch.cuda.is_available():
+if globals().get("MANTENER_VLM") and torch.cuda.is_available():
+    print(f"GPU con el VLM residente: {torch.cuda.memory_allocated() / 1e9:.1f} GB")
+elif torch.cuda.is_available():
     torch.cuda.empty_cache()
     print(f"GPU tras liberar el VLM: {torch.cuda.memory_allocated() / 1e9:.1f} GB "
           f"de {torch.cuda.get_device_properties(0).total_memory / 1e9:.0f} GB")
@@ -694,6 +710,65 @@ print("once respuestas terminaron copiando esa etiqueta en vez de concluir.")
 '''
 
 
+CODIGO_REVISAR_FOTO = r'''
+# PUNTO DE ENTRADA DE LA DEMO · una foto -> "tu error está en el paso N"
+#                                          o "no pude leer tu hoja".
+#
+# Requiere los dos modelos a la vez: VLM (sección 5, con MANTENER_VLM = True) y
+# tutor (sección 7). El juez no hace falta.
+#
+# La señal 4 necesita una REFERENCIA cuando llega una sola foto: la confianza de
+# 8–10 fotos NÍTIDAS de hojas escritas a mano (las dev-*, por ejemplo), con la
+# misma cámara y que NO sean del eval set. El conjunto impreso de calibración no
+# sirve de referencia: sus confianzas son casi nulas y marcaría hojas buenas.
+from pathlib import Path
+
+DIR_REFERENCIA = Path("m4/referencia_manuscrita")
+RUTA_REFERENCIA = Path("m4/referencia_legibilidad.json")
+PREGUNTA_DEMO = "Revisa mi procedimiento: ¿en qué paso me equivoqué?"
+
+if "vlm" not in globals():
+    print("El VLM se liberó en la sección 5. Para la demo: MANTENER_VLM = True, "
+          "y ejecuten de nuevo desde la sección 5.")
+
+REFERENCIA = None
+if RUTA_REFERENCIA.exists():
+    REFERENCIA = json.loads(RUTA_REFERENCIA.read_text(encoding="utf-8"))
+elif DIR_REFERENCIA.exists() and "vlm" in globals():
+    fotos_ref = sorted(f for f in DIR_REFERENCIA.iterdir()
+                       if f.suffix.lower() in (".jpg", ".jpeg", ".png"))
+    conf_ref = [leer_dos_veces(cargar_imagen(f), f.name)["confianza_numeros"]
+                for f in fotos_ref]
+    REFERENCIA = referencia_de_confianza(conf_ref)
+    REFERENCIA["fotos"] = [f.name for f in fotos_ref]
+    RUTA_REFERENCIA.write_text(json.dumps(REFERENCIA, indent=2), encoding="utf-8")
+if REFERENCIA:
+    print(f"Referencia de la señal 4: n = {REFERENCIA['n']}, "
+          f"umbral = {REFERENCIA['umbral']:.3f}")
+else:
+    print(f"Sin referencia: suban fotos nítidas a mano a {DIR_REFERENCIA}/. "
+          "Mientras tanto la señal 4 no decide y quedan las otras tres.")
+
+
+def revisar_foto_demo(ruta, pregunta=PREGUNTA_DEMO):
+    ruta = Path(ruta)
+    return revisar_foto(
+        cargar_imagen(ruta), pregunta,
+        leer=leer_dos_veces,
+        diagnosticar=lambda p, lec: sistema_multimodal(p, lec, clave=ruta.name),
+        referencia=REFERENCIA, archivo=ruta.name)
+
+
+if "vlm" in globals():
+    for nombre in ("vis-01.jpg", "vis-07.jpg"):
+        r = revisar_foto_demo(DIR_IMAGENES / nombre)
+        print(f"\n{nombre}: {r['estado']} · {r['diagnostico']} · "
+              f"lectura {r['segundos_lectura']} s · total {r['segundos_total']} s")
+        print("  Lo que leí:", *r["lectura"], sep="\n    ")
+        print("  ", r["respuesta"][:300])
+'''
+
+
 CODIGO_ENSAYO_DEV = r'''
 # ENSAYO sobre los 3 casos de DESARROLLO · antes de tocar los 12 de evaluación.
 #
@@ -787,6 +862,7 @@ for caso in eval_m4:
         "explicacion_pasos": " ".join(map(str, ev["explicacion_pasos"])),
         "explicacion_justifica": ev["explicacion_justifica"],
         "lectura_fiel": fiel,
+        "numeros_fieles": numeros_fieles(caso, lectura),
         "fuente_del_fallo": fuente_del_fallo(ev["acierto"], fiel),
         "segundos_lectura": (lectura or {}).get("segundos", 0.0),
         "segundos_tutor": round(seg_tutor, 2),
@@ -1089,7 +1165,7 @@ leer las fotos, que es la parte lenta.
 > entre ellos no es opcional, y con menos de 14 GB es imprescindible.
 """))
     c.append(code('''
-%pip install -q "transformers>=4.45" "peft>=0.12" "accelerate>=0.33" \\
+%pip install -q "transformers==5.20.2" "peft>=0.12" "accelerate>=0.33" \\
     sentence-transformers chromadb rank_bm25 "scikit-learn>=1.3" sympy pandas \\
     pillow qwen-vl-utils
 %pip uninstall -y -q torchao
@@ -1349,5 +1425,17 @@ de cualquier mejora que se reporte.
 `sin_imagen` quedan fuera de las medias, y el total hay que leerlo sobre los casos
 que sí se evaluaron, no sobre 12.
 """))
+
+    c.append(md("""
+---
+## 12 · Punto de entrada para la demo: `revisar_foto_demo`
+
+Una foto y una pregunta, de punta a punta: leer, decidir si la lectura es
+fiable y solo entonces diagnosticar. Si no es fiable, la respuesta es *"no pude
+leer tu hoja"* en lugar de un diagnóstico sobre un procedimiento inventado.
+
+No entra en ningún scorecard. Es la función sobre la que se monta la interfaz.
+"""))
+    c.append(code(CODIGO_REVISAR_FOTO))
 
     return c
