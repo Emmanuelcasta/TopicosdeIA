@@ -864,9 +864,9 @@
     "semantic_hash": ""
   },
   "scripts/eval_set_m5_vision_fuente.py": {
-    "mtime": 1793371091.185457,
-    "seen": 1793380108.3042061,
-    "ast_hash": "fa061373b3fd33a676ed69380827e7dd",
+    "mtime": 1793381244.3304572,
+    "seen": 1793381248.577547,
+    "ast_hash": "5ada690f625bcc4938a53eeda78958ad",
     "semantic_hash": ""
   },
   "M5_despliegue/docs/ARQUITECTURA_M5.md": {
@@ -888,8 +888,8 @@
     "semantic_hash": ""
   },
   "m4/eval_set/HOJAS_M5.md": {
-    "mtime": 1793371091.2161088,
-    "seen": 1793380108.304235,
+    "mtime": 1793381247.7516418,
+    "seen": 1793381248.5775769,
     "ast_hash": "e42f07498e8a686d63764105489de9e1",
     "semantic_hash": ""
   }

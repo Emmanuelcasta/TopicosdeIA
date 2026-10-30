@@ -1,9 +1,9 @@
 # Graph Report - ProyectoIA  (2026-10-30)
 
 ## Corpus Check
-- 118 files · ~269,976 words
+- 118 files · ~270,006 words
 - Verdict: corpus is large enough that graph structure adds value.
-- Unclassified: 98 file(s) not represented in the graph (top: .csv 50, .ipynb 33, .jsonl 12)
+- Unclassified: 99 file(s) not represented in the graph (top: .csv 50, .ipynb 33, .jsonl 12)
 
 ## Summary
 - 1503 nodes · 3081 edges · 90 communities (83 shown, 7 thin omitted)
@@ -11,7 +11,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `547a2db9`
+- Built from commit: `8804df98`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -59,7 +59,7 @@
 - revisar_adaptador
 - eval_set_m4_fuente.py
 - sys
-- Refinamiento del tutor antes de M5
+- integral_definida
 - Tutor
 - vision.py
 - Corrida 01 · 22-10-2026 · **no es un scorecard de M4**
@@ -78,7 +78,7 @@
 - pipeline.py
 - ._armar_agente
 - Hojas manuscritas para la evaluación visual de M5
-- integral_definida
+- Refinamiento del tutor antes de M5
 - Tutor de matemáticas · SI4006
 - Estado
 - enrutador
@@ -313,9 +313,9 @@ Nodes (7): C(), csv_entrega(), _evaluar_check(), hojas(), main(), paso(), valida
 Cohesion: 0.33
 Nodes (4): main(), reconstruir(), sha(), verificar()
 
-### Community 44 - "Refinamiento del tutor antes de M5"
-Cohesion: 0.20
-Nodes (10): 4 · ¿Hace falta entrenar? · evidencia, 5 · Lo que se sirve hoy y lo que falta medir, 6 · Protocolo para evaluar respuestas reales del Space, 8 · Calendario, Las variantes experimentales, que NO son resultados, Lo que no se va a hacer todavía, Lo que se sirve por omisión: S08-D, sin añadidos, Qué cambió en la primera revisión del 30-10 (+2 more)
+### Community 44 - "integral_definida"
+Cohesion: 0.24
+Nodes (8): 7 · Pendientes · qué falta y de quién depende, Cobertura temática · antes y ahora, separados, Tres herramientas de cálculo · implementadas y probadas, derivar(), integral_definida(), integrar(), _tratable(), _variable_de()
 
 ### Community 45 - "Tutor"
 Cohesion: 0.18
@@ -389,9 +389,9 @@ Nodes (10): buscador_hibrido(), buscar(), candidatos(), puntajes(), rerank_max()
 Cohesion: 0.14
 Nodes (13): Hojas manuscritas para la evaluación visual de M5, `m5v-01` · localizacion · tiene un error, `m5v-02` · localizacion · tiene un error, `m5v-03` · localizacion · tiene un error, `m5v-04` · localizacion · tiene un error, `m5v-05` · compensado · paso mal, resultado final BIEN, `m5v-06` · compensado · paso mal, resultado final BIEN, `m5v-07` · sin_error · está CORRECTO, no inventes un error (+5 more)
 
-### Community 63 - "integral_definida"
-Cohesion: 0.24
-Nodes (8): 7 · Pendientes · qué falta y de quién depende, Cobertura temática · antes y ahora, separados, Tres herramientas de cálculo · implementadas y probadas, derivar(), integral_definida(), integrar(), _tratable(), _variable_de()
+### Community 63 - "Refinamiento del tutor antes de M5"
+Cohesion: 0.20
+Nodes (10): 4 · ¿Hace falta entrenar? · evidencia, 5 · Lo que se sirve hoy y lo que falta medir, 6 · Protocolo para evaluar respuestas reales del Space, 8 · Calendario, Las variantes experimentales, que NO son resultados, Lo que no se va a hacer todavía, Lo que se sirve por omisión: S08-D, sin añadidos, Qué cambió en la primera revisión del 30-10 (+2 more)
 
 ### Community 64 - "Tutor de matemáticas · SI4006"
 Cohesion: 0.50
@@ -481,7 +481,7 @@ Nodes (3): Arquitectura real de M5, Decisiones que el diagrama hace explícitas,
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Refinamiento del tutor antes de M5` connect `Refinamiento del tutor antes de M5` to `3 · Cambios realizados y por qué`, `REFINAMIENTO_TUTOR_M5.md`, `Tutor`, `1 · Resultados de M1–M4 y sus fuentes`, `2 · Análisis de errores · exploratorio`, `integral_definida`?**
+- **Why does `Refinamiento del tutor antes de M5` connect `Refinamiento del tutor antes de M5` to `3 · Cambios realizados y por qué`, `REFINAMIENTO_TUTOR_M5.md`, `integral_definida`, `Tutor`, `1 · Resultados de M1–M4 y sus fuentes`, `2 · Análisis de errores · exploratorio`?**
   _High betweenness centrality (0.045) - this node is a cross-community bridge._
 - **What connects `Análisis de tokenizadores (BPE, WordPiece, SentencePiece)`, `Dominio: tutor de matemáticas para secundaria (9°-11°)`, `Métricas de generación (exactitud, formato_valido, rouge_l, long_media)` to the rest of the system?**
   _25 weakly-connected nodes found - possible documentation gaps or missing edges._

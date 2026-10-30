@@ -441,7 +441,9 @@ def hojas(casos: list) -> str:
 
 def csv_entrega(casos: list) -> str:
     buf = io.StringIO()
-    w = csv.writer(buf)
+    # El CSV se versiona y se valida con `git diff --check`: fijar LF evita que
+    # `csv.writer` introduzca CRLF aunque la generación ocurra en otro entorno.
+    w = csv.writer(buf, lineterminator="\n")
     w.writerow(["id", "bloque", "pregunta", "imagen_nitida", "imagen_borrosa",
                 "criterio", "esperado", "paso_error", "transcripcion_referencia",
                 "valor_final_escrito", "valor_correcto", "claves", "prohibido"])
