@@ -1309,3 +1309,100 @@ def test_el_prefijo_paso_n_no_entra_en_la_cuenta():
                          "Paso 3: Respuesta final: 302"]).paso == 2
     assert revisar_hoja(["Paso 1: 24 × 13.", "Paso 2: 24 × 13 = 312.",
                          "Paso 3: Respuesta final: 312"]).tipo == "ninguno"
+
+
+# ==========================================================================
+# 11 · Por qué la salvaguarda no marcó `vis-10` el 25-10, y la señal 4 con UNA
+#      sola foto (revisión M4)
+# ==========================================================================
+
+from vision import (  # noqa: E402
+    LLAVES_LECTURA_VIGENTE,
+    confianza_atipica_frente_a,
+    lectura_vigente,
+    referencia_de_confianza,
+    revisar_foto,
+)
+
+
+def test_la_cache_entregada_es_de_un_esquema_anterior_y_no_se_reusa():
+    """`m4/lecturas_m4.json` trae `consistente` pero no las señales 3 y 4: con el
+    criterio anterior (`"consistente" in previa`) se reusaba y la salvaguarda
+    quedaba ciega en 8 de 11 fotos."""
+    cache = json.loads((RAIZ / "m4" / "lecturas_m4.json").read_text(encoding="utf-8"))
+    assert all("consistente" in v for v in cache.values())
+    assert not any(lectura_vigente(v) for v in cache.values())
+
+
+def test_una_lectura_con_las_cuatro_senales_si_se_reusa():
+    lec = {k: None for k in LLAVES_LECTURA_VIGENTE}
+    assert lectura_vigente(lec) is True
+    assert lectura_vigente(None) is False
+
+
+def test_con_tres_confianzas_la_senal_4_no_decide():
+    """Lo que pasó el 25-10: solo las 3 fotos del piloto tenían confianza."""
+    assert atipicos_por_mad({"vis-01": -0.004, "vis-07": -0.0003, "vis-10": -0.101}) == set()
+
+
+# Confianzas de lecturas reales (Qwen2-VL-2B, Apple MPS fp16) de las 10 fotos
+# legibles del eval set. Solo sirven para probar la mecánica: la referencia de
+# verdad se construye con fotos que NO son del eval set.
+_CONF_LEGIBLES = [-0.0043, -0.0161, -0.0270, -0.0131, -0.0092, -0.0357,
+                  -0.0003, -0.0020, -0.0025, -0.0034]
+
+
+def test_la_referencia_exige_al_menos_cuatro_fotos():
+    with pytest.raises(ValueError):
+        referencia_de_confianza([-0.01, -0.02, None])
+
+
+def test_la_foto_movida_cae_bajo_el_umbral_de_la_referencia():
+    ref = referencia_de_confianza(_CONF_LEGIBLES)
+    assert confianza_atipica_frente_a(-0.101, ref) is True
+    assert confianza_atipica_frente_a(-0.0043, ref) is False
+
+
+def test_sin_valor_o_con_mad_nula_la_senal_4_no_se_dispara():
+    assert confianza_atipica_frente_a(None, referencia_de_confianza(_CONF_LEGIBLES)) is None
+    assert confianza_atipica_frente_a(-0.5, referencia_de_confianza([-0.01] * 5)) is None
+    assert confianza_atipica_frente_a(-0.5, None) is None
+
+
+def _lectura(conf, legible=True, consistente=True):
+    return {"ok": True, "consistente": consistente, "legible_declarada": legible,
+            "confianza_numeros": conf,
+            "json": {"pasos": ["24 x 13", "24 x 13 = 306"], "respuesta_final": "306"}}
+
+
+def test_revisar_foto_no_diagnostica_una_lectura_no_fiable():
+    """`vis-10`: el VLM dice que se lee y lo lee igual dos veces; solo la señal 4,
+    contra una referencia, la detiene. El tutor no llega a ver el invento."""
+    llamadas = []
+    r = revisar_foto("img", "¿en qué paso me equivoqué?",
+                     leer=lambda img, a: _lectura(-0.101),
+                     diagnosticar=lambda p, l: llamadas.append(p) or "Diagnóstico: paso 1",
+                     referencia=referencia_de_confianza(_CONF_LEGIBLES), archivo="vis-10.jpg")
+    assert r["estado"] == "no_pude_leer" and r["diagnostico"] == "ilegible"
+    assert r["senal_4"] == "atípica" and llamadas == []
+    assert "No pude leer tu hoja" in r["respuesta"]
+
+
+def test_revisar_foto_sin_referencia_deja_pasar_la_foto_movida_y_lo_dice():
+    r = revisar_foto("img", "p", leer=lambda img, a: _lectura(-0.101),
+                     diagnosticar=lambda p, l: "Diagnóstico: sin error")
+    assert r["estado"] == "diagnostico" and r["senal_4"] == "sin referencia"
+
+
+def test_revisar_foto_diagnostica_una_lectura_fiable():
+    r = revisar_foto("img", "p", leer=lambda img, a: _lectura(-0.004),
+                     diagnosticar=lambda p, l: "Explicación.\nDiagnóstico: paso 2",
+                     referencia=referencia_de_confianza(_CONF_LEGIBLES))
+    assert r["estado"] == "diagnostico" and r["diagnostico"] == "paso 2"
+    assert r["lectura"][-1] == "Respuesta final: 306"
+
+
+def test_revisar_foto_respeta_las_otras_senales():
+    r = revisar_foto("img", "p", leer=lambda img, a: _lectura(-0.004, legible=False),
+                     diagnosticar=lambda p, l: "Diagnóstico: paso 2")
+    assert r["estado"] == "no_pude_leer"
