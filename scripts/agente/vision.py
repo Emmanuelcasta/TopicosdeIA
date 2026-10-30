@@ -184,14 +184,39 @@ def numeros_de(texto: str) -> list:
 
 
 def huella_lectura(lectura) -> tuple:
-    """Lo que tiene que coincidir entre dos lecturas de la MISMA foto: cuántos
-    pasos y qué números. La redacción puede variar; los números, no."""
+    """Huella conservadora para comparar dos lecturas de la MISMA foto.
+
+    No basta con que ambas salidas contengan los mismos números: también deben
+    describir la misma estructura y los mismos pasos. La comparación normaliza
+    mayúsculas, tildes y espacios para no detenerse por formato, pero una
+    diferencia de contenido se trata como ambigüedad. Ante la duda se pide otra
+    foto o se deja que el estudiante escriba el procedimiento.
+    """
     js = (lectura or {}).get("json") or {}
+    if not isinstance(js, dict):
+        return ("json_no_objeto",)
     if js.get("ilegible"):
         return ("ilegible",)
-    pasos = js.get("pasos") or []
+    pasos = js.get("pasos")
+    if not isinstance(pasos, list):
+        return ("estructura_invalida", tuple(sorted(map(str, js))))
+
+    def normalizar_paso(texto) -> str:
+        # Qwen puede alternar entre × y x, o entre espacios simples y dobles,
+        # sin que eso cambie lo que leyó de la hoja.
+        return " ".join(_norm(str(texto)).replace("×", "x").split())
+
+    estructura = (
+        "enunciado" in js,
+        "pasos" in js,
+        "respuesta_final" in js,
+        len(pasos),
+    )
+    pasos_normalizados = tuple(normalizar_paso(paso) for paso in pasos)
+    respuesta_final = normalizar_paso(js.get("respuesta_final", ""))
     texto = " ".join(map(str, pasos)) + " " + str(js.get("respuesta_final", ""))
-    return (len(pasos), tuple(numeros_de(texto)))
+    return ("procedimiento", estructura, pasos_normalizados, respuesta_final,
+            tuple(numeros_de(texto)))
 
 
 def lecturas_consistentes(a, b) -> bool:
@@ -205,7 +230,8 @@ def lecturas_consistentes(a, b) -> bool:
     y por eso es estable.
 
     Se conserva porque es barata y sí caza las lecturas inestables, pero ya no se
-    usa como única defensa.
+    usa como única defensa. La huella exige coincidencia de estructura, pasos y
+    números; no concede fiabilidad por una coincidencia parcial.
     """
     return huella_lectura(a) == huella_lectura(b)
 
@@ -258,15 +284,14 @@ def lectura_no_fiable(lectura) -> tuple:
 
       1. la transcripción no salió estructurada;
       2. el propio VLM declaró la hoja ilegible al transcribir;
-      3. preguntado **aparte** si la hoja se lee —sin transcribir, otra pregunta y
-         otro encuadre, para no arrastrar el prior de la transcripción—, dijo que
-         no (`legible_declarada = False`);
-      4. la confianza del modelo en los **números** que transcribió es atípica
-         frente a las demás fotos del conjunto (`confianza_atipica`). Un número
-         leído de una cifra nítida sale con más confianza que uno rellenado.
+      3. si el llamador hizo una pregunta separada de legibilidad y el modelo dijo
+         que no (`legible_declarada = False`);
+      4. si una evaluación por lote, con conjunto de calibración separado, marcó
+         la confianza en los números como atípica (`confianza_atipica`).
 
     La señal de consistencia entre dos generaciones queda como quinta, degradada:
-    sirve, pero no se le confía la decisión.
+    sirve, pero no se le confía la decisión. Esta función no fabrica las señales
+    opcionales 3 y 4: la ruta que no las mida debe documentarlo.
 
     Nunca acredita un caso: una lectura no fiable no vuelve correcta ninguna
     respuesta, solo evita juzgar al tutor sobre un invento del VLM.
@@ -574,6 +599,21 @@ INSTRUCCION_VER = (
     'devuelve {"ilegible": true, "motivo": "..."}.'
 )
 
+# No reutiliza el texto de la primera generación: es otra llamada del VLM y otro
+# encuadre verbal. Las dos salidas se comparan antes de ofrecer una transcripción
+# al estudiante. Su acuerdo no certifica que sea verdadera —`vis-10` mostró una
+# invención estable—, por eso la confirmación editable sigue siendo obligatoria.
+INSTRUCCION_VER_INDEPENDIENTE = (
+    "Haz una segunda lectura independiente de esta hoja, como si fuera la primera "
+    "vez que la ves. Transcribe EXACTAMENTE lo escrito a mano; no arregles ninguna "
+    "cuenta ni completes números poco claros.\n"
+    "Devuelve SOLO un JSON con esta forma:\n"
+    '{"enunciado": "...", "pasos": ["...", "..."], "respuesta_final": "..."}\n'
+    "Un elemento de `pasos` por cada línea escrita. Si no puedes leerla con "
+    "claridad, o no hay un procedimiento matemático, devuelve "
+    '{"ilegible": true, "motivo": "..."}.'
+)
+
 # El formato de salida, y la evidencia que lo decidió.
 #
 # En las once respuestas completas de la corrida del 22-10, OCHO terminan
@@ -667,6 +707,44 @@ def prompt_revision(pregunta: str, lectura) -> str:
     return (f"{INSTRUCCION_REVISION}\n\n{EJEMPLO_REVISION}\n\n"
             f"Ahora la hoja de verdad.\n{pasos_como_texto(lectura)}\n\n"
             f"Pregunta del estudiante: {pregunta}\n\n{RECORDATORIO_FORMATO}")
+
+
+def texto_de_pasos(enunciado: str | None, pasos) -> str:
+    """Los pasos ya confirmados, numerados aquí y no por quien los escribió.
+
+    Misma convención que `pasos_como_texto`, para que «Paso 2» signifique lo
+    mismo en los dos caminos: el de la lectura automática y el de la lectura que
+    el estudiante corrigió a mano.
+    """
+    lineas = [f"Enunciado: {enunciado or '(no transcrito)'}"]
+    lineas += [f"Paso {i}: {p}" for i, p in enumerate(pasos, 1)]
+    return "\n".join(lineas)
+
+
+def prompt_revision_confirmada(pregunta: str, enunciado, pasos,
+                               evidencia: str | None = None) -> str:
+    """El prompt de revisión sobre pasos que el estudiante ya confirmó.
+
+    Dos diferencias con `prompt_revision`, y las dos son del producto, no del
+    modelo:
+
+    1. Los pasos vienen confirmados o corregidos por el estudiante, así que no
+       hay que advertir de que la transcripción pueda ser inventada.
+    2. Si el verificador aritmético encontró una igualdad que no cuadra, se pasa
+       como **evidencia**, no como veredicto. El verificador dice «3 × 24 = 82 no
+       se cumple»; cuál es el paso que hay que señalar y cómo explicarlo sigue
+       siendo trabajo del tutor. Entregarle el veredicto hecho convertiría la
+       explicación en una justificación de algo ya decidido.
+    """
+    partes = [INSTRUCCION_REVISION, EJEMPLO_REVISION,
+              "La hoja, tal como el estudiante la confirmó:",
+              texto_de_pasos(enunciado, pasos)]
+    if evidencia:
+        partes.append(
+            "Comprobación aritmética automática (es una observación, NO el "
+            f"veredicto; decide tú qué paso señalar):\n{evidencia}")
+    partes += [f"Pregunta del estudiante: {pregunta}", RECORDATORIO_FORMATO]
+    return "\n\n".join(partes)
 
 
 def asegurar_diagnostico(respuesta: str, reintentar) -> tuple:

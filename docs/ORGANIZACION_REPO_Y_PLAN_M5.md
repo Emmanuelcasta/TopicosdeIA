@@ -1,6 +1,7 @@
 # Organización del repositorio y preparación de M5
 
-Fecha: 29-10-2026 · Sin commits, sin push, sin merge a `main`.
+Fecha: 29-10-2026 · **Hay commits locales** (ver §3.2). Sin push, sin merge a
+`main`, sin Space publicado.
 
 Este documento describe el estado **real y verificado** del repositorio tras la
 reorganización. Cada afirmación está respaldada por una comprobación que se
@@ -25,9 +26,18 @@ ProyectoIA/
 ├── scripts/               generadores, fuentes de datos y el núcleo del agente
 ├── adaptadores/           pesos LoRA · FUERA de Git (.gitignore)
 ├── graphify-out/          grafo de conocimiento (caché generada)
-├── ProyectoIA-m4vision/   worktree de la rama m4-vision · excluido localmente
-└── ProyectoIA-integracion/ worktree de integracion-m5 · excluido localmente
+└── M5_despliegue/         aplicación, medición, documentación y pruebas
+
+../ProyectoIA-m4vision/    worktree de m4-vision · FUERA de la carpeta principal
 ```
+
+**La carpeta principal está en `integracion-m5`.** Ya no hay una segunda copia
+del proyecto dentro de ella: el worktree de integración se retiró tras registrar
+su trabajo, y el de M4 se **movió** —no se borró— a `../ProyectoIA-m4vision`,
+como copia de seguridad viva.
+
+`ProyectoIA_artefactos_m1/` (421 MB de modelos y corridas de W&B) sigue dentro de
+la carpeta pero **git lo ignora**, así que no entra en ningún commit.
 
 **Criterio de ubicación**, en orden de prioridad:
 
@@ -131,7 +141,19 @@ materiales de clase.
 | `m4-vision` | `9c0c0df` | sincronizado 0/0 | **M4 completo**: 73 archivos en `m4/` |
 | **`integracion-m5`** | `8f02818` | nueva, local | los cuatro historiales anteriores |
 
-### 3.2 · Cómo se integró
+### 3.2 · Commits locales creados
+
+Tres, ninguno publicado:
+
+| Commit | Qué |
+|---|---|
+| `748a00a` | merge de `mejora-nucleo` en `integracion-m5` |
+| `8f02818` | merge de `m4-vision` en `integracion-m5` |
+| `547a2db` | el informe y `scripts/empaquetar_entrega.py` |
+
+`integracion-m5` está 8 commits por delante de `origin/main`.
+
+### 3.3 · Cómo se integró
 
 Antes de integrar se simularon las tres fusiones con `git merge-tree`, que **no
 escribe nada**: ninguna presentaba conflictos. La integración se hizo en un
@@ -147,7 +169,7 @@ integracion-m5  (desde origin/main c91ed6e)
 Comprobado con `git merge-base --is-ancestor` que los cuatro están contenidos:
 `origin/main`, `main`, `mejora-nucleo` y `m4-vision`.
 
-### 3.3 · Qué llegó, verificado archivo a archivo
+### 3.4 · Qué llegó, verificado archivo a archivo
 
 - **M4**: 73 archivos — 4 notebooks ejecutados, 16 archivos en 3 corridas
   archivadas, 9 CSV de desarrollo, 11 fotos, 19 imágenes de calibración,
@@ -157,7 +179,7 @@ Comprobado con `git merge-base --is-ancestor` que los cuatro están contenidos:
 - **M4 en scripts**: `vision.py`, `verificador_aritmetico.py`, `nb_m4.py`,
   `nb_m4_diagnostico.py`, `data/trayectorias_diagnostico.jsonl`.
 
-### 3.4 · Riesgos de las ramas
+### 3.5 · Riesgos de las ramas
 
 1. **`mejora-nucleo` no tiene remoto.** El verificador, el enrutador y el banco de
    errores **solo existen en este disco**. Es lo más frágil del repositorio.
@@ -166,27 +188,57 @@ Comprobado con `git merge-base --is-ancestor` que los cuatro están contenidos:
 
 ---
 
-## 4 · Arquitectura de M5 · pendiente de construir
+## 4 · M5 · implementado, sin medir
 
-Lo planificado, **todavía no implementado**:
+*Revisado el 30-10-2026. Lo que decía esta sección el 29-10 era correcto sobre la
+estructura y falso sobre lo que la app servía: ver «La configuración se elige».*
 
 ```
 M5_despliegue/
-├── app/          app.py (Gradio), tutor.py (adaptador al pipeline real),
-│                 health.py, registro.py
-├── config/       requirements.txt fijado, README del Space, .env.example
-├── evaluacion/   medir_eficiencia.py (fp16 vs int4), eval set propio
-├── resultados/   scorecards cuando se ejecuten
-├── docs/         GUION_DEMO.md, DESPLIEGUE.md
-└── tests/        pruebas sin GPU, con dependencias simuladas
+├── app/configuraciones.py  las 9 configuraciones y su resultado medido
+├── app/pipeline.py     monta el tutor reutilizando scripts/agente/
+├── app/app.py          Gradio: pestaña de texto, de imagen y de estado
+├── app/salud.py        health check que no fuerza la carga del modelo
+├── app/telemetria.py   registro estructurado, W&B opcional
+├── config/             requirements fijados, README del Space, .env.example
+├── evaluacion/         verificar_retrieval.py (sin GPU) · ablaciones.py ·
+│                       medir_eficiencia.py
+├── docs/               DESPLIEGUE.md · GUION_DEMO.md
+└── tests/              28 pruebas sin GPU
 ```
 
-La aplicación debe **reutilizar** `scripts/agente/` (enrutador, herramientas,
-núcleo, verificador, visión), no duplicar la lógica del tutor. El notebook S15 es
-una plantilla didáctica: sus casos de café, el evaluador que devuelve `NaN` y la
-respuesta `[SUSTITUTO]` **no** se copian como funcionalidad.
+**La configuración se elige, no se adivina.** `TUTOR_CONFIG` decide qué se sirve;
+por omisión `s08d` (18/21). La primera versión de `pipeline.py` montaba el prompt
+del agente, búsqueda léxica y `qwen-lora-agente` **si estaba en el disco**: una
+variante de C5, 12/21, con el nombre de la mejor medida. Las ocho configuraciones
+están declaradas con su cifra de respaldo, o con que no la hay.
 
----
+**Y se comprueba.** `evaluacion/verificar_retrieval.py` monta el retrieval y el
+enrutador sin cargar el LLM y los compara contra lo que el notebook dejó en
+`m3_rag_avanzado.json`: pesos, leave-one-out y las 21 rutas coinciden. Así se
+encontraron tres discrepancias —falta del cross-encoder, `rerank_max=None` y
+embeddings sin normalizar— que dejaban la validación en 0,939 en vez de 0,970.
+
+**No duplica la lógica del tutor.** `pipeline.py` importa `registro`,
+`herramientas`, `nucleo`, `documentos`, `prompts`, `enrutador`, `vision` y
+`verificador_aritmetico`; el corpus se obtiene ejecutando su fuente canónica en
+`nb_comun_rag`, igual que hace `trayectorias_fuente.py`. Dos pruebas lo vigilan.
+
+**Degrada en lugar de caerse.** El montaje va por capas y cada fallo se anota:
+la interfaz muestra *"Tutor NO disponible: modelo: falta torch"* en vez de
+reventar. El retrieval tiene un repliegue léxico que funciona sin embeddings.
+
+**Privacidad.** No se registra el texto del usuario por defecto —solo longitud y
+hash—; W&B se apaga limpio si falta la credencial. Con pruebas.
+
+**Un detalle que salió en las pruebas:** el módulo de telemetría se llamaba
+`registro.py` y ensombrecía a `scripts/agente/registro.py`, el Tool Registry.
+Renombrado a `telemetria.py`.
+
+**Lo que NO existe:** Space publicado, URL, corrida de los 21 casos en este
+entorno, medición de eficiencia ejecutada y telemetría recogida. El guion de demo
+los marca `[PENDIENTE]` y no los inventa. El 18/21 es una cifra de S08, no una
+medición de M5: lo comprobado es que M5 monta esa configuración.
 
 ## 5 · Cambios realizados
 
@@ -201,7 +253,11 @@ respuesta `[SUSTITUTO]` **no** se copian como funcionalidad.
 | `M4_vision/` | retirado a la Papelera tras verificar duplicación |
 | `scripts/empaquetar_entrega.py` | nuevo: verifica y regenera la entrega de M3 |
 | `docs/ORGANIZACION_REPO_Y_PLAN_M5.md` | este documento |
-| rama `integracion-m5` | nueva, con los cuatro historiales |
+| `M5_despliegue/` | nuevo; revisado el 30-10: `app/configuraciones.py`, `evaluacion/verificar_retrieval.py`, `evaluacion/ablaciones.py` |
+| `scripts/agente/herramientas.py` | 3 herramientas de cálculo con topes, ambigüedad y rechazo de divergentes |
+| `scripts/taxonomia_errores.py` | reescrito: etiquetado exploratorio, una etiqueta principal por caso |
+| `docs/REFINAMIENTO_TUTOR_M5.md` | revisado el 30-10 con las seis correcciones |
+| rama `integracion-m5` | nueva, con los cuatro historiales · **activa en la carpeta principal** |
 
 ---
 
@@ -211,7 +267,11 @@ respuesta `[SUSTITUTO]` **no** se copian como funcionalidad.
 
 | Verificación | Resultado |
 |---|---|
-| `pytest scripts/tests` en `integracion-m5` | **258 pasan** |
+| `pytest scripts/tests` en `integracion-m5` | **306 pasan** |
+| `pytest M5_despliegue/tests` | **54 pasan** (sin GPU) |
+| Ambas suites en el entorno fijado de `config/requirements.txt` (Python 3.9) | **360 pasan** |
+| `evaluacion/verificar_retrieval.py` | **reproduce S08-D**: pesos, leave-one-out y 21/21 rutas |
+| Búsqueda de secretos en `M5_despliegue/` y `docs/` | ninguno |
 | Rutas de datos e imágenes | las 6 comprobadas existen |
 | Generador de notebooks | 14 registrados, 0 destinos inexistentes |
 | Guarda anti-sobrescritura | protege 5 notebooks con salidas |
@@ -225,8 +285,12 @@ respuesta `[SUSTITUTO]` **no** se copian como funcionalidad.
 - la publicación del Space y la telemetría.
 
 **Lo que M4 dejó, sin adornos.** Ninguna configuración mejoró la exactitud:
-3/9, 2/9 y 2/9 sobre 9 casos de desarrollo. **Los 12 casos de evaluación siguen
-sin gastarse.** El detalle está en `m4/README.md` y `m4/CONCLUSIONES_M4.md`.
+3/9, 2/9 y 2/9 sobre 9 casos de desarrollo. **Los 12 casos visuales ya se
+gastaron**: tres corridas exploratorias dieron 4/12, 1/12 y 2/12, y la de 4/12
+repitió «Paso 2» en las 11 respuestas con conclusión —un sistema que contestara
+siempre «Paso 2» habría acertado lo mismo—. Son evidencia histórica y conjunto de
+regresión, no un holdout ciego. El detalle está en `m4/README.md` y
+`m4/CONCLUSIONES_M4.md`, que ya lo decían; lo que estaba mal era este informe.
 
 ---
 

@@ -1,12 +1,6 @@
 {
   "0": "Notebook Generation",
-  "3": "M1 Architecture Comparison",
-  "4": "Math Tools Library",
   "5": "M2/M3 RAG & Agent Findings",
   "6": "Evaluation Scoreboard",
-  "9": "Trajectory Generation",
-  "10": "RAG-as-Tool & Agent Nucleus",
-  "11": "Tool Registry",
-  "13": "Tool Decorator & Schemas",
   "14": "System Prompts"
 }

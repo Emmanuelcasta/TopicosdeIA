@@ -1,0 +1,26 @@
+# Dependencias del Space. Versiones fijadas: una demo que se rompe porque una
+# librería cambió de API el martes no es una demo.
+gradio==4.44.1
+torch==2.4.1
+transformers==4.45.2
+peft==0.13.2
+accelerate==0.34.2
+sympy==1.13.3
+
+# Retrieval de S08. NO son opcionales para la configuración por defecto: sin
+# ellas `pipeline.py` se repliega a búsqueda léxica y lo que se sirve ya no es
+# la S08-D que midió 18/21. El cross-encoder hace falta dos veces: para el
+# reranking de S08-C y para el tercer rasgo del enrutador.
+sentence-transformers==3.1.1
+rank-bm25==0.2.2
+scikit-learn==1.5.2
+pillow==10.4.0
+numpy==1.26.4
+
+# Cuantización int4. Solo hay ruedas para Linux: en macOS `pip install -r` falla
+# entero sin el marcador, y el Space (Linux + CUDA) es donde se usa. En CPU no
+# hace nada: la app arranca igual y lo dice.
+bitsandbytes==0.44.1 ; sys_platform == "linux"
+
+# Telemetría OPCIONAL. Sin WANDB_API_KEY la app funciona y lo registra una vez.
+wandb==0.18.5

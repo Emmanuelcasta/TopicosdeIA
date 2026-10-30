@@ -1,0 +1,16 @@
+{
+  "experimento": "E2 (parcial)",
+  "que_es": "comprobación de REPRODUCCIÓN del enrutador y el retrieval. NO es una medición de exactitud del tutor",
+  "codigo_salida": 0,
+  "reproduce": true,
+  "segundos": 25.2,
+  "salida": [
+    "",
+    "ruta de cada caso del eval set fijo de M2",
+    "  21 de 21 coinciden con la referencia",
+    "",
+    "Reproduce el enrutador de S08-D: pesos, leave-one-out y las 21 rutas coinciden con m3_rag_avanzado.json.",
+    "-> M5_despliegue/evaluacion/verificacion_retrieval.json"
+  ],
+  "pendiente": "el recall de la clave de oro y la exactitud del tutor necesitan GPU"
+}

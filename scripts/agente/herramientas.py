@@ -69,6 +69,13 @@ def formatear(q: Fraction, preferir_fraccion: bool = False) -> dict:
 
 _PERMITIDOS = re.compile(r"^[0-9a-z_+\-*/().,\s=]*$")
 _IDENTIFICADORES_OK = {"x", "y", "z", "a", "b", "c", "n", "m", "t", "sqrt", "pi"}
+
+# Topes. No son estéticos: `integrate` sobre una expresión suficientemente
+# grande, o `diff` de x**10**9, bloquean el proceso sin devolver nada, y una
+# demo colgada es peor que una herramienta que dice que no puede.
+MAX_EXPRESION = 200        # caracteres del texto de entrada
+MAX_OPERACIONES = 40       # sympy.count_ops del árbol ya parseado
+MAX_EXPONENTE = 50         # |exponente| entero
 _SUPERINDICES = {"²": "**2", "³": "**3", "⁴": "**4", "⁵": "**5"}
 
 
@@ -97,6 +104,10 @@ def parsear(texto: str, x_es_por: bool = False):
     from sympy.parsing.sympy_parser import (
         convert_xor, implicit_multiplication_application, parse_expr, standard_transformations,
     )
+    if len(texto or "") > MAX_EXPRESION:
+        raise ErrorHerramienta(
+            f"la expresión tiene {len(texto)} caracteres y el tope es "
+            f"{MAX_EXPRESION}: pásala por partes")
     t = normalizar_expresion(texto, x_es_por=x_es_por)
     if not _PERMITIDOS.match(t) or "__" in t:
         raise ErrorHerramienta(f"la expresión contiene símbolos no permitidos: {texto!r}")
@@ -394,3 +405,132 @@ def operar_expresion(expresion: str,
                  "factorizar": sympy.factor}[operacion](expr)
     texto = sympy.sstr(resultado).replace("**", "^").replace("*", "")
     return {"resultado": texto, "valor": texto}
+
+
+# --------------------------------------------------------------------------
+# CÁLCULO · derivadas e integrales
+#
+# Por qué se añaden ahora. La auditoría de temas de M5 encontró que el tutor no
+# tenía NADA para cálculo: cero herramientas, cero casos en el corpus de M1, cero
+# en los eval sets. Sin herramienta, el modelo de 1.5B contesta igualmente —y eso
+# es lo peligroso: genera una derivada plausible sin forma de comprobarla.
+#
+# Es la mejora de menor coste que había disponible: SymPy ya es dependencia y
+# `parsear()` ya lo usa con lista blanca de símbolos. Son deterministas y
+# verificables, así que no hace falta entrenar nada para cubrir el tema.
+# --------------------------------------------------------------------------
+
+def _variable(nombre: str):
+    """El símbolo de SymPy, con la misma lista blanca que `parsear`."""
+    import sympy
+
+    if nombre not in _IDENTIFICADORES_OK or nombre in ("sqrt", "pi"):
+        raise ErrorHerramienta(f"variable no permitida: {nombre!r}")
+    return sympy.Symbol(nombre)
+
+
+def _tratable(expr) -> None:
+    """Rechaza lo que SymPy podría no terminar de calcular. Lanza o calla."""
+    import sympy
+
+    ops = sympy.count_ops(expr)
+    if ops > MAX_OPERACIONES:
+        raise ErrorHerramienta(
+            f"la expresión tiene {ops} operaciones y el tope es {MAX_OPERACIONES}: "
+            "divídela en partes más simples")
+    for potencia in expr.atoms(sympy.Pow):
+        e = potencia.exp
+        if e.is_Integer and abs(int(e)) > MAX_EXPONENTE:
+            raise ErrorHerramienta(
+                f"el exponente {e} pasa del tope {MAX_EXPONENTE}: no puedo "
+                "derivar ni integrar algo así de forma útil")
+
+
+def _variable_de(expr, nombre: str):
+    """La variable respecto a la que se opera, o una petición de aclaración.
+
+    Con `3*x**2` sobra decirlo. Con `a*x**2 + b` hay dos lecturas razonables y
+    elegir `x` en silencio es inventar la pregunta del estudiante: el tutor debe
+    preguntar. Por eso el valor por omisión es vacío y no `"x"`.
+    """
+    if nombre:
+        return _variable(nombre)
+    libres = sorted(str(s) for s in expr.free_symbols)
+    if not libres:
+        return _variable("x")          # una constante: la respuesta no depende de cuál
+    if len(libres) == 1:
+        return _variable(libres[0])
+    raise ErrorHerramienta(
+        f"la expresión tiene varias variables ({', '.join(libres)}) y no dijiste "
+        "respecto a cuál operar. Pregúntale al estudiante y repite indicando "
+        "`variable`.")
+
+
+@REGISTRO.herramienta(familia="calculo")
+def derivar(expresion: str, variable: str = "") -> dict:
+    """Deriva una expresión respecto a una variable. Resultado exacto, no numérico.
+
+    Args:
+        expresion: la función a derivar, por ejemplo '3*x**2 + 5*x - 2'.
+        variable: respecto a qué se deriva. Si la expresión tiene más de una
+            variable hay que indicarla; con una sola se deduce.
+    """
+    import sympy
+
+    expr = parsear(expresion, x_es_por=False)
+    _tratable(expr)
+    v = _variable_de(expr, variable)
+    derivada = sympy.simplify(sympy.diff(expr, v))
+    return {"resultado": f"d/d{v} ({sympy.sstr(expr)}) = {sympy.sstr(derivada)}",
+            "valor": sympy.sstr(derivada)}
+
+
+@REGISTRO.herramienta(familia="calculo")
+def integrar(expresion: str, variable: str = "") -> dict:
+    """Calcula la primitiva (integral indefinida) de una expresión.
+
+    Args:
+        expresion: la función a integrar, por ejemplo '2*x + 1'.
+        variable: respecto a qué se integra. Si la expresión tiene más de una
+            variable hay que indicarla; con una sola se deduce.
+    """
+    import sympy
+
+    expr = parsear(expresion, x_es_por=False)
+    _tratable(expr)
+    v = _variable_de(expr, variable)
+    primitiva = sympy.simplify(sympy.integrate(expr, v))
+    if primitiva.has(sympy.Integral):
+        raise ErrorHerramienta("no sé resolver esa integral de forma exacta")
+    return {"resultado": f"∫ ({sympy.sstr(expr)}) d{v} = "
+                         f"{sympy.sstr(primitiva)} + C",
+            "valor": sympy.sstr(primitiva)}
+
+
+@REGISTRO.herramienta(familia="calculo")
+def integral_definida(expresion: str, desde: float, hasta: float,
+                      variable: str = "x") -> dict:
+    """Calcula una integral definida entre dos límites. Resultado exacto.
+
+    Args:
+        expresion: la función a integrar, por ejemplo 'x**2'.
+        desde: límite inferior.
+        hasta: límite superior.
+        variable: respecto a qué se integra. Con una sola variable se deduce.
+    """
+    import sympy
+
+    expr = parsear(expresion, x_es_por=False)
+    _tratable(expr)
+    v = _variable_de(expr, variable)
+    a, b = sympy.Rational(str(desde)), sympy.Rational(str(hasta))
+    valor = sympy.integrate(expr, (v, a, b))
+    # Una integral impropia divergente no es un número: SymPy devuelve ±oo, zoo
+    # o una `Integral` sin resolver. Ninguno de esos tres es una respuesta, y
+    # darlos como tal sería exactamente la alucinación que esto previene.
+    if (valor.has(sympy.Integral) or valor.has(sympy.zoo, sympy.nan)
+            or valor in (sympy.oo, -sympy.oo) or not valor.is_finite):
+        raise ErrorHerramienta(
+            f"la integral de {sympy.sstr(expr)} entre {a} y {b} no converge "
+            "(o no tiene forma exacta): no hay un número que dar")
+    return _sympy_a_salida(sympy.simplify(valor))

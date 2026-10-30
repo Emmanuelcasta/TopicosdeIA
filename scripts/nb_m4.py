@@ -973,6 +973,10 @@ print("\nGuardado: m4/delta_m3_m4.csv")
 CODIGO_ARTEFACTOS = r'''
 json.dump({
     "patron": "input",
+    # El entorno queda dentro del resultado. Sin esto, dos corridas con cifras
+    # distintas no se pueden atribuir ni al modelo ni a las librerías, que es
+    # exactamente lo que pasó con `transformers>=4.45`.
+    "entorno": ENTORNO,
     "vlm": VLM_ID,
     "max_pixels": MAX_PIXELS,
     "lado_mayor_px": LADO_MAYOR,
@@ -1088,12 +1092,42 @@ leer las fotos, que es la parte lenta.
 > modelos grandes, pero **en momentos distintos**: la celda de liberación que va
 > entre ellos no es opcional, y con menos de 14 GB es imprescindible.
 """))
+    c.append(md("""
+**Las versiones van fijadas, y no es cosmético.** La corrida que se reportó usó
+`transformers>=4.45`, un rango sin tope: dos ejecuciones en días distintos podían
+traer librerías distintas y producir transcripciones distintas sin que nada lo
+advirtiera. Son las mismas versiones que `M5_despliegue/config/requirements.txt`,
+para que el notebook y el servicio desplegado sean el mismo entorno.
+"""))
     c.append(code('''
-%pip install -q "transformers>=4.45" "peft>=0.12" "accelerate>=0.33" \\
-    sentence-transformers chromadb rank_bm25 "scikit-learn>=1.3" sympy pandas \\
-    pillow qwen-vl-utils
+%pip install -q transformers==4.45.2 peft==0.13.2 accelerate==0.34.2 \\
+    sentence-transformers==3.1.1 rank-bm25==0.2.2 scikit-learn==1.5.2 \\
+    sympy==1.13.3 numpy==1.26.4 pillow==10.4.0 chromadb pandas qwen-vl-utils
 %pip uninstall -y -q torchao
 print("Listo. Si Colab pide reiniciar la sesión, reinícienla y sigan desde aquí.")
+'''))
+    c.append(code('''
+# La OTRA causa: una caché de modelos desactualizada. `ver()` reprodujo las 11
+# transcripciones en otra máquina, lo que descarta el modelo y señala al entorno.
+# Esta celda deja constancia de qué hay en la caché y permite forzar una descarga
+# limpia cuando una corrida no se reproduce.
+import os
+from pathlib import Path
+
+FORZAR_DESCARGA = False   # ponlo en True solo si una corrida no se reproduce
+
+HF_HOME = Path(os.environ.get("HF_HOME", Path.home() / ".cache" / "huggingface"))
+cache = HF_HOME / "hub"
+if FORZAR_DESCARGA and cache.exists():
+    import shutil
+    shutil.rmtree(cache)
+    print(f"Caché borrada: {cache}")
+print(f"Caché de modelos: {cache}  (existe: {cache.exists()})")
+if cache.exists():
+    for d in sorted(cache.glob("models--*")):
+        refs = d / "refs" / "main"
+        rev = refs.read_text().strip()[:12] if refs.exists() else "sin ref"
+        print(f"  {d.name}  revisión {rev}")
 '''))
     c.append(code('''
 import os, random, re
@@ -1108,6 +1142,25 @@ transformers.set_seed(SEMILLA)
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"transformers {transformers.__version__} | torch {torch.__version__} | {DEVICE}")
+
+# Se comprueba, no se confía: `%pip install` puede fallar en silencio si Colab
+# trae una versión incompatible preinstalada, y entonces la corrida no es la que
+# dice ser. Avisa en vez de bloquear, para que una corrida de prueba siga.
+VERSIONES_ESPERADAS = {"transformers": "4.45.2"}
+import importlib.metadata as _md
+ENTORNO = {}
+for _paq in ("transformers", "peft", "accelerate", "torch",
+             "sentence-transformers", "scikit-learn", "sympy", "numpy"):
+    try:
+        ENTORNO[_paq] = _md.version(_paq)
+    except Exception:
+        ENTORNO[_paq] = "ausente"
+for _paq, _esp in VERSIONES_ESPERADAS.items():
+    if ENTORNO.get(_paq) != _esp:
+        print(f"  AVISO: {_paq} {ENTORNO.get(_paq)} en vez de {_esp}. Esta corrida "
+              "NO es comparable con las anteriores; reinicia la sesión y repite "
+              "la celda de instalación.")
+print("Entorno:", " | ".join(f"{k} {v}" for k, v in ENTORNO.items()))
 
 # Sirve CUALQUIER GPU CUDA: T4, G4, L4, A100, RTX… No se comprueba el modelo,
 # solo que haya CUDA, y se imprime el dispositivo detectado. La corrida del 22-10

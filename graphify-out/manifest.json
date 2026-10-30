@@ -108,10 +108,10 @@
     "semantic_hash": "9a728c65092f72e39a37d139109193e6"
   },
   "scripts/agente/herramientas.py": {
-    "mtime": 1789649790.0315225,
-    "seen": 1792629252.081158,
-    "ast_hash": "8a1f4d7dd3a789daf98df223afbfa483",
-    "semantic_hash": "8a1f4d7dd3a789daf98df223afbfa483"
+    "mtime": 1793367164.9171255,
+    "seen": 1793370037.9545548,
+    "ast_hash": "8684458632427427e16eece1cfb1d549",
+    "semantic_hash": ""
   },
   "scripts/agente/metricas.py": {
     "mtime": 1789651385.144516,
@@ -162,10 +162,10 @@
     "semantic_hash": "7585c71ad53581c99259f678f726ed2d"
   },
   "scripts/generar_notebooks.py": {
-    "mtime": 1790553467.5399926,
-    "seen": 1792629252.081162,
-    "ast_hash": "3e8900ff86f62938cef2aff90ab0d74b",
-    "semantic_hash": "3e8900ff86f62938cef2aff90ab0d74b"
+    "mtime": 1793278145.1824343,
+    "seen": 1793278146.284127,
+    "ast_hash": "c044c6c2685e245acaa75c520b707338",
+    "semantic_hash": ""
   },
   "scripts/nb_agente.py": {
     "mtime": 1790442229.2467544,
@@ -342,10 +342,10 @@
     "semantic_hash": "f32baf5b5deec318c275df520b1395d3"
   },
   "README.md": {
-    "mtime": 1790553869.765804,
-    "seen": 1792629252.081173,
-    "ast_hash": "6de248d27744426cdf1b4e8ce65d36ff",
-    "semantic_hash": "6de248d27744426cdf1b4e8ce65d36ff"
+    "mtime": 1793278145.1473992,
+    "seen": 1793278146.284173,
+    "ast_hash": "4aecbd2a17dc1b95671ecc2bc9ff6d1e",
+    "semantic_hash": ""
   },
   "scripts/eval_set_m4_fuente.py": {
     "mtime": 1792629674.8342488,
@@ -354,9 +354,543 @@
     "semantic_hash": ""
   },
   "m4/eval_set/HOJAS_PARA_ESCRIBIR.md": {
-    "mtime": 1792629678.3677332,
-    "seen": 1792632536.313459,
+    "mtime": 1793276674.6945827,
+    "seen": 1793278146.2841809,
     "ast_hash": "0c63e2ec426976c3f108f086867b7e6d",
+    "semantic_hash": ""
+  },
+  "scripts/agente/enrutador.py": {
+    "mtime": 1792633161.0526943,
+    "seen": 1792633391.7930381,
+    "ast_hash": "38b6decb96fe5fe2c11d905549e9c6a3",
+    "semantic_hash": ""
+  },
+  "scripts/agente/verificador.py": {
+    "mtime": 1792633356.4378467,
+    "seen": 1792633391.793042,
+    "ast_hash": "c3d5d5f0b7cba0e3b8987f4aab6d2a19",
+    "semantic_hash": ""
+  },
+  "scripts/banco_errores.py": {
+    "mtime": 1792633208.2903152,
+    "seen": 1792633391.793043,
+    "ast_hash": "0d82d8f2daec91229e69b5f8cad4d617",
+    "semantic_hash": ""
+  },
+  "scripts/evaluar_verificador.py": {
+    "mtime": 1792633005.7673507,
+    "seen": 1792633391.793046,
+    "ast_hash": "a2556398545bdf3dee303d5f349b0d55",
+    "semantic_hash": ""
+  },
+  "scripts/tests/test_mejora_nucleo.py": {
+    "mtime": 1792633297.4727273,
+    "seen": 1792633391.793056,
+    "ast_hash": "298dc8fe20a2e774092a0037e39129d5",
+    "semantic_hash": ""
+  },
+  "M3_rag_agentes/resultados/banco_errores.md": {
+    "mtime": 1792633211.365515,
+    "seen": 1792633391.793061,
+    "ast_hash": "619d197545cc280432e70c14a1cc7ca0",
+    "semantic_hash": ""
+  },
+  "m4/corridas/corrida-01_2026-10-22/lecturas_m4.json": {
+    "mtime": 1793278145.1521027,
+    "seen": 1793278146.2840881,
+    "ast_hash": "eef99574c6d8027e354aa6cd4e2ef4dc",
+    "semantic_hash": ""
+  },
+  "m4/corridas/corrida-01_2026-10-22/resultados_m4.json": {
+    "mtime": 1793278145.1522896,
+    "seen": 1793278146.28409,
+    "ast_hash": "4c29e25324c7f2ccceb23ce309a5a23f",
+    "semantic_hash": ""
+  },
+  "m4/corridas/corrida-03_2026-10-24/lecturas_m4.json": {
+    "mtime": 1793278145.1561155,
+    "seen": 1793278146.284091,
+    "ast_hash": "47710624fd09b32bb72111eb271c1ad8",
+    "semantic_hash": ""
+  },
+  "m4/corridas/corrida-03_2026-10-24/resultados_m4.json": {
+    "mtime": 1793278145.156394,
+    "seen": 1793278146.284092,
+    "ast_hash": "4d1296fa2e47de4ff0752c52f42793f9",
+    "semantic_hash": ""
+  },
+  "m4/eval_set/calibracion/manifiesto.json": {
+    "mtime": 1793278145.1672888,
+    "seen": 1793278146.284093,
+    "ast_hash": "2c30360c1e116014b253f613d936f77d",
+    "semantic_hash": ""
+  },
+  "m4/lecturas_m4.json": {
+    "mtime": 1793278145.173107,
+    "seen": 1793278146.2840939,
+    "ast_hash": "47710624fd09b32bb72111eb271c1ad8",
+    "semantic_hash": ""
+  },
+  "m4/pipeline/celda_medicion_dev_dg.py": {
+    "mtime": 1793278145.1792996,
+    "seen": 1793278146.284095,
+    "ast_hash": "88bed163edfed01631af9cb32f14875c",
+    "semantic_hash": ""
+  },
+  "m4/pipeline/celda_pruebas_A_B_dev_dg.py": {
+    "mtime": 1793278145.179586,
+    "seen": 1793278146.284096,
+    "ast_hash": "5621b6a8f445e14a3abef85bdd900cd0",
+    "semantic_hash": ""
+  },
+  "m4/resultados_m4.json": {
+    "mtime": 1793278145.1796634,
+    "seen": 1793278146.284097,
+    "ast_hash": "4d1296fa2e47de4ff0752c52f42793f9",
+    "semantic_hash": ""
+  },
+  "scripts/agente/verificador_aritmetico.py": {
+    "mtime": 1793278145.180177,
+    "seen": 1793278146.284112,
+    "ast_hash": "791b775ecab0fd5a4d8b9469a3e7a175",
+    "semantic_hash": ""
+  },
+  "scripts/agente/vision.py": {
+    "mtime": 1793380098.2177074,
+    "seen": 1793380108.304202,
+    "ast_hash": "2730209fb377bf762d990f2f8ec557d1",
+    "semantic_hash": ""
+  },
+  "scripts/calibracion_legibilidad_fuente.py": {
+    "mtime": 1793278145.1817603,
+    "seen": 1793278146.284116,
+    "ast_hash": "7ebf79f47475d430194cef7cfd127ae6",
+    "semantic_hash": ""
+  },
+  "scripts/empaquetar_entrega.py": {
+    "mtime": 1793278145.1818662,
+    "seen": 1793278146.2841191,
+    "ast_hash": "f00934420c03b5fe259df7578345597a",
+    "semantic_hash": ""
+  },
+  "scripts/evaluar_verificador_dg.py": {
+    "mtime": 1793278145.1820493,
+    "seen": 1793278146.2841249,
+    "ast_hash": "0db0c65a93c1ae9a1f5f1e77785548e4",
+    "semantic_hash": ""
+  },
+  "scripts/nb_m4.py": {
+    "mtime": 1793371206.3644357,
+    "seen": 1793380108.304214,
+    "ast_hash": "e51f290016f71f06802e7e6dff45ebbe",
+    "semantic_hash": ""
+  },
+  "scripts/nb_m4_datos.py": {
+    "mtime": 1793278145.182927,
+    "seen": 1793278146.284142,
+    "ast_hash": "33805923d780109487034efcd00dfd3d",
+    "semantic_hash": ""
+  },
+  "scripts/nb_m4_diagnostico.py": {
+    "mtime": 1793278145.1831224,
+    "seen": 1793278146.2841432,
+    "ast_hash": "f14dd18bc451a6dcf801af17d7764ba0",
+    "semantic_hash": ""
+  },
+  "scripts/tests/test_generador.py": {
+    "mtime": 1793278145.183287,
+    "seen": 1793278146.2841542,
+    "ast_hash": "0b23490c89d7cc667b952d0cf7042dc4",
+    "semantic_hash": ""
+  },
+  "scripts/tests/test_m4_vision.py": {
+    "mtime": 1793278145.183585,
+    "seen": 1793278146.284155,
+    "ast_hash": "801903bb405d836dbcca0c7605c00b60",
+    "semantic_hash": ""
+  },
+  "scripts/trayectorias_diagnostico_fuente.py": {
+    "mtime": 1793278145.1837764,
+    "seen": 1793278146.284157,
+    "ast_hash": "51a94fef80ad11b284ca384f9466a8ea",
+    "semantic_hash": ""
+  },
+  "docs/ORGANIZACION_REPO_Y_PLAN_M5.md": {
+    "mtime": 1793371654.8844764,
+    "seen": 1793380108.304231,
+    "ast_hash": "18255abf6d4c55531c0520f3104825da",
+    "semantic_hash": ""
+  },
+  "m4/CONCLUSIONES_M4.md": {
+    "mtime": 1793278145.1487806,
+    "seen": 1793278146.2841759,
+    "ast_hash": "8ab065eb1adf652300c4aa7bc0a88073",
+    "semantic_hash": ""
+  },
+  "m4/README.md": {
+    "mtime": 1793278145.149466,
+    "seen": 1793278146.2841768,
+    "ast_hash": "528f9e46ae705c06135d3c6f6f4a88aa",
+    "semantic_hash": ""
+  },
+  "m4/corridas/corrida-01_2026-10-22/LEEME.md": {
+    "mtime": 1793278145.1498997,
+    "seen": 1793278146.284178,
+    "ast_hash": "454c548efec59a9d4b73c2ae9dd7d957",
+    "semantic_hash": ""
+  },
+  "m4/corridas/corrida-02_2026-10-22-tarde/README.md": {
+    "mtime": 1793278145.1529396,
+    "seen": 1793278146.284179,
+    "ast_hash": "aa5093cda8adf3bc80ca3a6c079e067d",
+    "semantic_hash": ""
+  },
+  "m4/corridas/corrida-03_2026-10-24/README.md": {
+    "mtime": 1793278145.1542535,
+    "seen": 1793278146.28418,
+    "ast_hash": "6ee2ba91e24833921b6fe2600d30e660",
+    "semantic_hash": ""
+  },
+  "m4/trayectorias_diagnostico.md": {
+    "mtime": 1793278145.1798782,
+    "seen": 1793278146.284182,
+    "ast_hash": "ab1a993337de0d77dd6af3f20ecbba8b",
+    "semantic_hash": ""
+  },
+  "m4/eval_set/calibracion/cal-01-ilegible_fuerte.png": {
+    "mtime": 1793278145.1596508,
+    "seen": 1793278146.284183,
+    "ast_hash": "ee54648cb2f1ec35c5cd47f62550cb69",
+    "semantic_hash": ""
+  },
+  "m4/eval_set/calibracion/cal-01-ilegible_leve.png": {
+    "mtime": 1793278145.1601593,
+    "seen": 1793278146.284184,
+    "ast_hash": "6c4694c5f9e7b45efd6273542039cf61",
+    "semantic_hash": ""
+  },
+  "m4/eval_set/calibracion/cal-01-legible.png": {
+    "mtime": 1793278145.1605556,
+    "seen": 1793278146.2841852,
+    "ast_hash": "9d67cc0446b5735b659929229ae7c365",
+    "semantic_hash": ""
+  },
+  "m4/eval_set/calibracion/cal-02-ilegible_fuerte.png": {
+    "mtime": 1793278145.161126,
+    "seen": 1793278146.2841861,
+    "ast_hash": "3f0074a6107bd6a444a7dfb9f53cd083",
+    "semantic_hash": ""
+  },
+  "m4/eval_set/calibracion/cal-02-ilegible_leve.png": {
+    "mtime": 1793278145.1616173,
+    "seen": 1793278146.2841868,
+    "ast_hash": "58d37564b26acd28ee1bcd54f0d544d4",
+    "semantic_hash": ""
+  },
+  "m4/eval_set/calibracion/cal-02-legible.png": {
+    "mtime": 1793278145.16218,
+    "seen": 1793278146.2841868,
+    "ast_hash": "0d52864c032351b0bf0efecbae0bf412",
+    "semantic_hash": ""
+  },
+  "m4/eval_set/calibracion/cal-03-ilegible_fuerte.png": {
+    "mtime": 1793278145.162687,
+    "seen": 1793278146.2841878,
+    "ast_hash": "4bf7d6a3cc75f54ce76eaecfb657f718",
+    "semantic_hash": ""
+  },
+  "m4/eval_set/calibracion/cal-03-ilegible_leve.png": {
+    "mtime": 1793278145.1631687,
+    "seen": 1793278146.284189,
+    "ast_hash": "7005256296ba9fe997868969e7675656",
+    "semantic_hash": ""
+  },
+  "m4/eval_set/calibracion/cal-03-legible.png": {
+    "mtime": 1793278145.1635303,
+    "seen": 1793278146.28419,
+    "ast_hash": "afcb5b46480e89734e5a7f8c9bb608cd",
+    "semantic_hash": ""
+  },
+  "m4/eval_set/calibracion/dev-01-ilegible_fuerte.png": {
+    "mtime": 1793278145.1639333,
+    "seen": 1793278146.284191,
+    "ast_hash": "f5031b0001cdc8e588074e0611800ec4",
+    "semantic_hash": ""
+  },
+  "m4/eval_set/calibracion/dev-01-ilegible_leve.png": {
+    "mtime": 1793278145.1642764,
+    "seen": 1793278146.284192,
+    "ast_hash": "6f8322efef5107cdcf7b17addc182ab7",
+    "semantic_hash": ""
+  },
+  "m4/eval_set/calibracion/dev-01-legible.png": {
+    "mtime": 1793278145.1646688,
+    "seen": 1793278146.284193,
+    "ast_hash": "90eb854279c08835fd03e6374f8b69ed",
+    "semantic_hash": ""
+  },
+  "m4/eval_set/calibracion/dev-02-ilegible_fuerte.png": {
+    "mtime": 1793278145.1651127,
+    "seen": 1793278146.284194,
+    "ast_hash": "d29a9d356734f9842aa4ee0632cbe3b9",
+    "semantic_hash": ""
+  },
+  "m4/eval_set/calibracion/dev-02-ilegible_leve.png": {
+    "mtime": 1793278145.1654332,
+    "seen": 1793278146.2841952,
+    "ast_hash": "dbe8cf6c3e3d2d52d7f0771bb1cb2aae",
+    "semantic_hash": ""
+  },
+  "m4/eval_set/calibracion/dev-02-legible.png": {
+    "mtime": 1793278145.1657603,
+    "seen": 1793278146.2841961,
+    "ast_hash": "7c451bb9fca9c9c6671e8fc59c92e744",
+    "semantic_hash": ""
+  },
+  "m4/eval_set/calibracion/dev-03-ilegible_fuerte.png": {
+    "mtime": 1793278145.1664462,
+    "seen": 1793278146.284197,
+    "ast_hash": "83d1b5c85329a905e2ce62807dab949a",
+    "semantic_hash": ""
+  },
+  "m4/eval_set/calibracion/dev-03-ilegible_leve.png": {
+    "mtime": 1793278145.1667843,
+    "seen": 1793278146.284197,
+    "ast_hash": "da029fa7885864a048c3a11f75654aa7",
+    "semantic_hash": ""
+  },
+  "m4/eval_set/calibracion/dev-03-legible.png": {
+    "mtime": 1793278145.1671002,
+    "seen": 1793278146.2841978,
+    "ast_hash": "0df54647d6aaba0a665c078fc3b846f7",
+    "semantic_hash": ""
+  },
+  "m4/eval_set/imagenes/vis-01.jpg": {
+    "mtime": 1793278145.1677444,
+    "seen": 1793278146.284199,
+    "ast_hash": "68efab0c973ee1a15f9fb79d7fb95098",
+    "semantic_hash": ""
+  },
+  "m4/eval_set/imagenes/vis-02.jpg": {
+    "mtime": 1793278145.168101,
+    "seen": 1793278146.2842,
+    "ast_hash": "0d5178196fc8e8a9dd495f09cb64cf0e",
+    "semantic_hash": ""
+  },
+  "m4/eval_set/imagenes/vis-03.jpg": {
+    "mtime": 1793278145.168445,
+    "seen": 1793278146.284201,
+    "ast_hash": "f758658488a3e26e76f389f450d1ade4",
+    "semantic_hash": ""
+  },
+  "m4/eval_set/imagenes/vis-04.jpg": {
+    "mtime": 1793278145.1687987,
+    "seen": 1793278146.284202,
+    "ast_hash": "1782daaf0b21d9fb38fe689f51a02159",
+    "semantic_hash": ""
+  },
+  "m4/eval_set/imagenes/vis-05.jpg": {
+    "mtime": 1793278145.1691244,
+    "seen": 1793278146.284203,
+    "ast_hash": "b1c45e683b0fadf38cb1d5f56605c68c",
+    "semantic_hash": ""
+  },
+  "m4/eval_set/imagenes/vis-06.jpg": {
+    "mtime": 1793278145.1698732,
+    "seen": 1793278146.284204,
+    "ast_hash": "cf7bc58f526348df22211b36b0710638",
+    "semantic_hash": ""
+  },
+  "m4/eval_set/imagenes/vis-07.jpg": {
+    "mtime": 1793278145.1702254,
+    "seen": 1793278146.284205,
+    "ast_hash": "082d7184cc1c3b0018361be2fdb2e6d6",
+    "semantic_hash": ""
+  },
+  "m4/eval_set/imagenes/vis-08.jpg": {
+    "mtime": 1793278145.1716292,
+    "seen": 1793278146.2842062,
+    "ast_hash": "79eb8445b4ba31e16b62cdb988961ad5",
+    "semantic_hash": ""
+  },
+  "m4/eval_set/imagenes/vis-09.jpg": {
+    "mtime": 1793278145.17204,
+    "seen": 1793278146.284207,
+    "ast_hash": "bed1acfb84f895fe444d6074dbf771ba",
+    "semantic_hash": ""
+  },
+  "m4/eval_set/imagenes/vis-10.jpeg": {
+    "mtime": 1793278145.1725929,
+    "seen": 1793278146.284208,
+    "ast_hash": "7057d5c0b1b409d90bfd58b8fe0898d6",
+    "semantic_hash": ""
+  },
+  "m4/eval_set/imagenes/vis-11.jpg": {
+    "mtime": 1793278145.172984,
+    "seen": 1793278146.284209,
+    "ast_hash": "4efa4ac5f6a45679f450c9e4a4765de6",
+    "semantic_hash": ""
+  },
+  "M5_despliegue/app/__init__.py": {
+    "mtime": 1793278309.1424308,
+    "seen": 1793366216.38306,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "M5_despliegue/app/app.py": {
+    "mtime": 1793380098.2552528,
+    "seen": 1793380108.30418,
+    "ast_hash": "b6e6556679b328bf92a70da338e5a548",
+    "semantic_hash": ""
+  },
+  "M5_despliegue/app/pipeline.py": {
+    "mtime": 1793380098.2375433,
+    "seen": 1793380108.304182,
+    "ast_hash": "76250de0b4a69aee784de353d560d9e2",
+    "semantic_hash": ""
+  },
+  "M5_despliegue/app/salud.py": {
+    "mtime": 1793370474.492769,
+    "seen": 1793380108.304182,
+    "ast_hash": "ff722fafdf182aeb2c878ed8f23fca97",
+    "semantic_hash": ""
+  },
+  "M5_despliegue/app/telemetria.py": {
+    "mtime": 1793278438.4612615,
+    "seen": 1793366216.383063,
+    "ast_hash": "0c44e1c3a195dde7e2a8efa26fd05841",
+    "semantic_hash": ""
+  },
+  "M5_despliegue/evaluacion/medir_eficiencia.py": {
+    "mtime": 1793278372.3508077,
+    "seen": 1793366216.383063,
+    "ast_hash": "3aa75239d25f5edde63ab12bffcd07a7",
+    "semantic_hash": ""
+  },
+  "M5_despliegue/tests/test_m5.py": {
+    "mtime": 1793371732.2550046,
+    "seen": 1793380108.304189,
+    "ast_hash": "0560aef6508cefb30681a2045fccd01e",
+    "semantic_hash": ""
+  },
+  "scripts/taxonomia_errores.py": {
+    "mtime": 1793367625.1027148,
+    "seen": 1793370037.954575,
+    "ast_hash": "b72243d81e861fcdfa2dd1a0dcd77c62",
+    "semantic_hash": ""
+  },
+  "scripts/tests/test_calculo.py": {
+    "mtime": 1793367229.0625672,
+    "seen": 1793370037.9545758,
+    "ast_hash": "4bdfe57906996aea00b7d176e40ccb52",
+    "semantic_hash": ""
+  },
+  "M5_despliegue/README.md": {
+    "mtime": 1793380135.2183988,
+    "seen": 1793380139.552719,
+    "ast_hash": "4c0503f2629d14a77a25b5658ce39c04",
+    "semantic_hash": ""
+  },
+  "M5_despliegue/config/README_SPACE.md": {
+    "mtime": 1793380098.3167076,
+    "seen": 1793380108.304228,
+    "ast_hash": "fc3b598d0963e3e00d64cc5f8f008c41",
+    "semantic_hash": ""
+  },
+  "M5_despliegue/config/requirements.txt": {
+    "mtime": 1793367419.2309728,
+    "seen": 1793370037.954585,
+    "ast_hash": "2b186b60e864bf3304c9eb9db26c7caa",
+    "semantic_hash": ""
+  },
+  "M5_despliegue/docs/DESPLIEGUE.md": {
+    "mtime": 1793380098.286544,
+    "seen": 1793380108.304229,
+    "ast_hash": "a859bc44dcc28bcd2b9791c20dc9cd3b",
+    "semantic_hash": ""
+  },
+  "M5_despliegue/docs/GUION_DEMO.md": {
+    "mtime": 1793371654.8843377,
+    "seen": 1793380108.30423,
+    "ast_hash": "0dda449eb904ef5103c43a1baaa70831",
+    "semantic_hash": ""
+  },
+  "docs/REFINAMIENTO_TUTOR_M5.md": {
+    "mtime": 1793371622.8971622,
+    "seen": 1793380108.304232,
+    "ast_hash": "744161c1ef4af9b4ada5b32301faa5c4",
+    "semantic_hash": ""
+  },
+  "docs/taxonomia_errores.md": {
+    "mtime": 1793368659.2401237,
+    "seen": 1793370037.954588,
+    "ast_hash": "d7a116e5f7a216a2261288ed744ebb11",
+    "semantic_hash": ""
+  },
+  "M5_despliegue/app/configuraciones.py": {
+    "mtime": 1793370798.8587196,
+    "seen": 1793380108.304181,
+    "ast_hash": "7791354c5fba48e64bf7763a12720a85",
+    "semantic_hash": ""
+  },
+  "M5_despliegue/evaluacion/ablaciones.py": {
+    "mtime": 1793368427.0938535,
+    "seen": 1793370037.954546,
+    "ast_hash": "f87724154aff4a8488f84d7d04e3e24a",
+    "semantic_hash": ""
+  },
+  "M5_despliegue/evaluacion/verificacion_retrieval.json": {
+    "mtime": 1793371411.7045476,
+    "seen": 1793380108.3041868,
+    "ast_hash": "4a02f1db45631b99e3d532e869814c54",
+    "semantic_hash": ""
+  },
+  "M5_despliegue/evaluacion/verificar_retrieval.py": {
+    "mtime": 1793368163.591576,
+    "seen": 1793370037.954548,
+    "ast_hash": "f048fb5abbd6b3a04d88dad1c7a1f837",
+    "semantic_hash": ""
+  },
+  "M5_despliegue/evaluacion/validacion_m5.py": {
+    "mtime": 1793371373.0177162,
+    "seen": 1793380108.304186,
+    "ast_hash": "fc94a6de725741650c73a6821f385b69",
+    "semantic_hash": ""
+  },
+  "M5_despliegue/resultados/validacion_e2.json": {
+    "mtime": 1793371412.0924432,
+    "seen": 1793380108.304188,
+    "ast_hash": "b839b37ba2f5eb26436629cc00cd1ac3",
+    "semantic_hash": ""
+  },
+  "scripts/eval_set_m5_vision_fuente.py": {
+    "mtime": 1793371091.185457,
+    "seen": 1793380108.3042061,
+    "ast_hash": "fa061373b3fd33a676ed69380827e7dd",
+    "semantic_hash": ""
+  },
+  "M5_despliegue/docs/ARQUITECTURA_M5.md": {
+    "mtime": 1793380098.331359,
+    "seen": 1793380108.304229,
+    "ast_hash": "4a50ae755e8ffb4e926b2073ef504113",
+    "semantic_hash": ""
+  },
+  "M5_despliegue/docs/VALIDACION_M5.md": {
+    "mtime": 1793371624.0708978,
+    "seen": 1793380108.30423,
+    "ast_hash": "afd3a98ceba386304c159e0c9bd33f0b",
+    "semantic_hash": ""
+  },
+  "m4/FEEDBACK_M4.md": {
+    "mtime": 1793371279.5682402,
+    "seen": 1793380108.304233,
+    "ast_hash": "e6355333c617afc4a6109ee8ab0d8218",
+    "semantic_hash": ""
+  },
+  "m4/eval_set/HOJAS_M5.md": {
+    "mtime": 1793371091.2161088,
+    "seen": 1793380108.304235,
+    "ast_hash": "e42f07498e8a686d63764105489de9e1",
     "semantic_hash": ""
   }
 }
