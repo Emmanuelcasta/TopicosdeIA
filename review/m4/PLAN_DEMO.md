@@ -72,18 +72,22 @@ La rama de CODE_PR ya trae el punto de entrada de una foto (`revisar_foto_demo`)
   - El scorecard trae `numeros_fieles` (C2).
 - **Quién lo asume:** lo decide el equipo.
 
-**P2 — Tres números de valor y una demo que no se cae**
+**P2 — Tres números del sistema que van a mostrar, y una demo que no se cae**
 - **Qué podría ocurrir durante la demo:**
+  - Alguien pregunta «¿cuánto acierta con fotos?» y el único número disponible es de un tutor anterior.
   - Un número difícil de defender, como «M4 es más rápido que M3» comparando tareas distintas.
   - O una falla de red o GPU sin plan B.
 - **Evidencia exacta:**
+  - Las corridas con las 12 fotos usaron el adaptador `agente` (corrida-03/README L5); la configuración final (`diagnostico`, «Paso N») solo se midió en 9 casos de desarrollo. Las 12 fotos ya no son holdout ciego (CONCLUSIONES L76) (M4-08).
   - `delta_m3_m4.csv` compara 14,1 s (texto) con 13,0 s (foto).
   - El peor caso es `fallos.iloc[0]` (nb_m4.py L936), no uno analizado.
   - El README tiene unas 2 600 palabras (M4-04).
   - No hay una sección de procedencia y uso de las fotos (M4-05).
 - **Cambio mínimo recomendado:**
+  - Correr en T4 la configuración final con C1 y C2: primero la prueba de humo (vis-01, vis-07, vis-10 con `revisar_foto_demo`, sección 12 del notebook), luego las 12 fotos con la caché borrada.
+  - 5–6 hojas nuevas escritas a mano (una adversarial), fotografiadas con el celular de la demo; congelar sistema y criterios y correrlas una sola vez (M4-08).
   - 1–3 números con su denominador:
-    - aciertos con foto de la configuración que mostrarán, sobre 12 (post-hoc, dicho así);
+    - aciertos con foto del sistema que mostrarán: sobre las hojas nuevas, y sobre las 12 (post-hoc, dicho así);
     - regresión sin foto, 15/21 frente a 13/21;
     - «leer la foto cuesta unos 3–4 s de los ~13 s».
   - vis-10 como peor caso contado: «antes lo diagnosticaba; ahora pide otra foto».
@@ -94,7 +98,7 @@ La rama de CODE_PR ya trae el punto de entrada de una foto (`revisar_foto_demo`)
     - W&B con latencias como «así lo operamos»;
     - medir la técnica de eficiencia elegida con una tabla antes/después.
 - **Qué NO hace falta rehacer:** el harness, el eval set ni las corridas ya archivadas.
-- **Cómo verificar el cierre:** un README de una página con los 3 números y sus denominadores, el peor caso, la sección de uso responsable y un tag de la versión de la demo.
+- **Cómo verificar el cierre:** una corrida nueva en `m4/corridas/` hecha en T4, con el SHA y el adaptador `diagnostico` impresos y una fila para las hojas nuevas; un README de una página con los 3 números y sus denominadores, el peor caso, la sección de uso responsable y un tag de la versión de la demo.
 - **Quién lo asume:** lo decide el equipo.
 
 ## Guion sugerido (bloques, sin minutos obligatorios)

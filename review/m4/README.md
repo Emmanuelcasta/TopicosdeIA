@@ -182,8 +182,22 @@ En MPS se obtuvo exactamente eso.
   - Una transcripción a LaTeX puede ser una vista del producto, pero en nuestra prueba exploratoria rompió el JSON con el 2B (vis-01). Va al backlog.
 - **Criterio de cierre:** no aplica. Es una sugerencia.
 
+### M4-08 · La configuración que entregan aún no tiene su propia medición
+- **Dónde:** [m4/README.md L5–12 y L133–136](https://github.com/Emmanuelcasta/TopicosdeIA/blob/9c0c0dfc8703dd642ef4dcbc547d2b7ef34a0dbd/m4/README.md?plain=1#L5-L12); [CONCLUSIONES_M4.md L76](https://github.com/Emmanuelcasta/TopicosdeIA/blob/9c0c0dfc8703dd642ef4dcbc547d2b7ef34a0dbd/m4/CONCLUSIONES_M4.md?plain=1#L76); [corrida-03/README.md L5](https://github.com/Emmanuelcasta/TopicosdeIA/blob/9c0c0dfc8703dd642ef4dcbc547d2b7ef34a0dbd/m4/corridas/corrida-03_2026-10-24/README.md?plain=1#L5); `m4/scorecard_m4.csv`.
+- **Qué se observa:**
+  - Las corridas con las 12 fotos usaron el adaptador `agente` y el prompt anterior («Adaptador del tutor: `agente`», corrida-03).
+  - La configuración final (adaptador `diagnostico`, prompt «Paso N», puerta) solo se midió en los 9 casos de desarrollo con transcripciones sintéticas.
+  - Por eso `scorecard_m4.csv` (2/12) describe un sistema anterior al entregado. Ustedes lo dicen con claridad en el README.
+  - Las 12 fotos ya se usaron en corridas exploratorias, así que ya no son un holdout ciego (CONCLUSIONES L76).
+- **Por qué importa:** hoy no hay un número que hable del tutor que van a mostrar. En la Demo, «¿cuánto acierta con fotos?» debería responderse con el sistema real, sobre casos que no se usaron para ajustarlo.
+- **Sugerencia:**
+  - Correr en T4 la configuración final con C1 y C2: `revisar_foto` sobre las 12 fotos, tras la prueba de humo de la §4 (vis-01, vis-07, vis-10) y con la caché borrada.
+  - Reportar ese 12 como medición post-hoc, dicho así.
+  - Escribir y fotografiar un **holdout nuevo**: 5–6 hojas con error en pasos distintos y al menos una adversarial (movida o fuera de dominio), con las mismas reglas de `HOJAS_PARA_ESCRIBIR.md`. Congelar sistema y criterios antes de correrlo una sola vez.
+- **Criterio de cierre:** una carpeta `m4/corridas/` nueva con el notebook ejecutado en T4, el SHA del código, el adaptador `diagnostico` impreso, `scorecard_m4.csv` con `numeros_fieles`, y una fila aparte para el holdout nuevo.
+
 ### Límites que ustedes declararon (sugerencias, sin observación nueva)
-- **Configuración final:** medirla con las 12 fotos por el camino de `revisar_foto`. Será una medición post-hoc, porque el holdout ya se usó; conviene decirlo así.
+- **Configuración final y holdout:** los declararon con claridad; la medición que falta se detalla en M4-08.
 - **Adversariales:** pasar la etiqueta de los adversariales del código (por ID) a una columna del CSV.
 - **Tutor:** pasarle la pista del verificador aritmético cuando la lectura es fiable. Reescribe en lugar de diagnosticar, como ya vieron.
 - **Retrieval:** que el de M2 vuelva a ser el de S10 (híbrido con reranker) antes de comparar regresión.
@@ -204,7 +218,7 @@ Para la demo se presenta el sistema completo M1–M4 como producto:
 
 1. **[P0] Un «momento wow» de punta a punta.** El estudiante sube la foto de su hoja y ve «esto es lo que leí» y «tu error está en el paso 2», con la cuenta que lo prueba (M4-01, M4-06; C1).
 2. **[P1] Confianza como característica: «¿Leí bien tu hoja?».** Ante una foto movida, el producto pide otra en lugar de inventar (M4-02, M4-03; C1, C2).
-3. **[P2] Tres números de valor y una demo robusta** (M4-04, M4-05).
+3. **[P2] Tres números del sistema que van a mostrar, y una demo robusta.** La configuración final, corrida en T4 sobre las 12 fotos y sobre un holdout nuevo (M4-08, M4-04, M4-05; prueba de humo de C1).
 
 ## 8. Cómo reproducir lo verificado
 
