@@ -794,6 +794,28 @@ def lectura_fiel(caso: dict, lectura) -> bool | None:
     return esperado.replace(" ", "") in escrito
 
 
+def numeros_fieles(caso: dict, lectura) -> bool | None:
+    """¿Están TODOS los números de la hoja, en orden, en lo que leyó el VLM?
+
+    Complementa a `lectura_fiel`, que solo mira cuántos pasos hay y el valor final
+    escrito: con esa regla `vis-09` cuenta como fiel aunque `14 × 9 = 126` se leyó
+    `14 x 9 = 12G`. Aquí se comparan los valores (`0.2` = `0.20`); las fracciones,
+    tal como están escritas (`6/8` no es `3/4` en una hoja que las iguala). None cuando no hay procedimiento esperado (adversariales).
+    """
+    from fractions import Fraction
+
+    if caso.get("bloque") == "adversarial" or not caso.get("pasos"):
+        return None
+    if ((lectura or {}).get("json") or {}).get("ilegible"):
+        return False
+    def valor(n):        # 0.2 = 0.20; una fracción se compara tal cual: 6/8 ≠ 3/4
+        return n if "/" in n else Fraction(n)
+
+    leidos = iter(valor(n) for n in numeros_de(" ".join(pasos_numerados(lectura))))
+    return all(any(n == m for m in leidos)
+               for n in (valor(x) for x in numeros_de(" ".join(caso["pasos"]))))
+
+
 def fuente_del_fallo(acierto: bool, fiel: bool | None) -> str:
     """A qué etapa se le atribuye un fallo. El resultado principal de M4."""
     if acierto:

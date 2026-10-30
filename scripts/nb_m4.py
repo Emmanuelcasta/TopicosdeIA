@@ -397,6 +397,7 @@ for cid, que_prueba in PILOTO.items():
               + ("  <-- NO COINCIDE" if vistos != len(esperados) else ""))
         print(f"      diagnóstico esperado: {diagnostico_esperado(caso)!r}")
         print(f"      ¿transcripción fiel?: {lectura_fiel(caso, lectura)}")
+        print(f"      ¿todos los números de la hoja?: {numeros_fieles(caso, lectura)}")
     else:
         print(f"      diagnóstico esperado: {diagnostico_esperado(caso)!r} (caso adversarial)")
     print()
@@ -861,6 +862,7 @@ for caso in eval_m4:
         "explicacion_pasos": " ".join(map(str, ev["explicacion_pasos"])),
         "explicacion_justifica": ev["explicacion_justifica"],
         "lectura_fiel": fiel,
+        "numeros_fieles": numeros_fieles(caso, lectura),
         "fuente_del_fallo": fuente_del_fallo(ev["acierto"], fiel),
         "segundos_lectura": (lectura or {}).get("segundos", 0.0),
         "segundos_tutor": round(seg_tutor, 2),

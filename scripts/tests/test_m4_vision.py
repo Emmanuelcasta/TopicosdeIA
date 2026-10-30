@@ -1406,3 +1406,41 @@ def test_revisar_foto_respeta_las_otras_senales():
     r = revisar_foto("img", "p", leer=lambda img, a: _lectura(-0.004, legible=False),
                      diagnosticar=lambda p, l: "Diagnóstico: paso 2")
     assert r["estado"] == "no_pude_leer"
+
+
+# ---------------------------------------------------------------------------
+# 12 · `numeros_fieles`: todos los números de la hoja, no solo el final
+# ---------------------------------------------------------------------------
+from vision import lectura_fiel, numeros_fieles  # noqa: E402
+
+_VIS09 = {"id": "vis-09", "bloque": "localizacion", "valor_final_escrito": "63",
+          "pasos": ["El área del triángulo es base por altura dividido entre dos.",
+                    "14 × 9 = 126.", "126 ÷ 2 = 63.",
+                    "Respuesta final: 63 centímetros cuadrados"]}
+
+
+def _leida(pasos, final):
+    return {"json": {"pasos": pasos, "respuesta_final": final}, "ok": True,
+            "consistente": True, "legible_declarada": True,
+            "confianza_numeros": -0.003, "confianza_atipica": False}
+
+
+def test_numeros_fieles_detecta_el_126_leido_como_12G():
+    """Lectura real de vis-09 (la misma en su corrida y en la reproducción)."""
+    lec = _leida(["El área de triángulo es base por altura dividido entre 2.",
+                  "14 x 9 = 12G", "12G / 2 = 63", "Respuesta Final: 63 cm"], "63 cm")
+    assert lectura_fiel(_VIS09, lec) is True       # la regla actual no lo ve
+    assert numeros_fieles(_VIS09, lec) is False
+
+
+def test_numeros_fieles_acepta_la_misma_cifra_escrita_distinto():
+    caso = {"bloque": "localizacion",
+            "pasos": ["El descuento es 45000 × 0.20 = 9000.", "Respuesta final: 3/4"]}
+    lec = _leida(["El descuento es 45000 x 0.2 = 9000"], "6/8")
+    assert numeros_fieles(caso, lec) is False      # 3/4 escrito, 6/8 leído
+    lec = _leida(["El descuento es 45000 x 0.2 = 9000"], "3/4")
+    assert numeros_fieles(caso, lec) is True
+
+
+def test_numeros_fieles_no_aplica_a_adversariales():
+    assert numeros_fieles({"bloque": "adversarial", "pasos": []}, _leida([], "")) is None
