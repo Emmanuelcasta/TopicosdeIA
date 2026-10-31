@@ -25,6 +25,15 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+# Antes de tocar Gradio. Con pydantic >= 2.11 la ruta que sirve la página lanza
+# `TypeError: argument of type 'bool' is not iterable` al describir el esquema de
+# `gr.Image`, y el enlace público responde Internal Server Error. El arreglo
+# primario es el pin de `config/requirements.txt`; esto cubre los entornos donde
+# ese pin no se puede imponer, como Kaggle. Ver `compat_gradio.py`.
+import compat_gradio                        # noqa: E402
+
+COMPAT = compat_gradio.aplicar()
+
 from pipeline import obtener_tutor          # noqa: E402
 from telemetria import registrar              # noqa: E402
 from salud import texto_salud               # noqa: E402
@@ -222,6 +231,11 @@ def _bandera_activa(nombre: str) -> bool:
 
 def lanzar():
     """Arranca Gradio; el túnel público solo se habilita bajo petición explícita."""
+    v = COMPAT["versiones"]
+    print("Entorno: " + " | ".join(f"{k} {val}" for k, val in v.items()))
+    if COMPAT["parche_aplicado"]:
+        print("Compatibilidad de Gradio: parche de subesquemas booleanos APLICADO")
+        print(f"  {COMPAT['motivo']}")
     return construir().launch(
         server_name="0.0.0.0",
         server_port=int(os.environ.get("PORT", 7860)),

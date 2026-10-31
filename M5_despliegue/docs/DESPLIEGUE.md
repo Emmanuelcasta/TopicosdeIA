@@ -45,6 +45,104 @@ TUTOR_CONFIG=revision_foto TUTOR_GRADIO_SHARE=1 python M5_despliegue/app/app.py
 Kaggle; no sustituye una URL permanente y no se activa en Hugging Face Spaces,
 que ya publica su propia URL.
 
+### El enlace de Kaggle que devolvía *Internal Server Error*
+
+**Qué pasaba.** La celda imprimía una URL `*.gradio.live` y al abrirla salía
+*Internal Server Error* o «No interface is running», con esta traza en el log:
+
+```
+gradio/routes.py        api_info()
+gradio/blocks.py        get_api_info()
+gradio_client/utils.py  json_schema_to_python_type() -> _json_schema_to_python_type()
+                        -> get_type()
+TypeError: argument of type 'bool' is not iterable
+```
+
+**La causa.** `gradio==4.44.1` declara `pydantic>=2.0` **sin tope**. Desde
+**pydantic 2.11**, un campo anotado como `dict` pelado se describe en JSON Schema
+con `additionalProperties: true`, y el campo `meta` de `FileData` —el modelo que
+publica `gr.Image`— es justo eso. `gradio_client 1.3.0` recorre ese valor como si
+siempre fuera un subesquema:
+
+```python
+if "additionalProperties" in schema:
+    des += [f"str, {_json_schema_to_python_type(schema['additionalProperties'], defs)}"]
+```
+
+y acaba en `get_type(True)`, cuya primera línea es `if "const" in schema`.
+`"const" in True` lanza `TypeError`. En Gradio 4.44 la ruta que sirve la página
+consulta la información de la API, así que un esquema que no se puede describir
+impide servir **toda** la interfaz, no solo `/info`.
+
+Verificado con `gradio 4.44.1` + `gradio_client 1.3.0`:
+
+| pydantic | `additionalProperties` | `get_api_info()` |
+|---|---|---|
+| 2.7.4 · 2.8.2 · 2.9.2 · 2.10.6 | clave ausente | OK |
+| 2.11.9 · 2.13.5 | `true` | `TypeError` |
+
+**El arreglo.** `config/requirements.txt` fija `pydantic>=2.0,<2.11` y repite
+`gradio-client==1.3.0` (el pin transitivo de `gradio` no basta en Kaggle, donde
+`pip` conserva lo preinstalado cuando puede). Además `app/compat_gradio.py` añade
+el guardia que a `gradio_client` le falta —un subesquema booleano `true` es `Any`
+y `false` es `None`, que es la semántica de JSON Schema— por si el pin no se puede
+imponer. No esconde el error: implementa la lectura correcta, y el diagnóstico
+dice si el fallo se estaba disparando o si el parche fue solo prevención.
+
+### Celdas de Kaggle · actualizar dependencias y relanzar
+
+**1 · Dependencias.** Pydantic ya está importado por el stack preinstalado de
+Kaggle, así que **hay que reiniciar el kernel** después de esta celda:
+
+```python
+!pip install -q "gradio==4.44.1" "gradio-client==1.3.0" "pydantic>=2.0,<2.11"
+import IPython; IPython.Application.instance().kernel.do_shutdown(True)
+```
+
+**2 · Diagnóstico** (tras el reinicio, antes de lanzar nada):
+
+```python
+import os, sys
+os.chdir("/kaggle/working/ProyectoIA")          # ajusta a tu ruta del repo
+sys.path.insert(0, "M5_despliegue/app")
+os.environ["TUTOR_CONFIG"] = "revision_foto"
+import compat_gradio
+print(compat_gradio.diagnostico())
+```
+
+Debe imprimir, con `python 3.11.x` en Kaggle:
+
+```
+Versiones instaladas:
+  python         3.11.x
+  gradio         4.44.1
+  gradio_client  1.3.0
+  pydantic       2.10.6          <- cualquier 2.x por debajo de 2.11
+  pydantic_core  2.27.2
+  fastapi        …
+  starlette      …
+Parche de compatibilidad aplicado: True
+El fallo se estaba disparando: False      <- False = el pin funcionó
+get_api_info(): OK · 4 endpoints descritos. La página se puede servir.
+```
+
+Las dos líneas que deciden: **`get_api_info(): OK`** y **`se estaba disparando:
+False`**. Si sale `True`, el pin de pydantic no se aplicó —mira si otro paquete
+lo arrastró— pero el parche sostiene la app igual. Si sale `get_api_info():
+FALLA`, no lances nada: el enlace daría error 500.
+
+**3 · Lanzar.** El adaptador está en un dataset adjunto, así que hay que
+apuntarlo o la app arranca en modo degradado:
+
+```python
+!cd /kaggle/working/ProyectoIA &&   TUTOR_CONFIG=revision_foto   TUTOR_GRADIO_SHARE=1   TUTOR_ADAPTADOR_M1=/kaggle/input/datasets/emmanuelcastaedacano/adaptadorqwen/qwen-lora   python M5_despliegue/app/app.py
+```
+
+`lanzar()` imprime las versiones y, si tuvo que parchear, lo dice antes de
+levantar el servidor. Comprueba en la cabecera de la interfaz que **no** sale
+`MODO DEGRADADO`: si el adaptador no se encontró, saldría, y lo que responde no
+sería la configuración que se quiere demostrar.
+
 Medición de eficiencia — **esto es lo que falta para cerrar S15**:
 
 ```bash

@@ -225,11 +225,35 @@ def test_el_env_de_ejemplo_no_trae_secretos():
 
 
 def test_requirements_tiene_versiones_fijadas():
-    txt = (RAIZ / "M5_despliegue" / "config" / "requirements.txt").read_text(encoding="utf-8")
+    """Cada paquete con versión exacta, o con los DOS extremos acotados.
+
+    El rango se admite solo con tope: `pydantic>=2.0` a secas fue justamente el
+    agujero por el que entró pydantic 2.11 y rompió la interfaz en Kaggle.
+    """
+    txt = (RAIZ / "M5_despliegue" / "config" / "requirements.txt").read_text(
+        encoding="utf-8")
     paquetes = [l for l in txt.splitlines() if l.strip() and not l.startswith("#")]
     assert paquetes
     for p in paquetes:
-        assert "==" in p, f"sin versión fijada: {p}"
+        especificacion = p.split(";")[0]          # sin el marcador de plataforma
+        acotado = "==" in especificacion or (
+            ">=" in especificacion and "<" in especificacion)
+        assert acotado, f"sin versión fijada ni rango con tope: {p}"
+
+
+def test_pydantic_excluye_las_versiones_que_rompen_la_interfaz():
+    """Desde pydantic 2.11, un campo `dict` pelado se describe con
+    `additionalProperties: true`, y `gradio_client 1.3.0` revienta al recorrerlo:
+    `TypeError: argument of type 'bool' is not iterable`. Sin este tope, el
+    enlace público de Gradio responde Internal Server Error."""
+    txt = (RAIZ / "M5_despliegue" / "config" / "requirements.txt").read_text(
+        encoding="utf-8")
+    linea = next(l for l in txt.splitlines()
+                 if l.strip().startswith("pydantic") and "pydantic_core" not in l)
+    assert "<2.11" in linea.replace(" ", ""), linea
+    # Y gradio_client fijado explícitamente: en Kaggle el pin transitivo de
+    # gradio no basta, porque pip conserva lo preinstalado cuando puede.
+    assert "gradio-client==1.3.0" in txt or "gradio_client==1.3.0" in txt
 
 
 # --- la reproducción de S08-D queda registrada ----------------------------
@@ -702,3 +726,92 @@ def test_la_version_fijada_coincide_con_la_del_despliegue():
            "requirements.txt").read_text(encoding="utf-8")
     assert "transformers==4.45.2" in req
     assert "peft==0.13.2" in req and "accelerate==0.34.2" in req
+
+
+# =========================================================================
+# Gradio con pydantic >= 2.11 · el fallo del enlace público en Kaggle
+#
+# Síntoma: la URL *.gradio.live responde Internal Server Error. Causa: `gr.Image`
+# publica el esquema de `FileData`, cuyo campo `meta` es un `dict` pelado;
+# pydantic >= 2.11 lo describe con `additionalProperties: true`, y
+# `gradio_client 1.3.0` recorre ese booleano como si fuera un subesquema:
+#
+#   if "additionalProperties" in schema:
+#       ... _json_schema_to_python_type(schema["additionalProperties"], defs)
+#   -> get_type(True) -> "const" in True -> TypeError
+#
+# Reproducido en local con gradio 4.44.1 + gradio_client 1.3.0 + pydantic 2.13.5.
+# =========================================================================
+
+def test_el_parche_de_compatibilidad_arregla_el_subesquema_booleano():
+    """Lo que importa: la función que fallaba deja de fallar, con la semántica
+    correcta de JSON Schema (`true` acepta cualquier valor, `false` ninguno)."""
+    import compat_gradio
+    pytest.importorskip("gradio_client")
+    from gradio_client import utils
+
+    compat_gradio.aplicar()
+    assert utils._json_schema_to_python_type(True, {}) == "Any"
+    assert utils._json_schema_to_python_type(False, {}) == "None"
+    # Y un objeto con `additionalProperties: true`, que es el caso real.
+    esquema = {"type": "object", "properties": {},
+               "additionalProperties": True}
+    assert "Any" in utils._json_schema_to_python_type(esquema, {})
+
+
+def test_aplicar_es_idempotente():
+    import compat_gradio
+    pytest.importorskip("gradio_client")
+
+    primera = compat_gradio.aplicar()
+    segunda = compat_gradio.aplicar()
+    # La segunda ve el guardia ya puesto y no vuelve a envolver nada.
+    assert segunda["parche_aplicado"] is False
+    assert "ya acepta" in segunda["motivo"]
+    assert primera["versiones"] == segunda["versiones"]
+
+
+def test_el_diagnostico_separa_las_dos_mitades_del_problema():
+    """Una cosa es que la librería no acepte booleanos; otra, que la pydantic
+    instalada los produzca. Decir solo «parche aplicado» no distingue si el
+    fallo estaba ocurriendo."""
+    import compat_gradio
+
+    info = compat_gradio.aplicar()
+    assert "se_disparaba" in info and isinstance(info["se_disparaba"], bool)
+    v = info["versiones"]
+    for clave in ("python", "gradio", "gradio_client", "pydantic"):
+        assert clave in v, clave
+
+
+def test_la_app_puede_describir_su_api():
+    """La comprobación de verdad: `get_api_info()` es lo que la ruta principal
+    necesita para servir la página. Si lanza, el enlace público da error 500."""
+    pytest.importorskip("gradio")
+    import compat_gradio
+
+    resultado = compat_gradio.comprobar_api()
+    assert resultado.startswith("get_api_info(): OK"), resultado
+
+
+def test_la_app_aplica_el_parche_antes_de_construir_la_interfaz():
+    """El orden importa: parchear después de que Gradio haya resuelto los
+    esquemas no serviría de nada."""
+    fuente = (RAIZ / "M5_despliegue" / "app" / "app.py").read_text(encoding="utf-8")
+    pos_compat = fuente.index("import compat_gradio")
+    pos_pipeline = fuente.index("from pipeline import")
+    assert pos_compat < pos_pipeline
+    assert "COMPAT = compat_gradio.aplicar()" in fuente
+
+
+def test_un_adaptador_ausente_se_ve_antes_de_terminar_el_montaje(monkeypatch):
+    """Al lanzar en Kaggle el adaptador viene de un dataset adjunto y es fácil
+    apuntarlo mal. Si `efectiva()` preguntara primero por `montado`, el hecho ya
+    conocido quedaría tapado detrás de «sin montar todavía»."""
+    monkeypatch.setitem(pipeline.RUTAS_ADAPTADOR, "m1", "ruta/que/no/existe")
+    t = pipeline.Tutor("s08d")
+    assert t.comprobar_adaptador() is None
+    assert t.estado.montado is False          # el montaje no ha terminado
+    assert t.estado.degradado                 # y aun así se sabe que falta
+    assert "MODO DEGRADADO" in t.estado.efectiva()
+    assert t.estado.medido_aplicable is None

@@ -1,6 +1,21 @@
 # Dependencias del Space. Versiones fijadas: una demo que se rompe porque una
 # librería cambió de API el martes no es una demo.
 gradio==4.44.1
+# `gradio` ya lo fija a esta versión exacta, pero se repite aquí porque en Kaggle
+# el `pip install` conserva lo preinstalado cuando puede: con un gradio_client
+# distinto del de gradio, la ruta que sirve la página deja de funcionar.
+gradio-client==1.3.0
+# **El tope de pydantic es lo que arregla el enlace de Kaggle.** `gradio 4.44.1`
+# declara `pydantic>=2.0` sin tope, y desde **pydantic 2.11** un campo `dict`
+# pelado —como `FileData.meta`, el de `gr.Image`— se describe con
+# `additionalProperties: true`. `gradio_client 1.3.0` recorre ese valor como si
+# fuera un subesquema y revienta en `get_type(True)` con
+# `TypeError: argument of type 'bool' is not iterable`, lo que impide servir la
+# interfaz: el enlace público responde Internal Server Error.
+#
+# Comprobado con gradio 4.44.1 + gradio_client 1.3.0: 2.7.4, 2.8.2, 2.9.2 y
+# 2.10.6 funcionan (no escriben la clave); 2.11.9 y 2.13.5 fallan.
+pydantic>=2.0,<2.11
 torch==2.4.1
 transformers==4.45.2
 peft==0.13.2

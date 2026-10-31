@@ -112,12 +112,16 @@ class Estado:
         Nunca «S08-D» cuando falta una de sus piezas: un nombre que promete una
         cifra tiene que describir el sistema que la produjo.
         """
+        # El orden importa: un componente que YA se sabe ausente es un hecho,
+        # aunque el montaje no haya terminado. Preguntar antes por `montado`
+        # tapaba el adaptador que no se encontró detrás de un «sin montar
+        # todavía», que es justo lo que hay que ver al lanzar en Kaggle.
+        if self.degradado:
+            return (f"MODO DEGRADADO (se pidió {self.config}; falta "
+                    f"{', '.join(self.faltantes)})")
         if not self.montado:
             return f"{self.config_nombre} (sin montar todavía)"
-        if not self.degradado:
-            return self.config_nombre
-        return (f"MODO DEGRADADO (se pidió {self.config}; falta "
-                f"{', '.join(self.faltantes)})")
+        return self.config_nombre
 
     def piezas(self) -> list:
         """Qué componente está funcionando, uno por uno, para enseñarlo.
