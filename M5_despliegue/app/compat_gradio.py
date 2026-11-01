@@ -1,4 +1,4 @@
-"""Compatibilidad de Gradio con Pydantic ≥ 2.11 · el fallo del enlace en Kaggle.
+"""Compatibilidad del stack Gradio / Hugging Face · Kaggle.
 
 El síntoma. En Kaggle con T4, `TUTOR_GRADIO_SHARE=1` imprime una URL
 `*.gradio.live` y al abrirla responde *Internal Server Error* o «No interface is
@@ -46,6 +46,15 @@ esquema que no se puede describir impide servir la interfaz.
 `pydantic>=2.0,<2.11`. Lo de este módulo es la red de seguridad para entornos
 donde ese pin no se puede imponer —Kaggle trae su propio stack preinstalado y
 otro paquete puede arrastrar pydantic 2.11+—.
+
+Gradio 4.44.1 también importa `HfFolder` desde `huggingface_hub` al importar
+OAuth. El runtime de Kaggle devolvió `ImportError: cannot import name 'HfFolder'`;
+por eso el proyecto fija `huggingface_hub==0.26.5` y reporta esa versión en el
+diagnóstico.
+
+Gradio 4.44.1 también llama `TemplateResponse` con la firma posicional antigua.
+Starlette 1.x eliminó esa compatibilidad y la ruta `/` falla durante el render
+con `TypeError: unhashable type: 'dict'`; fijamos `starlette<1.0`.
 
 Y no es un parche que esconda el error: implementa la semántica que el esquema ya
 tiene. En JSON Schema, un subesquema booleano `true` acepta cualquier valor y
@@ -156,7 +165,7 @@ def versiones() -> dict:
     import sys
 
     v = {"python": ".".join(map(str, sys.version_info[:3]))}
-    for paquete in ("gradio", "gradio_client", "pydantic", "pydantic_core",
+    for paquete in ("gradio", "gradio_client", "huggingface_hub", "pydantic", "pydantic_core",
                     "fastapi", "starlette"):
         try:
             v[paquete] = md.version(paquete)

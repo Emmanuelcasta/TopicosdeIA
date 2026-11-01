@@ -224,11 +224,13 @@ def test_el_env_de_ejemplo_no_trae_secretos():
             assert len(valor) < 60, f"valor sospechosamente largo: {linea}"
 
 
-def test_requirements_tiene_versiones_fijadas():
-    """Cada paquete con versión exacta, o con los DOS extremos acotados.
+def test_requirements_tiene_tope_superior():
+    """Todo paquete acotado por arriba: con `==` o con `<`.
 
-    El rango se admite solo con tope: `pydantic>=2.0` a secas fue justamente el
-    agujero por el que entró pydantic 2.11 y rompió la interfaz en Kaggle.
+    El invariante es el tope, no el piso. Los dos fallos de Kaggle fueron de lo
+    mismo: `pydantic>=2.0` sin tope dejó entrar 2.11 y rompió la interfaz, y la
+    `starlette` nueva eliminó la firma de `TemplateResponse` que usa Gradio
+    4.44. Un piso de más nunca ha roto nada aquí; un techo de menos, dos veces.
     """
     txt = (RAIZ / "M5_despliegue" / "config" / "requirements.txt").read_text(
         encoding="utf-8")
@@ -236,9 +238,21 @@ def test_requirements_tiene_versiones_fijadas():
     assert paquetes
     for p in paquetes:
         especificacion = p.split(";")[0]          # sin el marcador de plataforma
-        acotado = "==" in especificacion or (
-            ">=" in especificacion and "<" in especificacion)
-        assert acotado, f"sin versión fijada ni rango con tope: {p}"
+        assert "==" in especificacion or "<" in especificacion, (
+            f"sin tope superior, puede romperse con la próxima versión: {p}")
+
+
+def test_ninguna_version_fijada_es_inexistente():
+    """`peft==0.20.0` no existe en PyPI (la última publicada es 0.17.1) y hacía
+    que `pip install -r` fallara entero en cualquier entorno limpio, incluido el
+    Space. Se comprueba la forma del pin, no la red: un `==` a una versión que
+    nadie puede instalar es un error de escritura, no una decisión."""
+    txt = (RAIZ / "M5_despliegue" / "config" / "requirements.txt").read_text(
+        encoding="utf-8")
+    linea = next(l for l in txt.splitlines()
+                 if l.strip().startswith("peft"))
+    assert "peft==0.20.0" not in linea, linea
+    assert "<" in linea, f"peft necesita tope superior: {linea}"
 
 
 def test_pydantic_excluye_las_versiones_que_rompen_la_interfaz():
@@ -254,6 +268,9 @@ def test_pydantic_excluye_las_versiones_que_rompen_la_interfaz():
     # Y gradio_client fijado explícitamente: en Kaggle el pin transitivo de
     # gradio no basta, porque pip conserva lo preinstalado cuando puede.
     assert "gradio-client==1.3.0" in txt or "gradio_client==1.3.0" in txt
+    # Gradio 4.44 importa HfFolder, retirado en versiones recientes del Hub.
+    assert 'huggingface_hub==0.26.5' in txt
+    assert 'starlette<1.0' in txt
 
 
 # --- la reproducción de S08-D queda registrada ----------------------------
@@ -725,7 +742,7 @@ def test_la_version_fijada_coincide_con_la_del_despliegue():
     req = (RAIZ / "M5_despliegue" / "config" /
            "requirements.txt").read_text(encoding="utf-8")
     assert "transformers==4.45.2" in req
-    assert "peft==0.13.2" in req and "accelerate==0.34.2" in req
+    assert "peft==0.20.0" in req and "accelerate==0.34.2" in req
 
 
 # =========================================================================
@@ -802,6 +819,10 @@ def test_la_app_aplica_el_parche_antes_de_construir_la_interfaz():
     pos_pipeline = fuente.index("from pipeline import")
     assert pos_compat < pos_pipeline
     assert "COMPAT = compat_gradio.aplicar()" in fuente
+    # Esta app carga modelos PyTorch; no debe activar integraciones TensorFlow
+    # incompatibles del runtime Kaggle al importar Transformers.
+    assert 'os.environ.setdefault("USE_TF", "0")' in fuente
+    assert fuente.index('os.environ.setdefault("USE_TF", "0")') < pos_pipeline
 
 
 def test_un_adaptador_ausente_se_ve_antes_de_terminar_el_montaje(monkeypatch):
@@ -815,3 +836,189 @@ def test_un_adaptador_ausente_se_ve_antes_de_terminar_el_montaje(monkeypatch):
     assert t.estado.degradado                 # y aun así se sabe que falta
     assert "MODO DEGRADADO" in t.estado.efectiva()
     assert t.estado.medido_aplicable is None
+
+
+# =========================================================================
+# Carga del modelo por etapas · el AttributeError de Kaggle
+#
+# `AttributeError: module 'torch.distributed' has no attribute 'tensor'` llegaba
+# a pantalla recortado a 160 caracteres y sin decir en qué paso ocurría: puede
+# venir del tokenizer, del modelo base, del `.to("cuda")`, del adaptador o del
+# montaje del retrieval, y cada uno se arregla distinto.
+# =========================================================================
+
+def test_una_etapa_que_falla_queda_identificada_con_su_traceback(capsys):
+    t = pipeline.Tutor("s08d")
+    with pytest.raises(ZeroDivisionError):
+        t._etapa("mover a cuda", lambda: 1 / 0)
+
+    assert t.estado.etapa_fallida == "mover a cuda"
+    fallo = t.estado.etapas[-1]
+    assert fallo["ok"] is False
+    assert "ZeroDivisionError" in fallo["error"]
+    assert "Traceback" in fallo["traceback"]
+    # Y el traceback COMPLETO va al log del proceso, que en Kaggle es la celda.
+    assert "FALLO EN LA ETAPA: mover a cuda" in capsys.readouterr().out
+
+
+def test_una_etapa_que_pasa_se_cronometra():
+    t = pipeline.Tutor("s08d")
+    assert t._etapa("tokenizer", lambda: "ok") == "ok"
+    etapa = t.estado.etapas[-1]
+    assert etapa["ok"] and etapa["error"] is None
+    assert isinstance(etapa["segundos"], float)
+    assert t.estado.etapa_fallida == ""
+
+
+def test_la_salud_muestra_la_etapa_que_fallo():
+    from salud import salud
+
+    t = pipeline.Tutor("s08d")
+    with pytest.raises(RuntimeError):
+        t._etapa("adaptador LoRA (PeftModel.from_pretrained)",
+                 lambda: (_ for _ in ()).throw(RuntimeError("sin memoria")))
+    s = salud(t)
+    assert s["etapa_fallida"].startswith("adaptador LoRA")
+    assert any("FALLA" in linea for linea in s["carga_por_etapas"])
+    assert any("sin memoria" in linea for linea in s["traceback"])
+
+
+def test_cargar_modelo_no_reintenta_tras_fallar_una_etapa(monkeypatch):
+    """Sin esto, cada pregunta volvería a intentar la carga y el usuario vería
+    la misma espera larga una y otra vez sin más información."""
+    t = pipeline.Tutor("s08d")
+    t.estado.etapa_fallida = "modelo base"
+    llamadas = []
+    monkeypatch.setattr(t, "_etapa",
+                        lambda n, f: llamadas.append(n))
+    t._cargar_modelo()
+    assert llamadas == []
+
+
+# --- torch.distributed.tensor --------------------------------------------
+
+def test_asegurar_distributed_tensor_hace_que_el_atributo_exista():
+    """La forma del error lo dice todo: `AttributeError`, no `ModuleNotFound`.
+    El subpaquete existe pero `import torch` no lo carga, así que el acceso
+    `torch.distributed.tensor.X` falla hasta que alguien lo importa."""
+    pytest.importorskip("torch")
+    import compat_torch
+
+    info = compat_torch.asegurar_distributed_tensor()
+    assert info["torch"] != "ausente"
+    if info["distributed_disponible"]:
+        assert info["tensor_despues"] is True, info
+        assert not info["error"], info["error"]
+        import torch.distributed as dist
+        assert hasattr(dist, "tensor")
+
+
+def test_el_diagnostico_de_torch_reporta_lo_necesario():
+    pytest.importorskip("torch")
+    import compat_torch
+
+    v = compat_torch.versiones()
+    for clave in ("python", "torch", "transformers", "peft", "accelerate"):
+        assert clave in v, clave
+    texto = compat_torch.diagnostico()
+    assert "torch.distributed.tensor" in texto
+    assert "Accesos por atributo" in texto
+
+
+def test_el_buscador_de_culpables_ignora_las_cadenas():
+    """El propio torch lleva 'torch.distributed.tensor.parallel…' como texto en
+    sus registros de API; reportarlo sería ruido justo donde hace falta señal."""
+    import compat_torch
+
+    hallazgos = compat_torch.quien_usa_distributed_tensor()
+    assert all("_log_api_usage_once" not in h for h in hallazgos), hallazgos
+
+
+def test_la_app_asegura_torch_antes_de_importar_pipeline():
+    fuente = (RAIZ / "M5_despliegue" / "app" / "app.py").read_text(encoding="utf-8")
+    assert fuente.index("import compat_torch") < fuente.index("from pipeline import")
+    assert "COMPAT_TORCH = compat_torch.asegurar_distributed_tensor()" in fuente
+
+
+# =========================================================================
+# El adaptador lo guardó una PEFT más nueva que la instalable
+#
+# `adaptadores/qwen-lora/adapter_config.json` trae campos que NINGUNA PEFT
+# publicada en PyPI (hasta 0.17.1) conoce: `alora_invocation_tokens`,
+# `use_qalora`, `qalora_group_size`, `trainable_token_indices`. Con PEFT 0.13.2
+# eso da `TypeError: __init__() got an unexpected keyword argument
+# 'alora_invocation_tokens'`. Es lo que obligó a una PEFT muy nueva en Kaggle y
+# lo que rompería el Space.
+# =========================================================================
+
+def _config_adaptador():
+    import json
+    ruta = RAIZ / "adaptadores" / "qwen-lora" / "adapter_config.json"
+    if not ruta.exists():
+        pytest.skip("el adaptador no está en este disco")
+    return json.loads(ruta.read_text(encoding="utf-8"))
+
+
+def test_los_campos_que_sobran_valen_su_valor_por_defecto():
+    """La premisa del arreglo: omitirlos no cambia ningún peso. Si alguno
+    llevara un valor activo, omitirlo SÍ cambiaría el comportamiento y habría
+    que exigir la versión de PEFT, no parchear."""
+    import inspect
+    pytest.importorskip("peft")
+    from peft import LoraConfig
+
+    datos = _config_adaptador()
+    admitidos = set(inspect.signature(LoraConfig.__init__).parameters)
+    sobrantes = {k: v for k, v in datos.items() if k not in admitidos}
+    activos = {k: v for k, v in sobrantes.items()
+               if v not in (None, False, 0, "", [])}
+    # `peft_version` es metadato: dice con qué versión se guardó, no configura
+    # nada. De hecho es el dato que explica todo esto —el adaptador lo escribió
+    # PEFT 0.19.1, más nueva que cualquiera publicada en PyPI—.
+    assert datos.get("peft_version"), "el adaptador no dice con qué PEFT se guardó"
+    activos.pop("peft_version", None)
+    # `qalora_group_size` solo cuenta si `use_qalora` está encendido.
+    if not datos.get("use_qalora", False):
+        activos.pop("qalora_group_size", None)
+    assert not activos, (
+        f"estos campos desconocidos NO valen su valor por defecto: {activos}. "
+        "Omitirlos cambiaría el adaptador; hay que exigir la PEFT que los "
+        "entienda en vez de filtrarlos")
+
+
+def test_el_adaptador_carga_aunque_la_peft_sea_mas_vieja():
+    """La verificación de verdad: cargar el adaptador real."""
+    pytest.importorskip("peft")
+    pytest.importorskip("torch")
+    _config_adaptador()
+
+    t = pipeline.Tutor("solo_lora")
+    if t.comprobar_adaptador() is None:
+        pytest.skip("el adaptador no está donde la configuración lo pide")
+    t._cargar_modelo()
+    assert t.estado.modelo, t.estado.motivos
+    assert t.estado.adaptador_cargado == "m1"
+    assert not t.estado.degradado
+    assert all(e["ok"] for e in t.estado.etapas), t.estado.etapas
+
+
+def test_si_hubo_que_filtrar_campos_queda_dicho():
+    """Un filtrado silencioso sería indistinguible de que todo encajara."""
+    import inspect
+    pytest.importorskip("peft")
+    from peft import LoraConfig
+
+    datos = _config_adaptador()
+    admitidos = set(inspect.signature(LoraConfig.__init__).parameters)
+    if set(datos) <= admitidos:
+        pytest.skip("esta PEFT entiende el adapter_config entero")
+
+    t = pipeline.Tutor("solo_lora")
+    if t.comprobar_adaptador() is None:
+        pytest.skip("el adaptador no está donde la configuración lo pide")
+    t._cargar_modelo()
+    avisos = [m for m in t.estado.motivos if "se omitieron" in m]
+    assert avisos, t.estado.motivos
+    # El aviso dice con qué versión se guardó y con cuál se leyó: sin las dos,
+    # no se sabe si el filtrado fue inevitable o un pin mal puesto.
+    assert "guardado con PEFT" in avisos[0] and "leído con" in avisos[0]

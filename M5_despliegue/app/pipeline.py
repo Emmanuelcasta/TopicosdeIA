@@ -84,6 +84,11 @@ class Estado:
     registro_disponible: int = 0   # herramientas que EXISTEN (≠ activas)
     faltantes: list = field(default_factory=list)   # componentes requeridos ausentes
     motivos: list = field(default_factory=list)
+    # La carga del modelo, etapa por etapa: nombre, ok, segundos y traceback.
+    # Sin esto, un fallo en cualquier punto llegaba como un único mensaje
+    # recortado a 160 caracteres y había que adivinar en qué paso ocurrió.
+    etapas: list = field(default_factory=list)
+    etapa_fallida: str = ""
 
     @property
     def listo(self) -> bool:
@@ -342,9 +347,49 @@ class Tutor:
         except Exception as e:  # noqa: BLE001
             self.estado.motivos.append(f"herramientas: {type(e).__name__}")
 
+    def _etapa(self, nombre: str, funcion):
+        """Ejecuta una etapa de la carga y deja constancia de cómo fue.
+
+        Por qué existe. Antes toda la carga iba dentro de un solo
+        `except Exception` que guardaba `f"modelo: {type(e).__name__}: {e}"[:160]`.
+        Con eso, un `AttributeError: module 'torch.distributed' has no attribute
+        'tensor'` llegaba a pantalla sin decir **en qué paso** ocurrió: puede
+        venir del tokenizer, del modelo base, del `.to("cuda")`, del adaptador o
+        del montaje del retrieval, y cada uno se arregla distinto.
+
+        Ahora cada etapa se cronometra, se anota y, si falla, se imprime su
+        traceback completo en el log del proceso —que en Kaggle es la salida de
+        la celda— y se guarda para la pestaña Estado.
+        """
+        import time as _t
+        import traceback
+
+        t0 = _t.perf_counter()
+        try:
+            valor = funcion()
+        except BaseException as e:      # noqa: BLE001 — se re-lanza más abajo
+            traza = traceback.format_exc()
+            self.estado.etapas.append({
+                "etapa": nombre, "ok": False,
+                "segundos": round(_t.perf_counter() - t0, 2),
+                "error": f"{type(e).__name__}: {e}",
+                "traceback": traza,
+            })
+            self.estado.etapa_fallida = nombre
+            print(f"\n=== FALLO EN LA ETAPA: {nombre} ===\n{traza}", flush=True)
+            raise
+        self.estado.etapas.append({
+            "etapa": nombre, "ok": True,
+            "segundos": round(_t.perf_counter() - t0, 2),
+            "error": None, "traceback": None,
+        })
+        return valor
+
     def _cargar_modelo(self):
-        """Carga el modelo la primera vez que se necesita."""
-        if self._agente is not None or "modelo" in " ".join(self.estado.motivos):
+        """Carga el modelo la primera vez que se necesita, etapa por etapa."""
+        if self._agente is not None or self.estado.etapa_fallida:
+            return
+        if "modelo" in " ".join(self.estado.motivos):
             return
         try:
             import torch
@@ -355,32 +400,114 @@ class Tutor:
             return
 
         self.estado.dispositivo = "cuda" if torch.cuda.is_available() else "cpu"
-        try:
-            kwargs = {"torch_dtype": torch.float16 if self.estado.dispositivo == "cuda"
-                      else torch.float32}
+
+        def kwargs_carga():
             if CUANTIZAR:
                 from transformers import BitsAndBytesConfig
-                kwargs = {"quantization_config": BitsAndBytesConfig(
+                self.estado.cuantizado = True
+                return {"quantization_config": BitsAndBytesConfig(
                     load_in_4bit=True, bnb_4bit_quant_type="nf4",
                     bnb_4bit_compute_dtype=torch.float16)}
-                self.estado.cuantizado = True
+            return {"torch_dtype": torch.float16
+                    if self.estado.dispositivo == "cuda" else torch.float32}
 
+        def cargar_tokenizer():
             tok = AutoTokenizer.from_pretrained(MODELO_BASE)
             if tok.pad_token is None:
                 tok.pad_token = tok.eos_token
-            modelo = AutoModelForCausalLM.from_pretrained(MODELO_BASE, **kwargs)
-            if not CUANTIZAR:
-                modelo = modelo.to(self.estado.dispositivo)
+            return tok
 
-            ruta = self.comprobar_adaptador()
+        try:
+            kwargs = self._etapa("preparar opciones de carga", kwargs_carga)
+            tok = self._etapa("tokenizer", cargar_tokenizer)
+            modelo = self._etapa(
+                "modelo base",
+                lambda: AutoModelForCausalLM.from_pretrained(MODELO_BASE, **kwargs))
+            if not CUANTIZAR:
+                modelo = self._etapa(
+                    f"mover a {self.estado.dispositivo}",
+                    lambda: modelo.to(self.estado.dispositivo))
+
+            ruta = self._etapa("localizar adaptador", self.comprobar_adaptador)
             if ruta is not None:
-                modelo = PeftModel.from_pretrained(
-                    modelo, str(ruta), adapter_name=self.cfg.adaptador)
+                modelo = self._etapa(
+                    "adaptador LoRA (PeftModel.from_pretrained)",
+                    lambda: self._cargar_adaptador(PeftModel, modelo, ruta))
                 self.estado.adaptador_cargado = self.cfg.adaptador
-            self._armar_agente(modelo.eval(), tok)
+
+            self._etapa("armar agente (retrieval, enrutador, herramientas)",
+                        lambda: self._armar_agente(modelo.eval(), tok))
             self.estado.modelo = True
         except Exception as e:  # noqa: BLE001
-            self.estado.motivos.append(f"modelo: {type(e).__name__}: {e}"[:160])
+            # El traceback completo ya se imprimió en `_etapa`. Aquí queda el
+            # resumen corto que la interfaz enseña, CON la etapa, que es lo que
+            # faltaba para saber dónde mirar.
+            self.estado.motivos.append(
+                f"modelo: falló en «{self.estado.etapa_fallida}» · "
+                f"{type(e).__name__}: {e}"[:300])
+
+    def _cargar_adaptador(self, PeftModel, modelo, ruta):  # noqa: N803
+        """Carga el LoRA tolerando que lo guardara una PEFT más nueva.
+
+        El problema, medido. `adaptadores/qwen-lora/adapter_config.json` trae 38
+        campos, y cuatro de ellos no existen en las PEFT publicadas en PyPI:
+
+            alora_invocation_tokens = None
+            qalora_group_size       = 16
+            use_qalora              = False
+            trainable_token_indices = None
+
+        Con PEFT 0.13.2 eso revienta en
+        `TypeError: __init__() got an unexpected keyword argument
+        'alora_invocation_tokens'`, que es justo lo que obligó a instalar una
+        PEFT muy nueva en Kaggle y lo que rompería el Space, donde esa versión
+        no se puede instalar.
+
+        **Por qué se pueden omitir y no es esconder nada.** Los cuatro valen su
+        valor por defecto: `None`, `False` y —con `use_qalora=False`— un
+        `qalora_group_size` que no se usa. Codifican «esta función está
+        apagada». Quitarlos no cambia ni un peso del adaptador; mantenerlos
+        obliga a una versión concreta de la librería por nada.
+
+        Solo se omite lo que la `LoraConfig` instalada **no** acepta, y queda
+        anotado en el estado. Si falla por cualquier otra razón, se propaga.
+        """
+        try:
+            return PeftModel.from_pretrained(modelo, str(ruta),
+                                             adapter_name=self.cfg.adaptador)
+        except TypeError as e:
+            if "unexpected keyword argument" not in str(e):
+                raise
+            import inspect
+            import json
+
+            from peft import LoraConfig
+
+            datos = json.loads((ruta / "adapter_config.json").read_text(
+                encoding="utf-8"))
+            admitidos = set(inspect.signature(LoraConfig.__init__).parameters)
+            sobrantes = {k: v for k, v in datos.items() if k not in admitidos}
+            # Un campo desconocido con valor distinto del de por defecto sí
+            # cambiaría el comportamiento: ahí no se puede seguir en silencio.
+            # `peft_version` es metadato, no una opción: dice con qué versión
+            # se guardó, que es justamente el dato que explica el fallo.
+            guardado_con = sobrantes.pop("peft_version", None)
+            activos = {k: v for k, v in sobrantes.items()
+                       if v not in (None, False, 0, "", [])}
+            config = LoraConfig(**{k: v for k, v in datos.items()
+                                   if k in admitidos})
+            import importlib.metadata as _md
+            try:
+                instalada = _md.version("peft")
+            except Exception:      # noqa: BLE001
+                instalada = "desconocida"
+            self.estado.motivos.append(
+                f"adaptador guardado con PEFT {guardado_con or '?'} y leído con "
+                f"{instalada}: se omitieron {sorted(sobrantes)} por no existir "
+                "en la instalada; todos valían su valor por defecto"
+                + (f". OJO, estos NO: {activos}" if activos else ""))
+            return PeftModel.from_pretrained(modelo, str(ruta), config=config,
+                                             adapter_name=self.cfg.adaptador)
 
     def comprobar_adaptador(self):
         """-> la ruta del adaptador que pide la configuración, o None.

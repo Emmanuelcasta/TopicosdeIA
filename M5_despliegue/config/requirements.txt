@@ -1,6 +1,12 @@
 # Dependencias del Space. Versiones fijadas: una demo que se rompe porque una
 # librería cambió de API el martes no es una demo.
 gradio==4.44.1
+# Gradio 4.44.1 usa la firma posicional antigua de TemplateResponse. Starlette
+# 1.x la eliminó y la ruta raíz falla con TypeError: unhashable type: 'dict'.
+starlette<1.0
+# Gradio 4.44 importa HfFolder desde huggingface_hub; fijamos una versión que
+# conserva esa API para evitar el ImportError observado en el runtime de Kaggle.
+huggingface_hub==0.26.5
 # `gradio` ya lo fija a esta versión exacta, pero se repite aquí porque en Kaggle
 # el `pip install` conserva lo preinstalado cuando puede: con un gradio_client
 # distinto del de gradio, la ruta que sirve la página deja de funcionar.
@@ -18,7 +24,18 @@ gradio-client==1.3.0
 pydantic>=2.0,<2.11
 torch==2.4.1
 transformers==4.45.2
-peft==0.13.2
+# OJO: `peft==0.20.0` NO existe en PyPI (la última publicada es 0.17.1), así que
+# ese pin rompía cualquier instalación limpia —incluida la del Space—. En Kaggle
+# hay una 0.20.0 que viene con su imagen; este rango la deja intacta (ya lo
+# satisface, y pip no cambia lo que cumple) y es instalable fuera.
+#
+# El piso puede ser 0.13.2 porque `pipeline._cargar_adaptador` tolera que el
+# `adapter_config.json` lo guardara una PEFT más nueva: omite los campos que la
+# instalada no conoce —`alora_invocation_tokens`, `use_qalora`,
+# `trainable_token_indices`…, todos con su valor por defecto— y avisa. Sin eso
+# el adaptador exigía una PEFT que no existe en PyPI. Verificado cargando el
+# adaptador real con 0.13.2.
+peft>=0.13.2,<0.21
 accelerate==0.34.2
 sympy==1.13.3
 

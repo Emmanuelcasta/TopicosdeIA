@@ -72,6 +72,19 @@ def salud(tutor=None) -> dict:
             "listo": e.listo,
             "resumen": e.resumen(),
         })
+        # La carga, etapa por etapa. Es lo que convierte «no funciona» en «falló
+        # al mover el modelo a cuda», que es lo único accionable.
+        if e.etapas:
+            datos["carga_por_etapas"] = [
+                f"{'ok ' if x['ok'] else 'FALLA'} {x['segundos']:>6.2f}s  "
+                f"{x['etapa']}" + ("" if x["ok"] else f"  -> {x['error']}")
+                for x in e.etapas]
+        if e.etapa_fallida:
+            datos["etapa_fallida"] = e.etapa_fallida
+            fallo = next((x for x in e.etapas if not x["ok"]), None)
+            if fallo and fallo.get("traceback"):
+                # Las últimas líneas: el resto está en el log del proceso.
+                datos["traceback"] = fallo["traceback"].strip().splitlines()[-12:]
         if e.motivos:
             datos["avisos"] = e.motivos
     return datos

@@ -25,6 +25,12 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+# Este servicio carga modelos de PyTorch. En Kaggle, Transformers puede
+# descubrir el TensorFlow preinstalado e importar sus integraciones aunque no
+# se usen; el binario de TensorFlow del runtime no es compatible con su NumPy.
+# Desactivamos esa ruta antes de importar pipeline/transformers.
+os.environ.setdefault("USE_TF", "0")
+
 # Antes de tocar Gradio. Con pydantic >= 2.11 la ruta que sirve la página lanza
 # `TypeError: argument of type 'bool' is not iterable` al describir el esquema de
 # `gr.Image`, y el enlace público responde Internal Server Error. El arreglo
@@ -33,6 +39,15 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import compat_gradio                        # noqa: E402
 
 COMPAT = compat_gradio.aplicar()
+
+# Antes de importar pipeline, que es quien acaba cargando el modelo. En Kaggle
+# la primera pregunta fallaba con `AttributeError: module 'torch.distributed'
+# has no attribute 'tensor'`: alguien accede al subpaquete sin importarlo, y
+# `import torch` no lo carga solo. Importarlo aquí hace que el atributo exista.
+# Ver `compat_torch.py`, que además dice qué paquete lo usa así.
+import compat_torch                         # noqa: E402
+
+COMPAT_TORCH = compat_torch.asegurar_distributed_tensor()
 
 from pipeline import obtener_tutor          # noqa: E402
 from telemetria import registrar              # noqa: E402
@@ -236,6 +251,14 @@ def lanzar():
     if COMPAT["parche_aplicado"]:
         print("Compatibilidad de Gradio: parche de subesquemas booleanos APLICADO")
         print(f"  {COMPAT['motivo']}")
+    # El entorno de torch, que es donde fallaba la primera pregunta. Se imprime
+    # al arrancar para que el log de la celda de Kaggle ya traiga la respuesta
+    # cuando algo salga mal, sin tener que reproducirlo.
+    print("torch: " + " | ".join(
+        f"{k} {val}" for k, val in compat_torch.versiones().items()))
+    print(f"torch.distributed.tensor: {COMPAT_TORCH['accion'] or '—'}")
+    if COMPAT_TORCH.get("error"):
+        print(f"  AVISO: {COMPAT_TORCH['error']}")
     return construir().launch(
         server_name="0.0.0.0",
         server_port=int(os.environ.get("PORT", 7860)),
