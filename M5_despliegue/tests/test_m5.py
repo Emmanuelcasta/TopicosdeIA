@@ -379,7 +379,7 @@ def _degradar(monkeypatch, config="s08d", **sustituciones):
 
 
 def test_sin_recuperador_hibrido_el_sistema_queda_degradado(monkeypatch):
-    t = _degradar(monkeypatch, buscador_hibrido=lambda chunks: None)
+    t = _degradar(monkeypatch, buscador_hibrido=lambda chunks, diag=None: None)
     assert t.estado.degradado
     assert "retrieval híbrido + reranker" in t.estado.faltantes
     assert t.estado.medido_aplicable is None
@@ -392,7 +392,7 @@ def test_sin_recuperador_hibrido_el_sistema_queda_degradado(monkeypatch):
 def test_sin_reranker_tampoco_hay_enrutador_y_los_dos_se_informan(monkeypatch):
     """El enrutador usa el puntaje del reranker como tercer rasgo: sin él, no es
     el enrutador que midió nada, y caen las dos piezas."""
-    t = _degradar(monkeypatch, buscador_hibrido=lambda chunks: None)
+    t = _degradar(monkeypatch, buscador_hibrido=lambda chunks, diag=None: None)
     assert t.estado.faltantes == ["retrieval híbrido + reranker",
                                   "enrutador consulta/problema"]
     assert t.estado.enrutador_pedido is True
@@ -401,7 +401,7 @@ def test_sin_reranker_tampoco_hay_enrutador_y_los_dos_se_informan(monkeypatch):
 
 def test_un_enrutador_que_no_arranca_se_informa_aunque_el_retrieval_este(monkeypatch):
     """Caso distinto del anterior: la híbrida se monta y el enrutador falla."""
-    def hibrido_sin_enrutador(chunks):
+    def hibrido_sin_enrutador(chunks, diag=None):
         def buscar(consulta, k=3):
             return list(range(min(k, len(chunks))))
         buscar.encode = lambda textos: [[0.0]] * len(list(textos))
@@ -468,7 +468,7 @@ def test_con_todas_las_piezas_la_cifra_historica_si_se_informa():
 def test_la_salud_degradada_no_atribuye_la_cifra_a_esta_ejecucion(monkeypatch):
     from salud import salud, texto_salud
 
-    t = _degradar(monkeypatch, buscador_hibrido=lambda chunks: None)
+    t = _degradar(monkeypatch, buscador_hibrido=lambda chunks, diag=None: None)
     s = salud(t)
     assert s["degradado"] is True
     assert s["componentes_faltantes"]
@@ -482,7 +482,7 @@ def test_la_salud_degradada_no_atribuye_la_cifra_a_esta_ejecucion(monkeypatch):
 def test_la_cabecera_de_la_interfaz_marca_el_modo_degradado(monkeypatch):
     import app as interfaz
 
-    t = _degradar(monkeypatch, buscador_hibrido=lambda chunks: None)
+    t = _degradar(monkeypatch, buscador_hibrido=lambda chunks, diag=None: None)
     cab = interfaz._cabecera(t)
     assert "MODO DEGRADADO" in cab
     assert "NO MEDIDO" in cab
@@ -738,11 +738,22 @@ def test_el_notebook_de_m4_fija_las_versiones():
 
 def test_la_version_fijada_coincide_con_la_del_despliegue():
     """Si el notebook y el Space usan versiones distintas, medir en uno no dice
-    nada del otro."""
+    nada del otro.
+
+    Se leen los PINES, no el texto del archivo. Esta prueba pasaba sola:
+    buscaba `peft==0.20.0` como subcadena y lo encontraba en el comentario que
+    explica que esa versión no existe en PyPI, así que seguía en verde después
+    de cambiar el pin a un rango.
+    """
     req = (RAIZ / "M5_despliegue" / "config" /
            "requirements.txt").read_text(encoding="utf-8")
-    assert "transformers==4.45.2" in req
-    assert "peft==0.20.0" in req and "accelerate==0.34.2" in req
+    pins = [l.split("#")[0].strip() for l in req.splitlines()
+            if l.strip() and not l.lstrip().startswith("#")]
+    assert "transformers==4.45.2" in pins
+    assert "accelerate==0.34.2" in pins
+    peft = next(p for p in pins if p.startswith("peft"))
+    assert peft != "peft==0.20.0", "no existe en PyPI"
+    assert "<0.21" in peft, peft
 
 
 # =========================================================================
@@ -1022,3 +1033,177 @@ def test_si_hubo_que_filtrar_campos_queda_dicho():
     # El aviso dice con qué versión se guardó y con cuál se leyó: sin las dos,
     # no se sabe si el filtrado fue inevitable o un pin mal puesto.
     assert "guardado con PEFT" in avisos[0] and "leído con" in avisos[0]
+
+
+# =========================================================================
+# El retrieval que no se monta tiene que decir POR QUÉ
+#
+# Lo que pasó en Kaggle el 1 de noviembre de 2026: el tutor respondió
+# correctamente `7/8` a «¿Cuánto es 3/4 + 1/8?» y la pestaña Estado decía
+# `degradado: True`, `faltantes: retrieval híbrido + reranker`. Nada más. El
+# aviso era «falta rank_bm25, sentence-transformers o los modelos en caché», y
+# los tres paquetes estaban instalados: el mensaje era falso en sus dos primeras
+# opciones y mudo en la tercera.
+#
+# La causa quedaba oculta porque `buscador_hibrido` tenía un `except ImportError`
+# y un `except Exception` que devolvían la misma None. Estas pruebas fijan que
+# ahora se registre la etapa, el error, la causa probable y el traceback.
+# =========================================================================
+
+def test_el_retrieval_que_no_se_monta_dice_en_que_etapa_y_con_que_error(monkeypatch):
+    """Una None sin explicación obliga a adivinar entre cinco causas distintas."""
+    # Con None en sys.modules, el `from rank_bm25 import ...` lanza ImportError
+    # tanto si el paquete está instalado como si no: la prueba vale en los dos
+    # entornos, y no depende de que falte una dependencia.
+    monkeypatch.setitem(sys.modules, "rank_bm25", None)
+
+    t = pipeline.Tutor("s08d")
+    t.resolver_componentes()
+
+    assert t.estado.degradado
+    assert "retrieval híbrido + reranker" in t.estado.faltantes
+    diag = t.estado.retrieval_diagnostico
+    assert diag, "sin diagnóstico no se sabe en qué etapa se rompió la cadena"
+    fallo = next(x for x in diag if not x["ok"])
+    assert "importar" in fallo["etapa"]
+    assert "rank_bm25" in fallo["error"]
+    assert "dependencia" in fallo["causa_probable"]
+    assert "ImportError" in fallo["traceback"] or "rank_bm25" in fallo["traceback"]
+    # Y el aviso que se enseña ya no es la lista de sospechosos.
+    aviso = next(m for m in t.estado.motivos if m.startswith("retrieval:"))
+    assert "rank_bm25" in aviso and "causa probable" in aviso
+
+
+def test_la_salud_publica_el_diagnostico_del_retrieval(monkeypatch):
+    """La pestaña Estado es donde se mira en Kaggle; si no sale ahí, no sirve."""
+    monkeypatch.setitem(sys.modules, "rank_bm25", None)
+    t = pipeline.Tutor("s08d")
+    t.resolver_componentes()
+
+    d = salud(t)
+    assert "retrieval_por_etapas" in d
+    assert any("FALLA" in linea for linea in d["retrieval_por_etapas"])
+    assert "dependencia" in d["retrieval_causa_probable"]
+    assert d["retrieval_traceback"], "el traceback es lo único accionable"
+    assert "retrieval_por_etapas" in texto_salud(t)
+
+
+def test_el_diagnostico_no_publica_credenciales():
+    """Los errores del hub citan URLs y cabeceras, y esto se pega en informes."""
+    sucio = ("OSError: 401 en https://huggingface.co/api/models · "
+             "Authorization: Bearer hf_abcdefghijklmnop1234 · token=hf_otracosa99")
+    limpio = pipeline._redactar(sucio)
+    assert "hf_abcdefghijklmnop1234" not in limpio
+    assert "hf_otracosa99" not in limpio
+    assert "[REDACTADO]" in limpio
+    assert "huggingface.co/api/models" in limpio, "la URL sí hace falta verla"
+
+
+def test_la_causa_probable_separa_la_red_de_la_version():
+    """Son dos arreglos opuestos: con una, reinstalar no sirve; con la otra,
+    tener internet tampoco. Confundirlas cuesta una sesión de GPU."""
+    casos = {
+        ImportError("No module named 'rank_bm25'"): "dependencia",
+        MemoryError(): "memoria",
+        OSError("Max retries exceeded with url: https://huggingface.co"): "red",
+        OSError("We couldn't connect to huggingface.co"): "red",
+        TypeError("__init__() got an unexpected keyword argument"): "versión",
+        AttributeError("module 'torch.distributed' has no attribute 'tensor'"):
+            "versión",
+    }
+    for excepcion, esperado in casos.items():
+        assert esperado in pipeline._causa_probable(excepcion), excepcion
+
+
+def test_el_buscador_hibrido_prueba_una_consulta_antes_de_declararse_montado():
+    """Que los constructores no lancen no significa que la cadena responda: sin
+    esta etapa, la primera pregunta del estudiante era la que lo descubría."""
+    fuente = (RAIZ / "M5_despliegue" / "app" / "pipeline.py").read_text(
+        encoding="utf-8")
+    inicio = fuente.index("def buscador_hibrido(")
+    cuerpo = fuente[inicio:fuente.index("def buscador_lexico(")]
+    assert "consulta de prueba contra el corpus" in cuerpo
+    # Y codificar el corpus ocurre DENTRO de una etapa: antes estaba fuera de
+    # todo manejo de errores y un fallo ahí no degradaba el retrieval, tumbaba
+    # la carga entera del tutor.
+    assert 'etapa(f"codificar los' in cuerpo
+    assert "except Exception:      # noqa: BLE001" not in cuerpo
+
+
+def test_el_enrutador_no_se_monta_sobre_la_busqueda_lexica():
+    """El tercer rasgo de S08-D es el puntaje del cross-encoder. Un enrutador
+    sin `encode` ni `rerank_max` no es el que se midió, así que no se monta."""
+    chunks, _m, _i = pipeline.cargar_corpus()
+    lexico = pipeline.buscador_lexico(chunks)
+    assert getattr(lexico, "encode", None) is None
+    assert getattr(lexico, "rerank_max", None) is None
+
+    t = pipeline.Tutor("s08d")
+    assert t._montar_enrutador(lexico) is None
+    assert any("cross-encoder" in m for m in t.estado.motivos)
+
+
+# --- la validación distingue instalado / cargable / montado / efectivo ----
+
+def test_la_validacion_no_da_el_retrieval_por_montado_con_solo_los_imports():
+    """El error de la sesión anterior: «están los tres paquetes, luego el
+    retrieval está listo». Los cuatro niveles existen para que no se repita."""
+    sys.path.insert(0, str(RAIZ / "M5_despliegue" / "evaluacion"))
+    import validacion_m5
+
+    req = validacion_m5.estado_requisitos()
+    nivel1 = next(k for k in req if "nivel 1" in k)
+    assert "NO implica montado" in nivel1
+    niveles = next(k for k in req if "niveles 2-4" in k)
+    # Sin una corrida del diagnóstico no se afirma nada.
+    assert isinstance(req[niveles], str)
+    assert ("NO COMPROBADO" in req[niveles] or "nivel" in req[niveles]
+            or "cuatro niveles pasan" in req[niveles])
+    # Y la clave antigua, que mezclaba los cuatro en un booleano, ya no está.
+    assert "retrieval (sentence-transformers, rank_bm25, sklearn)" not in req
+
+
+def test_el_perfil_de_kaggle_no_baja_ninguna_version():
+    """Comprobado en la T4 el 2/11/2026: la imagen de Kaggle importa
+    `sentence_transformers` sin un fallo, y lo que rompía el retrieval eran
+    nuestras propias bajadas. `numpy==1.26.4` deja a jax sin
+    `numpy.dtypes.StringDType`, que existe desde numpy 2.0; el fallo sube por
+    tensorflow y `transformers.modeling_tf_utils` hasta el import. Así que en
+    Kaggle solo se instala lo que de verdad falta."""
+    kaggle = (RAIZ / "M5_despliegue" / "config" /
+              "requirements-kaggle.txt").read_text(encoding="utf-8")
+    pins = [l.split("#")[0].strip() for l in kaggle.splitlines()
+            if l.strip() and not l.lstrip().startswith("#")]
+    assert pins == ["rank-bm25==0.2.2"], (
+        "el perfil de Kaggle instala de más: " + ", ".join(pins))
+    # El error exacto queda escrito, no resumido: es la prueba del perfil.
+    assert "StringDType" in kaggle
+    assert "pip uninstall -y torchao" in kaggle
+
+
+def test_el_perfil_del_space_no_se_usa_en_kaggle():
+    """`requirements.txt` es correcto para el Space —torch 2.4.1 con numpy
+    1.26.4— y es justo el que rompe Kaggle. Los dos perfiles existen porque
+    describen dos máquinas distintas, no por duplicación."""
+    space = (RAIZ / "M5_despliegue" / "config" / "requirements.txt").read_text(
+        encoding="utf-8")
+    kaggle = (RAIZ / "M5_despliegue" / "config" /
+              "requirements-kaggle.txt").read_text(encoding="utf-8")
+    pins_space = [l.split("#")[0].strip() for l in space.splitlines()
+                  if l.strip() and not l.lstrip().startswith("#")]
+    assert any(p.startswith("numpy==1.26") for p in pins_space), (
+        "el Space sí fija numpy; si eso cambia, este análisis hay que rehacerlo")
+    assert "numpy" not in [p.split("==")[0] for p in
+                           kaggle.splitlines() if p and not p.startswith("#")]
+
+
+def test_el_guion_de_kaggle_dice_como_distinguir_completo_de_degradado():
+    """Sin ese criterio escrito, una respuesta correcta se lee como un sistema
+    completo: es literalmente lo que pasó con el `7/8`."""
+    guion = (RAIZ / "M5_despliegue" / "docs" / "GUION_KAGGLE.md").read_text(
+        encoding="utf-8")
+    assert "diagnostico_retrieval.py" in guion
+    assert "degradado" in guion
+    assert "requirements-kaggle.txt" in guion
+    # Y el paso 0 ya no pide un commit que ya está hecho.
+    assert "git commit" not in guion.split("## Contexto")[0]

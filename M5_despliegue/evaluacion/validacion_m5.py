@@ -180,6 +180,28 @@ EXPERIMENTOS = [
 # Qué se puede comprobar desde aquí, sin GPU y sin URL
 # --------------------------------------------------------------------------
 
+def _niveles_retrieval() -> str:
+    """Lo que dijo la última corrida de `diagnostico_retrieval.py`, o nada.
+
+    Sin corrida no se afirma nada: «no comprobado» es la respuesta honesta y la
+    única que no invita a dar el retrieval por montado.
+    """
+    ruta = SALIDA / "diagnostico_retrieval.json"
+    if not ruta.exists():
+        return ("NO COMPROBADO · correr "
+                "M5_despliegue/evaluacion/diagnostico_retrieval.py")
+    try:
+        d = json.loads(ruta.read_text(encoding="utf-8"))
+    except Exception as e:      # noqa: BLE001
+        return f"ilegible ({type(e).__name__})"
+    fallo = d.get("primer_fallo")
+    if fallo is None:
+        return "los cuatro niveles pasan"
+    nivel = next((n for n in d.get("niveles", []) if n["nivel"] == fallo), {})
+    return (f"FALLA en el nivel {fallo} ({nivel.get('titulo', '?')}): "
+            f"{nivel.get('error') or 'ver el json'}")
+
+
 def estado_requisitos() -> dict:
     """Qué hay y qué falta. No mide nada: comprueba disponibilidad."""
     def tiene(modulo):
@@ -205,8 +227,17 @@ def estado_requisitos() -> dict:
                              "qwen-lora-diagnostico")}
     return {
         "GPU": gpu,
-        "retrieval (sentence-transformers, rank_bm25, sklearn)":
+        # Cuatro cosas distintas, y antes se informaban como una sola. En
+        # Kaggle los tres paquetes estaban instalados y de ahí se concluyó que
+        # el retrieval estaba listo: no lo estaba —`degradado: True`, faltaba
+        # «retrieval híbrido + reranker»— porque un `import` que funciona no
+        # dice nada sobre cargar dos modelos y encadenarlos. Los niveles 2 a 4
+        # necesitan descargar pesos, así que viven en
+        # `diagnostico_retrieval.py` y aquí solo se lee su resultado.
+        "retrieval · nivel 1: paquetes instalados (NO implica montado)":
             all(tiene(m) for m in ("sentence_transformers", "rank_bm25", "sklearn")),
+        "retrieval · niveles 2-4 (modelo cargable, montado, efectivo)":
+            _niveles_retrieval(),
         "transformers + peft": tiene("transformers") and tiene("peft"),
         "adaptadores": adaptadores,
         "eval set de M2 (21 casos)": EVAL_M2.exists(),

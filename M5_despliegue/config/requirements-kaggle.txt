@@ -1,0 +1,116 @@
+# Perfil de Kaggle · COMPROBADO en la T4 el 2 de noviembre de 2026
+#
+# Regla: en Kaggle NO se baja ninguna versión. Se instala lo que falta y nada
+# más. Este archivo tiene UNA línea efectiva por una razón medida, no por
+# economía.
+#
+# ---------------------------------------------------------------------------
+# Por qué. El error exacto que tumbaba el retrieval.
+# ---------------------------------------------------------------------------
+# Síntoma: el tutor contestaba 7/8 pero la pestaña Estado decía
+# `degradado: True`, sin «retrieval híbrido + reranker» ni enrutador.
+#
+# Causa, confirmada por contraste en la imagen virgen:
+#
+#   AttributeError: module 'numpy.dtypes' has no attribute 'StringDType'
+#
+# La cadena, de abajo arriba:
+#
+#   buscador_hibrido()
+#     from sentence_transformers import CrossEncoder, SentenceTransformer
+#       sentence_transformers/__init__.py
+#         transformers.integrations.integration_utils
+#           transformers.modeling_tf_utils      (TFPreTrainedModel)
+#             tensorflow.lite.python.authoring
+#               jax/_src/dtypes.py:  np.dtypes.StringDType()
+#                 AttributeError: 'numpy.dtypes' no tiene 'StringDType'
+#
+# `numpy.dtypes.StringDType` existe desde numpy 2.0. La imagen de Kaggle trae
+# numpy 2.1.3, y su tensorflow 2.20 y su jax 0.11.1 están construidos contra
+# ella. `requirements.txt` fija `numpy==1.26.4` —correcto para el Space, con
+# torch 2.4.1—, y al aplicarlo en Kaggle se rompe jax, se rompe tensorflow, se
+# rompe el puente TF de transformers y con él el import de
+# sentence_transformers. El tutor seguía respondiendo porque el modelo de
+# lenguaje no pasa por esa cadena: solo el retrieval se caía.
+#
+# Era nuestra propia instalación la que rompía el entorno. La hipótesis previa
+# —que `sentence-transformers` se quedaba atrás al bajar sus tres compañeras—
+# queda DESCARTADA: en la imagen virgen importa sin un fallo.
+#
+# ---------------------------------------------------------------------------
+# La imagen virgen, medida (Kaggle, entorno fijado a 2026-10-22, T4 x2)
+# ---------------------------------------------------------------------------
+#   Python 3.13.15        numpy 2.1.3            scipy 1.16.3
+#   torch 2.11.0+cu128    transformers 5.16.1    tokenizers 0.23.1
+#   huggingface_hub 1.29.0                       sentence-transformers 5.7.0
+#   peft 0.20.0           accelerate 1.14.0      scikit-learn 1.6.1
+#   gradio 6.26.0         gradio_client 2.6.1    pydantic 2.13.5
+#   sympy 1.14.0          tensorflow 2.20.0      jax 0.11.1
+#   torchao 0.10.0        rank_bm25 AUSENTE  <-- lo único que falta
+#
+# Comprobado en proceso limpio con esa imagen más la línea de abajo:
+#   NIVEL 1 · importar sentence_transformers ........ OK
+#              rank_bm25 ............................ OK
+#   NIVEL 2 · paraphrase-multilingual-MiniLM-L12-v2 .. OK, dim (1, 384)
+#              mmarco-mMiniLMv2-L12-H384-v1 ......... OK, score 2.388
+#
+# ---------------------------------------------------------------------------
+# Lo único que se instala
+# ---------------------------------------------------------------------------
+rank-bm25==0.2.2
+
+# ---------------------------------------------------------------------------
+# Lo que NO se instala, y por qué cada uno
+# ---------------------------------------------------------------------------
+# numpy                 bajarlo a 1.26.4 es EL fallo descrito arriba.
+# torch                 la imagen trae 2.11.0+cu128, compilado para esta GPU.
+#                       `torch==2.4.1` descarga 2,5 GB y pierde el CUDA bueno.
+# transformers          5.16.1 en la imagen. Bajarlo a 4.45.2 arrastra
+#                       tokenizers y huggingface_hub, y deja
+#                       sentence-transformers 5.7.0 sobre piezas que no son
+#                       las suyas.
+# tokenizers,           van pegados a transformers. O se mueven los tres y
+# huggingface_hub       sentence-transformers a la vez, o ninguno.
+# sentence-transformers 5.7.0 funciona. No se toca.
+# gradio, gradio_client 6.26.0 sirvió la interfaz. `compat_gradio` no depende
+#                       de versión: comprueba si el fallo de subesquemas se
+#                       dispara y solo parchea si hace falta.
+# peft                  0.20.0 en la imagen, y el adaptador se parsea
+#                       (PeftType.LORA). No se fuerza.
+# scikit-learn, scipy,  presentes y consistentes con numpy 2.
+# sympy, pydantic, PIL
+#
+# ---------------------------------------------------------------------------
+# torchao · aparte, porque no es un pin
+# ---------------------------------------------------------------------------
+# `torchao==0.10.0` viene en la imagen y no se puede excluir desde un archivo
+# de requisitos. Si interfiere al cargar el adaptador, se quita a mano DESPUÉS
+# del último `pip install` de la sesión y se comprueba:
+#
+#   !pip uninstall -y torchao
+#   import importlib.util; print(importlib.util.find_spec("torchao") is None)
+#
+# COMPROBADO el 2 de noviembre de 2026: con torchao presente, la carga del
+# adaptador falla en seco y el error es explícito:
+#
+#   etapa_fallida: adaptador LoRA (PeftModel.from_pretrained)
+#   ImportError: Found an incompatible version of torchao.
+#                Found version 0.10.0, but only versions above 0.16.0 are supported
+#
+# peft 0.20.0 pide torchao > 0.16.0 y la imagen trae 0.10.0. No se actualiza
+# torchao: no hace falta para nada de este proyecto, y subirlo arrastraría
+# torch. Se desinstala y ya. Tras `pip uninstall -y torchao` la misma carga
+# pasa en 0.28 s.
+#
+# ---------------------------------------------------------------------------
+# Los cuatro niveles, medidos en la T4 el 2 de noviembre de 2026
+# ---------------------------------------------------------------------------
+#   1 · paquetes          import sentence_transformers OK, rank_bm25 OK
+#   2 · modelos cargables  MiniLM OK dim (1, 384); mmarco OK score 2.388
+#   3 · montado            buscador_hibrido devuelve objeto con `encode` y
+#                          `rerank_max`; consulta de prueba -> 3 resultados
+#   4 · efectivo           degradado: False, componentes_faltantes: ninguno,
+#                          configuracion_efectiva == solicitada (S08-D)
+#
+# El código del tutor, escrito contra transformers 4.45, corre sobre la 5.16.1
+# de la imagen sin cambios.

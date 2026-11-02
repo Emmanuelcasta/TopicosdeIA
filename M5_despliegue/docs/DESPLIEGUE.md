@@ -1,11 +1,20 @@
 # Despliegue · qué ejecutar y dónde
 
-**Estado al 1 de noviembre de 2026.** La interfaz se probó en Kaggle con una T4
-y se obtuvo un enlace temporal de Gradio, pero la prueba funcional no pasó: al
-enviar una pregunta, el tutor respondió `Tutor NO disponible` por un error de
-dependencias de PyTorch/PEFT. No hay Space permanente ni una corrida exitosa que
-permita presentar el tutor como listo. Los enlaces temporales de Kaggle caducan
-y no son una URL de producción.
+**Estado al 2 de noviembre de 2026.** La interfaz arranca en Kaggle con una T4,
+sirve un enlace temporal de Gradio y **responde correctamente** a la pregunta
+escrita: el 1 de noviembre contestó «¿Cuánto es 3/4 + 1/8?» con `3/4 = 6/8`,
+`6/8 + 1/8` y `7/8` en 9,3 s.
+
+**Y aun así la corrida no validó la arquitectura.** La pestaña Estado marcaba
+`degradado: True`, con `retrieval híbrido + reranker` y
+`enrutador consulta/problema` entre los faltantes, y el resultado como
+`NO MEDIDO`. Lo que contestó fue el modelo base con LoRA y búsqueda léxica, no la
+S08-D que se pidió. **Una respuesta correcta no es una arquitectura completa**, y
+el `7/8` no se puede presentar como validación de nada más que de que el modelo y
+el adaptador cargan.
+
+No hay Space permanente ni una corrida sin degradar. Los enlaces temporales de
+Kaggle caducan y no son una URL de producción.
 
 ## 1 · Local, sin GPU
 
@@ -93,48 +102,43 @@ y `false` es `None`, que es la semántica de JSON Schema— por si el pin no se 
 imponer. No esconde el error: implementa la lectura correcta, y el diagnóstico
 dice si el fallo se estaba disparando o si el parche fue solo prevención.
 
-### Celdas de Kaggle · actualizar dependencias y relanzar
+### Celdas de Kaggle · dependencias, en una sola resolución de pip
 
-**1 · Dependencias.** Pydantic ya está importado por el stack preinstalado de
-Kaggle, así que **hay que reiniciar el kernel** después de esta celda:
-
-```python
-%pip install -q "gradio==4.44.1" "gradio-client==1.3.0" "pydantic>=2.0,<2.11" "huggingface_hub==0.26.5" "starlette<1.0"
-import IPython; IPython.Application.instance().kernel.do_shutdown(True)
-```
-
-El pin de `huggingface_hub` evita el `ImportError: cannot import name 'HfFolder'`
-que Gradio 4.44.1 puede producir al importar OAuth con la versión preinstalada en
-Kaggle. El diagnóstico debe ejecutarse sin importar Gradio directamente: así
-`compat_gradio` puede informar de un fallo de importación en vez de detener la
-celda antes de mostrar las versiones. El pin `starlette<1.0` conserva la firma
-posicional de `TemplateResponse` que usa Gradio 4.44.1; con Starlette 1.x la ruta
-raíz falla al renderizar y el enlace `gradio.live` responde 500.
-
-Si también ejecutas la celda de dependencias generales del proyecto, aplica
-estos dos pines **al mismo tiempo que esa instalación**. De lo contrario, el
-resolver de `pip` puede dejar otro `huggingface_hub` en el proceso que arranca
-el modelo, aunque la instalación inicial de Gradio hubiera pasado:
+**1 · Dependencias.** Un solo `pip install`, con las cuatro piezas acopladas
+dentro. Pydantic ya está importado por el stack preinstalado de Kaggle, así que
+**hay que reiniciar el kernel** después:
 
 ```python
 %cd /kaggle/working/ProyectoIA
-!grep -vE '^(torch|torchvision|torchaudio)(==|[<>=])' M5_despliegue/config/requirements.txt > /tmp/requirements-kaggle.txt
-!printf '%s\n' 'huggingface_hub==0.26.5' 'starlette<1.0' >> /tmp/requirements-kaggle.txt
-%pip install -q -r /tmp/requirements-kaggle.txt
+%pip install -q -r M5_despliegue/config/requirements-kaggle.txt
+!pip uninstall -y -q torchao
 import IPython; IPython.Application.instance().kernel.do_shutdown(True)
 ```
 
-Después del reinicio, confirma desde el mismo Python que usará la app:
+**Por qué un solo install y no dos.** Antes esta sección proponía una celda con
+los paquetes de interfaz —`gradio`, `gradio-client`, `pydantic`,
+`huggingface_hub`, `starlette`— y otra, *opcional*, con el resto del proyecto. Si
+se corría solo la primera, pasaba lo del 1 de noviembre: `huggingface_hub` bajaba
+a 0.26.5 (gradio 4.44 importa `HfFolder`, retirado en el hub 1.x), eso arrastraba
+`transformers` y `tokenizers`, y `sentence-transformers` se quedaba en el
+preinstalado corriendo sobre tres piezas más viejas que las que vinieron con él.
+El retrieval híbrido dejó de montarse y el tutor respondió en modo degradado.
 
-```python
-import huggingface_hub, starlette
-print("huggingface_hub:", huggingface_hub.__version__)
-print("starlette:", starlette.__version__)
-from huggingface_hub import HfFolder
-```
+`requirements-kaggle.txt` existe para que esa combinación no se pueda armar a
+medias: las cuatro van en el mismo archivo y pip las resuelve a la vez. No toca
+`torch` (el de Kaggle ya resuelve CUDA para la T4), ni `numpy` (bajarlo bajo un
+torch y un scipy compilados contra numpy 2 es un error de ABI), ni
+`scikit-learn`. El archivo explica cada exclusión.
 
-Se espera `huggingface_hub: 0.26.5`, Starlette menor que `1.0` y que el import de
-`HfFolder` no lance error. Si falla esta comprobación, no lances la app todavía.
+Los pines de interfaz siguen dentro y por los mismos motivos: `pydantic<2.11`
+arregla el *Internal Server Error* del enlace público, `starlette<1.0` conserva
+la firma posicional de `TemplateResponse` que usa Gradio 4.44.1, y
+`gradio-client==1.3.0` va explícito porque el pin transitivo de gradio no basta
+donde hay uno preinstalado.
+
+El diagnóstico debe ejecutarse sin importar Gradio directamente: así
+`compat_gradio` puede informar de un fallo de importación en vez de detener la
+celda antes de mostrar las versiones.
 
 **2 · Diagnóstico** (tras el reinicio, antes de lanzar nada):
 
@@ -190,8 +194,13 @@ Esto **no resolvió por sí solo** el error final de la app (`module
 'torch.distributed' has no attribute 'tensor'`), así que no lo consideres un
 arreglo completo.
 
-**4 · Lanzar.** El adaptador está en un dataset adjunto, así que hay que
-apuntarlo o la app arranca en modo degradado:
+**4 · Lanzar.** Antes de esto, correr `evaluacion/diagnostico_retrieval.py`
+(celda 2 de «Celdas de Kaggle · diagnóstico y arranque», más abajo): con el
+retrieval caído la app arranca igual y responde igual, y es lo que dejó la
+corrida del 1 de noviembre sin validar nada.
+
+El adaptador está en un dataset adjunto, así que hay que apuntarlo o la app
+arranca en modo degradado:
 
 ```python
 !cd /kaggle/working/ProyectoIA &&   USE_TF=0 TUTOR_CONFIG=revision_foto   TUTOR_GRADIO_SHARE=1   TUTOR_ADAPTADOR_M1=/kaggle/working/ProyectoIA/adaptadores/qwen-lora   python M5_despliegue/app/app.py
@@ -289,21 +298,39 @@ de fracciones de principio a fin.
 
 ### Celdas de Kaggle · diagnóstico y arranque
 
-**1 · Dependencias** (sesión limpia). No reinstala torch: el de Kaggle sirve, y
-cambiarlo arrastraría compilaciones largas y un CUDA que puede no cuadrar con la
-T4. Solo se tocan los paquetes de la interfaz, que son ligeros y puros Python:
+**1 · Dependencias** (sesión limpia). Un solo `pip install`, el de
+`requirements-kaggle.txt`. No reinstala torch: el de Kaggle sirve, y cambiarlo
+arrastraría compilaciones largas y un CUDA que puede no cuadrar con la T4.
 
 ```python
-!pip install -q "gradio==4.44.1" "gradio-client==1.3.0"                 "pydantic>=2.0,<2.11" "starlette<1.0" "huggingface_hub==0.26.5"
+%cd /kaggle/working/ProyectoIA
+%pip install -q -r M5_despliegue/config/requirements-kaggle.txt
 !pip uninstall -y -q torchao
 import IPython; IPython.Application.instance().kernel.do_shutdown(True)
 ```
 
-`torchao` se quita porque su integración se activa sola con Transformers y no
-hace falta aquí. El reinicio no es opcional: pydantic y starlette ya están
-importados por el stack de Kaggle.
+`torchao` se quita porque rompe la carga del adaptador LoRA, y se quita
+**después** del install: reaparece cada vez que pip vuelve a resolver. El
+reinicio no es opcional: pydantic y starlette ya están importados por el stack
+de Kaggle.
 
-**2 · Diagnóstico** (tras el reinicio, antes de lanzar nada):
+**2 · Los cuatro niveles del retrieval.** Esta celda decide si lanzar la app
+tiene sentido: con la cadena de S08 caída, la app arranca igual y responde
+igual, y eso es lo que confundió la corrida del 1 de noviembre. No necesita GPU
+ni carga Qwen; sí descarga los dos modelos de S08 (~500 MB) si no están en caché.
+
+```python
+!cd /kaggle/working/ProyectoIA && USE_TF=0 TUTOR_CONFIG=s08d \
+  python M5_despliegue/evaluacion/diagnostico_retrieval.py
+```
+
+Tienen que salir los cuatro en `OK`. Si alguno falla, el guion imprime su
+traceback completo y la causa probable —dependencia, red, caché, memoria o
+versión—, que son arreglos opuestos: con un fallo de red, reinstalar paquetes no
+sirve; con uno de versión, tener internet tampoco. **Con el nivel 3 o 4 en rojo,
+no se lanza la app.**
+
+**3 · Diagnóstico de torch y Gradio** (antes de lanzar nada):
 
 ```python
 import os, sys
@@ -328,7 +355,7 @@ Accesos por atributo encontrados en site-packages:
 Si sale `ninguno` y el fallo persiste, el acceso está en código compilado:
 manda el traceback completo que ahora imprime la etapa.
 
-**3 · Lanzar.** La ruta del dataset se comprueba, no se supone: Kaggle la monta
+**4 · Lanzar.** La ruta del dataset se comprueba, no se supone: Kaggle la monta
 en `/kaggle/input/<slug>/` y el slug no siempre coincide con el nombre que se le
 puso. Localízala primero:
 
@@ -344,16 +371,198 @@ El directorio que contiene ese archivo es el que va en `TUTOR_ADAPTADOR_M1`.
 !cd /kaggle/working/ProyectoIA &&   USE_TF=0   TUTOR_CONFIG=revision_foto   TUTOR_GRADIO_SHARE=1   TUTOR_ADAPTADOR_M1=$RUTA_ADAPTADOR   python M5_despliegue/app/app.py
 ```
 
-**4 · Qué comprobar, en este orden** —y no se pasa al siguiente hasta que el
+**5 · Qué comprobar, en este orden** —y no se pasa al siguiente hasta que el
 anterior funcione:
 
 1. La cabecera **no** dice `MODO DEGRADADO`.
-2. Pestaña **Estado**: `adaptador_cargado: m1`, `retrieval_activo` con
-   `hibrido`, `enrutador_activo: true`, `componentes_faltantes: ninguno`.
+2. Pestaña **Estado**: `degradado: False`, `adaptador_cargado: m1`,
+   `retrieval_activo` con `hibrido`, `enrutador_activo: true`,
+   `componentes_faltantes: ninguno`, y `retrieval_por_etapas` con todas en `ok`
+   —incluida la consulta de prueba—. Si `degradado` es `True`, mirar
+   `retrieval_causa_probable` y `retrieval_traceback`: la causa está ahí.
 3. La pregunta escrita «¿Cuánto es 3/4 + 1/8?» responde. Si falla, la salida de
    la celda trae `=== FALLO EN LA ETAPA: … ===` con el traceback entero.
 4. Solo entonces, las latencias (abajo). **Nada de fotos ni ablaciones** antes
    de que la pregunta escrita funcione.
+
+### El retrieval caído que una respuesta correcta tapaba
+
+**El síntoma.** El tutor responde bien y la pestaña Estado dice
+`degradado: True`, con `retrieval híbrido + reranker` entre los faltantes. Pasa
+porque la app está diseñada para replegarse en vez de caerse: sin la cadena de
+S08 usa búsqueda léxica y lo anuncia. Lo que no hacía era decir **por qué**.
+
+**Por qué no se veía.** `buscador_hibrido` tenía un `except ImportError` y un
+`except Exception` que devolvían la misma `None`, así que «falta rank_bm25,
+sentence-transformers o los modelos en caché» era el único mensaje posible —y en
+Kaggle era falso en sus dos primeras opciones, porque los tres paquetes estaban
+instalados, y mudo en la tercera.
+
+**La causa, CONFIRMADA en la T4 el 2 de noviembre de 2026.** El error exacto es
+
+```
+AttributeError: module 'numpy.dtypes' has no attribute 'StringDType'
+```
+
+y la cadena, de abajo arriba:
+
+```
+buscador_hibrido()
+  from sentence_transformers import CrossEncoder, SentenceTransformer
+    sentence_transformers/__init__.py
+      transformers.integrations.integration_utils
+        transformers.modeling_tf_utils          (TFPreTrainedModel)
+          tensorflow.lite.python.authoring
+            jax/_src/dtypes.py:  np.dtypes.StringDType()
+```
+
+`numpy.dtypes.StringDType` existe desde numpy 2.0. La imagen de Kaggle trae
+numpy 2.1.3, y su tensorflow 2.20 y su jax 0.11.1 están construidos contra ella.
+`requirements.txt` fija `numpy==1.26.4` —correcto para el Space, que va con
+torch 2.4.1— y aplicarlo en Kaggle rompe jax, rompe tensorflow, rompe el puente
+TF de transformers y con él el import de `sentence_transformers`. El modelo de
+lenguaje no pasa por esa cadena, y por eso el tutor contestaba `7/8` con el
+retrieval muerto.
+
+**Era nuestra propia instalación la que rompía el entorno.** La hipótesis
+anterior —`sentence-transformers` quedándose atrás al bajar sus tres
+compañeras— queda **descartada**: medido en proceso limpio, la imagen virgen
+importa `sentence_transformers` sin un fallo. Lo único que le falta a esa imagen
+es `rank-bm25`:
+
+```
+NIVEL 1 · importar sentence_transformers ........ OK
+           rank_bm25 ............................ ModuleNotFoundError
+```
+
+y con `pip install rank-bm25` y nada más:
+
+```
+NIVEL 1 OK · rank_bm25 OK
+NIVEL 2 · paraphrase-multilingual-MiniLM-L12-v2 .. OK, dim (1, 384)
+           mmarco-mMiniLMv2-L12-H384-v1 ......... OK, score 2.388
+```
+
+La imagen virgen medida (entorno fijado a 2026-10-22, T4 x2):
+
+| | | | |
+|---|---|---|---|
+| Python 3.13.15 | numpy 2.1.3 | scipy 1.16.3 | torch 2.11.0+cu128 |
+| transformers 5.16.1 | tokenizers 0.23.1 | huggingface_hub 1.29.0 | sentence-transformers 5.7.0 |
+| peft 0.20.0 | accelerate 1.14.0 | scikit-learn 1.6.1 | sympy 1.14.0 |
+| gradio 6.26.0 | gradio_client 2.6.1 | pydantic 2.13.5 | tensorflow 2.20.0 |
+| jax 0.11.1 | torchao 0.10.0 | **rank_bm25 ausente** | |
+
+**Lo que se cambió.**
+
+1. `buscador_hibrido(chunks, diagnostico)` registra **cada etapa** —importar,
+   índice BM25, embeddings, cross-encoder, codificar el corpus y una consulta de
+   prueba— con su error, su causa probable y su traceback, y lo imprime en el log
+   del proceso. `salud.py` lo publica como `retrieval_por_etapas`,
+   `retrieval_causa_probable` y `retrieval_traceback`. Los tracebacks pasan por
+   un redactor: los errores del hub citan URLs y cabeceras.
+2. **Codificar el corpus ocurre ahora dentro del manejo de errores.** Estaba
+   fuera, y un fallo ahí no degradaba el retrieval: tumbaba la carga entera del
+   tutor.
+3. **Una consulta de prueba antes de declararse montado.** Que los constructores
+   no lancen no significa que la cadena responda.
+4. `config/requirements-kaggle.txt`: un perfil que fija **juntas** las cuatro
+   piezas acopladas, en una sola resolución de pip. No toca `torch`, `numpy` ni
+   `scikit-learn`, y explica por qué cada una.
+5. `evaluacion/diagnostico_retrieval.py`: cuatro niveles separados —paquete
+   instalado, modelo cargable, componente montado, componente efectivo— porque
+   fallan por motivos distintos y se arreglan distinto. El nivel 1 era lo único
+   que comprobaba la validación anterior, y de ahí salió el «retrieval listo»
+   que era falso.
+6. `validacion_m5.estado_requisitos()` ya no informa el retrieval como un
+   booleano de `find_spec`. Sin una corrida del diagnóstico dice `NO COMPROBADO`.
+
+```bash
+# cuatro niveles, sin GPU y sin cargar Qwen
+python M5_despliegue/evaluacion/diagnostico_retrieval.py
+python M5_despliegue/evaluacion/diagnostico_retrieval.py --solo-entorno
+```
+
+**Pendiente.** Ninguno de los cuatro niveles se ha corrido todavía en Kaggle con
+el perfil nuevo. Hasta entonces, el perfil es una hipótesis con fundamento, no un
+entorno validado.
+
+### La corrida del 2 de noviembre de 2026 · S08-D sin degradar
+
+Primera ejecución en la que la configuración solicitada y la efectiva coinciden.
+Kaggle T4 x2, entorno fijado a 2026-10-22, commit `9d1ea74`, perfil
+`requirements-kaggle.txt` (`rank-bm25` y nada más) más `pip uninstall -y torchao`.
+
+```
+configuracion_solicitada: S08-D · LoRA M1 + RAG híbrido + enrutador
+configuracion_efectiva:   S08-D · LoRA M1 + RAG híbrido + enrutador
+degradado: False          componentes_faltantes: ninguno
+montaje: verificado       listo: True
+modelo_cargado: True      adaptador_cargado: m1
+retrieval_activo: hibrido + rerank (BM25+denso, RRF, cross-encoder) = S08-C
+enrutador_activo: True    corpus: True    dispositivo: cuda
+```
+
+Carga por etapas: tokenizer 0,66 s · modelo base 1,92 s · mover a cuda 1,12 s ·
+localizar adaptador 0,00 s · adaptador LoRA 0,28 s · armar agente 10,47 s.
+
+**Las dos vías del enrutador**, que es lo que distingue S08-D de S08-C:
+
+| pregunta | contextos recuperados | respuesta | latencia |
+|---|---|---|---|
+| ¿Cuál es la nota mínima aprobatoria del curso? | **3** | «Nota mínima aprobatoria es 3.0» | 1,70 s |
+| ¿Cuánto es 2/3 + 1/6? | **0** | 4/6 + 1/6 = 5/6 | 3,50 s |
+| ¿Cuánto es 3/4 + 1/8? | **0** | 3/4 = 6/8; 6/8 + 1/8 = **7/8** | — |
+
+La factual entra por RAG y la de cálculo no. Es la decisión del enrutador, vista
+desde fuera y sin inventar una puntuación de confianza.
+
+**Latencia**, separando el arranque en frío de la respuesta habitual:
+
+| | |
+|---|---|
+| arranque en frío (carga del modelo + primera respuesta) | 25,72 s · n = 1 |
+| en caliente, n = 8 | p50 **4,23 s** · p95 **5,36 s** · min 3,31 s · máx 5,36 s |
+
+Con n = 8, el p95 coincide con el máximo observado; se reporta con su n y no se
+presenta como una cola estimada. El 9,3 s de la corrida anterior era de un
+sistema degradado y **no** es la latencia de S08-D.
+
+**Lo que esto no dice.** Es una comprobación de montaje y de dos vías del
+enrutador, no una medición de exactitud. La cifra 18/21 sigue siendo la
+histórica de S08 sobre el eval set fijo de M2. Las fotos de M5, las ablaciones y
+la evaluación completa siguen sin correr.
+
+### `torchao` · se desinstala, y reaparece
+
+Viene en la imagen de Kaggle y rompe la carga del adaptador LoRA. Vuelve a
+aparecer al reiniciar el runtime o al volver a resolver un `pip install`, así que
+se quita **después** del último install de la sesión y se comprueba:
+
+```python
+import importlib.util as u
+print("torchao:", u.find_spec("torchao"))     # tiene que decir None
+```
+
+`diagnostico_retrieval.py` lo avisa en su cabecera, con el comando para quitarlo.
+
+### Dos perfiles de dependencias, y por qué no son uno
+
+| | `requirements.txt` | `requirements-kaggle.txt` |
+|---|---|---|
+| Para | Space y local, instalación limpia | la sesión de Kaggle |
+| Gradio | 4.44.1 + `gradio-client 1.3.0` | 4.44.1; solo verificado con 6.26.0 |
+| `torch` | `==2.4.1` | el de la imagen, **no se toca** |
+| `numpy` | `==1.26.4` | el de la imagen (bajarlo rompe el ABI) |
+| Acopladas | las cuatro fijadas | las cuatro fijadas, en un solo install |
+
+El guardia de `app/compat_gradio.py` no depende de una versión concreta:
+comprueba si el fallo se dispara y solo parchea si hace falta. Por eso gradio
+6.26.0 sirvió la página el 1 de noviembre aunque el pin diga 4.44.1. Hay un
+segundo camino coherente —no bajar nada y quedarse con el stack preinstalado de
+Kaggle, desinstalando solo `torchao`—, documentado al final de
+`requirements-kaggle.txt`. No es el perfil por defecto porque deja el entorno a
+merced de una imagen que cambia sin avisar y no se puede fijar en un archivo.
 
 ### Latencias, cuando la pregunta ya responda
 

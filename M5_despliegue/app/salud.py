@@ -85,6 +85,20 @@ def salud(tutor=None) -> dict:
             if fallo and fallo.get("traceback"):
                 # Las últimas líneas: el resto está en el log del proceso.
                 datos["traceback"] = fallo["traceback"].strip().splitlines()[-12:]
+        # El retrieval, etapa por etapa. Una respuesta correcta con la cadena
+        # de S08 caída es exactamente lo que ocurrió en Kaggle: el tutor contestó
+        # 7/8 y la pestaña Estado solo decía «falta retrieval híbrido +
+        # reranker». Aquí se ve en qué etapa se rompió y con qué error.
+        if e.retrieval_diagnostico:
+            datos["retrieval_por_etapas"] = [
+                f"{'ok ' if x['ok'] else 'FALLA'} {x['segundos']:>6.2f}s  "
+                f"{x['etapa']}" + ("" if x["ok"] else f"  -> {x['error']}")
+                for x in e.retrieval_diagnostico]
+            fallo = next((x for x in e.retrieval_diagnostico if not x["ok"]), None)
+            if fallo:
+                datos["retrieval_causa_probable"] = fallo["causa_probable"]
+                datos["retrieval_traceback"] = (
+                    fallo.get("traceback", "").strip().splitlines()[-12:])
         if e.motivos:
             datos["avisos"] = e.motivos
     return datos

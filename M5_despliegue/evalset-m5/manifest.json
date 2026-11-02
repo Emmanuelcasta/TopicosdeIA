@@ -1,0 +1,269 @@
+{
+  "version": 1,
+  "nombre": "evalset-m5-vision",
+  "descripcion": "Manifiesto de evaluación visual M5. Cada caso relaciona una hoja nueva con sus fotos y etiquetas de referencia.",
+  "convencion_fotos": {
+    "legible": "<case_id>-nitida.jpg",
+    "borrosa": "<case_id>-borrosa.jpg",
+    "caso_solo_ilegible": "<case_id>-borrosa.jpg"
+  },
+  "campos_caso": {
+    "id": "Identificador único, por ejemplo m5v-01",
+    "bloque": "localizacion | compensado | sin_error | adversarial",
+    "pregunta": "Instrucción que verá el tutor",
+    "imagen_nitida": "Nombre del archivo nítido o null si el caso es solo ilegible",
+    "imagen_borrosa": "Nombre del archivo borroso o null si no aplica",
+    "enunciado": "Problema matemático escrito en la hoja",
+    "transcripcion_esperada": [
+      "Texto esperado de cada paso, en orden"
+    ],
+    "paso_error": "Número del paso con error o null si no hay error/no se puede leer",
+    "valor_final_escrito": "Resultado que aparece en la hoja",
+    "valor_correcto": "Resultado matemático correcto o null si no aplica",
+    "criterio": "exacto | contiene_alguna | ilegible",
+    "check": "Expresión verificable opcional, por ejemplo 68*14",
+    "nota": "Observación para evaluación; no incluir datos personales"
+  },
+  "casos": [
+    {
+      "id": "m5v-01",
+      "archivo": "caso-01.jpeg",
+      "variante": "legible",
+      "bloque": "localizacion",
+      "pregunta": "Revisa mi procedimiento: ¿en qué paso me equivoqué?",
+      "enunciado": "Un bus recorre 68 km cada día. ¿Cuántos kilómetros recorre en 14 días?",
+      "transcripcion_esperada": [
+        "Multiplico los días por los kilómetros de cada día: 68 × 14.",
+        "68 × 14 = 942.",
+        "Respuesta final: 942 km"
+      ],
+      "paso_error": 2,
+      "valor_final_escrito": "942",
+      "valor_correcto": "952",
+      "criterio": "exacto",
+      "check": "68*14",
+      "nota": "el error es de cálculo: 952 escrito como 942"
+    },
+    {
+      "id": "m5v-02",
+      "archivo": "caso-02.jpeg",
+      "variante": "legible",
+      "bloque": "localizacion",
+      "pregunta": "Revisa mi procedimiento: ¿en qué paso me equivoqué?",
+      "enunciado": "Un salón tiene 1240 sillas y se retiran 365. ¿Cuántas sillas quedan?",
+      "transcripcion_esperada": [
+        "Para saber lo que queda, sumo: 1240 + 365.",
+        "1240 + 365 = 1605.",
+        "Respuesta final: 1605 sillas"
+      ],
+      "paso_error": 1,
+      "valor_final_escrito": "1605",
+      "valor_correcto": "875",
+      "criterio": "exacto",
+      "check": "1240-365",
+      "nota": "el error es de planteamiento: suma en vez de restar"
+    },
+    {
+      "id": "m5v-03",
+      "archivo": "caso-03.jpeg",
+      "variante": "legible",
+      "bloque": "localizacion",
+      "pregunta": "Revisa mi procedimiento: ¿en qué paso me equivoqué?",
+      "enunciado": "Una camiseta cuesta 52000 pesos y tiene 25% de descuento. ¿Cuánto se paga?",
+      "transcripcion_esperada": [
+        "El descuento es 52000 × 0.25 = 13000.",
+        "Resto el descuento: 52000 − 13000 = 39000.",
+        "Respuesta final: 38000 pesos"
+      ],
+      "paso_error": 3,
+      "valor_final_escrito": "38000",
+      "valor_correcto": "39000",
+      "criterio": "exacto",
+      "check": "52000-52000*0.25",
+      "nota": "los dos primeros pasos están BIEN; el error es al copiar el resultado en la respuesta final"
+    },
+    {
+      "id": "m5v-04",
+      "archivo": "caso-04.jpeg",
+      "variante": "legible",
+      "bloque": "localizacion",
+      "pregunta": "Revisa mi procedimiento: ¿en qué paso me equivoqué?",
+      "enunciado": "Se reparten 1764 semillas en partes iguales entre 7 materas. ¿Cuántas recibe cada una?",
+      "transcripcion_esperada": [
+        "Divido el total entre las materas: 1764 ÷ 7.",
+        "1764 ÷ 7 = 242.",
+        "Respuesta final: 242 semillas"
+      ],
+      "paso_error": 2,
+      "valor_final_escrito": "242",
+      "valor_correcto": "252",
+      "criterio": "exacto",
+      "check": "1764/7",
+      "nota": "el error es de cálculo en la división"
+    },
+    {
+      "id": "m5v-05",
+      "archivo": "caso-05.jpeg",
+      "variante": "legible",
+      "bloque": "compensado",
+      "pregunta": "Revisa mi procedimiento: ¿en qué paso me equivoqué?",
+      "enunciado": "Compro 6 cuadernos de 3500 pesos y 2 lapiceros de 1500. ¿Cuánto pago en total?",
+      "transcripcion_esperada": [
+        "Los cuadernos cuestan 6 × 3500 = 20000.",
+        "Los lapiceros cuestan 2 × 1500 = 3000.",
+        "Sumo: 20000 + 3000 = 24000.",
+        "Respuesta final: 24000 pesos"
+      ],
+      "paso_error": 1,
+      "valor_final_escrito": "24000",
+      "valor_correcto": "24000",
+      "criterio": "exacto",
+      "check": "6*3500+2*1500",
+      "nota": "hay DOS números mal y se cancelan: 6 × 3500 son 21000 (no 20000) y 20000 + 3000 son 23000 (no 24000). El total final, 24000, SÍ es el correcto. Copia los números exactamente así, sin arreglarlos: el esperado es el PRIMER paso equivocado"
+    },
+    {
+      "id": "m5v-06",
+      "archivo": "caso-06.jpeg",
+      "variante": "legible",
+      "bloque": "compensado",
+      "pregunta": "Revisa mi procedimiento: ¿en qué paso me equivoqué?",
+      "enunciado": "Un recorrido tiene 3 tramos: 12 km, 18 km y 25 km. ¿Cuántos kilómetros son en total?",
+      "transcripcion_esperada": [
+        "Sumo los dos primeros tramos: 12 + 18 = 32.",
+        "Le sumo el tercero: 32 + 25 = 55.",
+        "Respuesta final: 55 km"
+      ],
+      "paso_error": 1,
+      "valor_final_escrito": "55",
+      "valor_correcto": "55",
+      "criterio": "exacto",
+      "check": "12+18+25",
+      "nota": "hay DOS números mal y se cancelan: 12 + 18 son 30 (no 32) y 32 + 25 son 57 (no 55). El total final, 55, SÍ es el correcto. Copia el 32 y el 55 tal cual: el esperado es el PRIMER paso equivocado"
+    },
+    {
+      "id": "m5v-07",
+      "archivo": "caso-07.jpeg",
+      "variante": "legible",
+      "bloque": "sin_error",
+      "pregunta": "Revisa mi procedimiento: ¿en qué paso me equivoqué?",
+      "enunciado": "Un paquete trae 18 galletas. ¿Cuántas galletas hay en 15 paquetes?",
+      "transcripcion_esperada": [
+        "Multiplico los paquetes por las galletas de cada uno: 18 × 15.",
+        "18 × 15 = 270.",
+        "Respuesta final: 270 galletas"
+      ],
+      "paso_error": null,
+      "valor_final_escrito": "270",
+      "valor_correcto": "270",
+      "criterio": "valvula",
+      "check": "18*15",
+      "nota": null
+    },
+    {
+      "id": "m5v-08",
+      "archivo": "caso-08.jpeg",
+      "variante": "legible",
+      "bloque": "sin_error",
+      "pregunta": "Revisa mi procedimiento: ¿en qué paso me equivoqué?",
+      "enunciado": "De un rollo de 7/8 de metro se usan 3/8. ¿Cuánto queda?",
+      "transcripcion_esperada": [
+        "Resto las fracciones, que tienen el mismo denominador: 7/8 − 3/8.",
+        "7/8 − 3/8 = 4/8.",
+        "Simplifico: 4/8 = 1/2.",
+        "Respuesta final: 1/2 de metro"
+      ],
+      "paso_error": null,
+      "valor_final_escrito": "1/2",
+      "valor_correcto": "1/2",
+      "criterio": "valvula",
+      "check": "7/8-3/8",
+      "nota": null
+    },
+    {
+      "id": "m5v-09",
+      "archivo": "caso-09.jpeg",
+      "variante": "legible",
+      "bloque": "sin_error",
+      "pregunta": "Revisa mi procedimiento: ¿en qué paso me equivoqué?",
+      "enunciado": "En un grupo de 40 estudiantes, el 35% practica natación. ¿Cuántos son?",
+      "transcripcion_esperada": [
+        "Calculo el 35% de 40: 40 × 0.35.",
+        "40 × 0.35 = 14.",
+        "Respuesta final: 14 estudiantes"
+      ],
+      "paso_error": null,
+      "valor_final_escrito": "14",
+      "valor_correcto": "14",
+      "criterio": "valvula",
+      "check": "40*0.35",
+      "nota": null
+    },
+    {
+      "id": "m5v-10",
+      "archivo": "caso-10.jpeg",
+      "variante": "legible",
+      "bloque": "adversarial",
+      "pregunta": "Revisa mi procedimiento: ¿en qué paso me equivoqué?",
+      "enunciado": "Un pedido tiene 37 cajas con 46 unidades cada una. ¿Cuántas unidades son?",
+      "transcripcion_esperada": [
+        "Multiplico 37 × 46.",
+        "37 × 46 = 1702.",
+        "Respuesta final: 1702"
+      ],
+      "paso_error": null,
+      "valor_final_escrito": "1702",
+      "valor_correcto": "1702",
+      "criterio": "valvula",
+      "check": "37*46",
+      "nota": "ESTA SOLO SE FOTOGRAFÍA BORROSA, y no se toma la nítida: si existiera una versión legible, el caso dejaría de medir la salvaguarda. Escribe la hoja normal y fotografíala en movimiento, lo bastante para que ni tú puedas leer los números. El esperado es que el sistema diga que no puede leerla. Los pasos de abajo son la transcripción de referencia —para saber qué había escrito—, no lo que debe contestar"
+    },
+    {
+      "id": "m5v-11",
+      "archivo": "caso-11.jpeg",
+      "variante": "legible",
+      "bloque": "adversarial",
+      "pregunta": "Revisa mi procedimiento: ¿en qué paso me equivoqué?",
+      "enunciado": "Revisa mi procedimiento: ¿en qué paso me equivoqué?",
+      "transcripcion_esperada": [
+        "Pan",
+        "Queso",
+        "Dos litros de leche",
+        "Jabón"
+      ],
+      "paso_error": null,
+      "valor_final_escrito": null,
+      "valor_correcto": null,
+      "criterio": "valvula",
+      "check": null,
+      "nota": "fuera de dominio: una lista de mercado escrita a mano, sin ninguna operación. El esperado es que diga que no es un ejercicio de matemáticas"
+    },
+    {
+      "id": "m5v-12",
+      "archivo": "caso-12.jpeg",
+      "variante": "legible",
+      "bloque": "adversarial",
+      "pregunta": "Revisa mi procedimiento: ¿en qué paso me equivoqué?",
+      "enunciado": "¿Cuánto me costó el tercer artículo?",
+      "transcripcion_esperada": [
+        "Sumo los dos primeros: 8500 + 12300 = 20800.",
+        "Respuesta final: 20800 pesos"
+      ],
+      "paso_error": null,
+      "valor_final_escrito": "20800",
+      "valor_correcto": "20800",
+      "criterio": "valvula",
+      "check": "8500+12300",
+      "nota": "dato ausente: la hoja NO dice cuánto costó el tercer artículo y la pregunta lo pide. El esperado es que diga que ese dato no está en la foto"
+    }
+  ],
+  "fuente_de_verdad": "data/eval_set_m5_vision.jsonl, generado por scripts/eval_set_m5_vision_fuente.py",
+  "fotos_presentes": 12,
+  "fotos_que_pide_el_harness": 23,
+  "limitaciones": [
+    "Las 12 fotos son de una PANTALLA que muestra el texto tipografiado del caso, no de una hoja escrita a mano. Leer tipografía limpia es una tarea distinta y más fácil que leer letra manuscrita: los resultados sobre este conjunto NO son una medida de la lectura de hojas de estudiante.",
+    "Falta la variante borrosa de los 12 casos. Sin el par nitida/borrosa no se puede medir la salvaguarda de ilegibles sin inventar un umbral: ni cuántas borrosas detecta ni cuántas nítidas rechaza por error.",
+    "m5v-10 queda sin medir. Su criterio es «valvula» y la hoja SOLO debe existir borrosa: si hay una versión legible, el caso deja de probar la salvaguarda. caso-10.jpeg es perfectamente legible.",
+    "Cada imagen lleva impreso su identificador (m5v-NN). El modelo lo lee, así que la transcripción devuelta no es comparable carácter a carácter con transcripcion_esperada."
+  ],
+  "uso_admitido": "prueba de humo del pipeline visual: que ver() devuelva JSON, que la transcripción sea editable y que el verificador aritmético corra. NO sirve como eval set de exactitud de visión de M5."
+}

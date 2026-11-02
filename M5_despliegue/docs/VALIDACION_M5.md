@@ -9,7 +9,8 @@ Generado por `M5_despliegue/evaluacion/validacion_m5.py`.
 | Requisito | Estado |
 |---|---|
 | GPU | **NO** |
-| retrieval (sentence-transformers, rank_bm25, sklearn) | sí |
+| retrieval · nivel 1: paquetes instalados (NO implica montado) | sí |
+| retrieval · niveles 2-4 (modelo cargable, montado, efectivo) | NO COMPROBADO · correr M5_despliegue/evaluacion/diagnostico_retrieval.py |
 | transformers + peft | sí |
 | adaptadores | qwen-lora: sí, qwen-lora-agente: NO, qwen-lora-diagnostico: NO |
 | eval set de M2 (21 casos) | sí |

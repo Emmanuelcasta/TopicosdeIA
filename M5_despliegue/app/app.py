@@ -93,11 +93,19 @@ def _cabecera(tutor) -> str:
         if e.medido:
             aclaracion = (f"La cifra {e.medido} es de esa configuración con todas "
                           "sus piezas y no describe lo que responde ahora. ")
+        # Y dónde está la causa. Sin esta línea, en Kaggle se leyó «falta
+        # retrieval híbrido + reranker» y se dio por hecho que faltaba un
+        # paquete; estaban los tres instalados.
+        donde = ""
+        if any(not x["ok"] for x in e.retrieval_diagnostico):
+            donde = ("\n\nLa causa concreta está en la pestaña **Estado**, en "
+                     "`retrieval_por_etapas`, `retrieval_causa_probable` y "
+                     "`retrieval_traceback`.")
         return ("🔴 **MODO DEGRADADO · resultado de esta ejecución: NO MEDIDO.**\n\n"
                 f"Se pidió `{e.config_nombre}` y falta **{', '.join(e.faltantes)}**. "
                 + aclaracion
                 + "Las respuestas siguen funcionando, pero no son las del sistema "
-                f"que se midió.\n\nQué está funcionando:\n{piezas}")
+                f"que se midió.{donde}\n\nQué está funcionando:\n{piezas}")
     if e.experimental:
         return (f"⚠️ **`{e.config_nombre}` · EXPERIMENTAL, sin medir.** Las cifras "
                 f"de M1–M4 no respaldan esta combinación.\n\nQué monta:\n{piezas}")

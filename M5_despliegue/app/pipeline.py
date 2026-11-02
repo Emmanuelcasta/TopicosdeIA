@@ -27,6 +27,7 @@ from __future__ import annotations
 import contextlib
 import io
 import os
+import re
 import sys
 import time
 from dataclasses import dataclass, field
@@ -89,6 +90,11 @@ class Estado:
     # recortado a 160 caracteres y había que adivinar en qué paso ocurrió.
     etapas: list = field(default_factory=list)
     etapa_fallida: str = ""
+    # Por qué el retrieval híbrido no se montó, etapa por etapa. Vacío significa
+    # que no se intentó; con todas en `ok`, que se montó y respondió una
+    # consulta de prueba. Es lo que faltaba en Kaggle: «retrieval híbrido +
+    # reranker» aparecía entre los faltantes sin decir por qué.
+    retrieval_diagnostico: list = field(default_factory=list)
 
     @property
     def listo(self) -> bool:
@@ -193,7 +199,55 @@ def cargar_corpus():
     return ns["chunks"], ns["metadatos"], ns["ids_chunks"]
 
 
-def buscador_hibrido(chunks):
+# Los dos modelos de la cadena de S08, como constantes: el guion de diagnóstico
+# comprueba exactamente estos y no una copia que se pueda desincronizar.
+MODELO_EMBEDDINGS = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+MODELO_RERANKER = "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1"
+
+_SECRETOS = re.compile(
+    r"(hf_[A-Za-z0-9]{8,}|(?i:token|api[_-]?key|secret|password|authorization)"
+    r"\s*[:=]\s*)(\S+)")
+
+
+def _redactar(texto: str) -> str:
+    """Tapa lo que parezca una credencial antes de publicar un traceback.
+
+    Los errores de `huggingface_hub` citan la URL y a veces la cabecera de la
+    petición. El diagnóstico se enseña en la pestaña Estado y se pega en los
+    informes, así que pasa por aquí antes de salir.
+    """
+    return _SECRETOS.sub(lambda m: m.group(1) + "[REDACTADO]", texto or "")
+
+
+def _causa_probable(e: BaseException) -> str:
+    """Traduce la excepción a la categoría que decide qué hacer después.
+
+    No es un diagnóstico definitivo —para eso está el traceback completo— sino
+    el primer corte: si la causa es la red, reinstalar paquetes no arregla
+    nada, y si es una versión, tener internet tampoco.
+    """
+    nombre = type(e).__name__
+    mensaje = str(e).lower()
+    if isinstance(e, (ImportError, ModuleNotFoundError)):
+        return ("dependencia ausente o incompatible (el paquete no importa, "
+                "no es la red)")
+    if isinstance(e, MemoryError) or "out of memory" in mensaje:
+        return "memoria"
+    if any(p in mensaje for p in ("offline", "connection", "timed out", "timeout",
+                                  "resolve", "proxy", "couldn't connect",
+                                  "max retries", "429", "503")):
+        return "red o descarga de modelos"
+    if any(p in mensaje for p in ("not a local folder", "no such file",
+                                  "cache", "entry not found", "repository not found",
+                                  "gated", "401", "403")):
+        return "caché o acceso al repositorio de modelos"
+    if nombre in ("AttributeError", "TypeError", "ValueError", "KeyError",
+                  "RuntimeError"):
+        return f"versión de dependencia o código ({nombre})"
+    return f"sin clasificar ({nombre})"
+
+
+def buscador_hibrido(chunks, diagnostico=None):
     """El retrieval de S08-C, que es el que S08-D enruta.
 
     Reproduce la cadena del notebook, no una aproximación:
@@ -206,34 +260,79 @@ def buscador_hibrido(chunks):
     rasgo el puntaje máximo del cross-encoder (`enrutador.RASGOS`). Sin él se
     monta otra cosa y se la presenta como la de 18/21.
 
-    Devuelve None si falta alguna dependencia, para que el pipeline se repliegue
-    diciéndolo en vez de aparentar que montó S08-D.
-    """
-    try:
-        import re
+    Devuelve None si no se puede montar, **y deja escrito por qué**. Antes no:
+    un `except ImportError` y un `except Exception` devolvían la misma None
+    tanto si faltaba `rank_bm25` como si el cross-encoder no se podía descargar,
+    y en Kaggle eso dejó «retrieval híbrido + reranker» entre los faltantes sin
+    una sola línea sobre la causa. `diagnostico` —una lista— recibe una entrada
+    por etapa con su error, su causa probable y su traceback; el estado del
+    tutor la publica en la pestaña Estado.
 
+    Además, codificar el corpus ya no ocurre fuera del manejo de errores. Antes
+    un fallo ahí no degradaba el retrieval: tumbaba la carga entera del tutor.
+    """
+    import traceback
+
+    registro = [] if diagnostico is None else diagnostico
+
+    def etapa(nombre, funcion):
+        """Corre una etapa y la registra. Devuelve (ok, valor); nunca lanza."""
+        t0 = time.perf_counter()
+        try:
+            valor = funcion()
+        except BaseException as e:      # noqa: BLE001 — se registra, no se oculta
+            registro.append({
+                "etapa": nombre, "ok": False,
+                "segundos": round(time.perf_counter() - t0, 2),
+                "error": _redactar(f"{type(e).__name__}: {e}")[:400],
+                "causa_probable": _causa_probable(e),
+                "traceback": _redactar(traceback.format_exc()),
+            })
+            print(f"\n=== RETRIEVAL · FALLÓ LA ETAPA: {nombre} ===\n"
+                  f"{_redactar(traceback.format_exc())}", flush=True)
+            return False, None
+        registro.append({"etapa": nombre, "ok": True,
+                         "segundos": round(time.perf_counter() - t0, 2)})
+        return True, valor
+
+    def importar():
         import numpy as np
         from rank_bm25 import BM25Okapi
         from sentence_transformers import CrossEncoder, SentenceTransformer
-    except ImportError:
+        return np, BM25Okapi, CrossEncoder, SentenceTransformer
+
+    ok, modulos = etapa("importar sentence-transformers, rank_bm25 y numpy",
+                        importar)
+    if not ok:
         return None
+    np, BM25Okapi, CrossEncoder, SentenceTransformer = modulos
 
     def tokenizar(texto):
         import unicodedata
         t = unicodedata.normalize("NFKD", (texto or "").lower())
         return re.findall(r"\w+", "".join(c for c in t if not unicodedata.combining(c)))
 
-    try:
-        bm25 = BM25Okapi([tokenizar(c) for c in chunks])
-        st = SentenceTransformer(
-            "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
-        reranker = CrossEncoder("cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
-                                max_length=512)
-    except Exception:      # noqa: BLE001 — sin red o sin caché de modelos
+    ok, bm25 = etapa("índice BM25 del corpus",
+                     lambda: BM25Okapi([tokenizar(c) for c in chunks]))
+    if not ok:
+        return None
+    ok, st = etapa(f"cargar embeddings {MODELO_EMBEDDINGS} (descarga o caché)",
+                   lambda: SentenceTransformer(MODELO_EMBEDDINGS))
+    if not ok:
+        return None
+    ok, reranker = etapa(f"cargar reranker {MODELO_RERANKER} (descarga o caché)",
+                         lambda: CrossEncoder(MODELO_RERANKER, max_length=512))
+    if not ok:
         return None
 
-    emb = st.encode(chunks, show_progress_bar=False)
-    emb = emb / np.linalg.norm(emb, axis=1, keepdims=True)
+    def codificar():
+        e = st.encode(chunks, show_progress_bar=False)
+        return e / np.linalg.norm(e, axis=1, keepdims=True)
+
+    ok, emb = etapa(f"codificar los {len(chunks)} chunks", codificar)
+    if not ok:
+        return None
+
     K_RECUPERAR, K_RRF = 10, 60
 
     def candidatos(consulta, n=K_RECUPERAR):
@@ -263,6 +362,15 @@ def buscador_hibrido(chunks):
         """El tercer rasgo del enrutador de S08-D: ¿hay algo que de verdad encaje?"""
         cand = candidatos(consulta)
         return float(max(puntajes(consulta, cand))) if cand else 0.0
+
+    # Una consulta de verdad antes de devolver el buscador. Sin esto, «montado»
+    # significaba solo que los constructores no lanzaron: la primera pregunta
+    # del estudiante era la que descubría que `predict` no funcionaba.
+    ok, prueba = etapa("consulta de prueba contra el corpus",
+                       lambda: buscar("¿cuál es la nota mínima aprobatoria?", 3))
+    if not ok:
+        return None
+    registro[-1]["resultados"] = len(prueba or [])
 
     # `normalize_embeddings=True`, como en el notebook
     # (`nb_rag_avanzado.py:355`). El enrutador promedia estos vectores para sus
@@ -550,13 +658,23 @@ class Tutor:
         #     pero no es la que midió nada.
         buscar, activo = None, "ninguno"
         if cfg.retrieval == "hibrido":
-            buscar = buscador_hibrido(self._chunks)
+            buscar = buscador_hibrido(self._chunks,
+                                      self.estado.retrieval_diagnostico)
             activo = "hibrido + rerank (BM25+denso, RRF, cross-encoder) = S08-C"
             if buscar is None:
                 self.estado.faltantes.append("retrieval híbrido + reranker")
+                # La causa concreta, no la lista de sospechosos: con los tres
+                # paquetes instalados el mensaje anterior («falta rank_bm25,
+                # sentence-transformers o los modelos en caché») era falso en
+                # sus dos primeras opciones y mudo en la tercera.
+                fallo = next((x for x in self.estado.retrieval_diagnostico
+                              if not x["ok"]), None)
+                detalle = (f"falló «{fallo['etapa']}» · {fallo['error']} · causa "
+                           f"probable: {fallo['causa_probable']}" if fallo
+                           else "no se registró ninguna etapa")
                 self.estado.motivos.append(
-                    "retrieval: falta rank_bm25, sentence-transformers o los "
-                    "modelos en caché; se usa búsqueda léxica, que NO es la de S08")
+                    f"retrieval: {detalle}. Se usa búsqueda léxica, que NO es "
+                    "la de S08")
         if buscar is None and cfg.retrieval != "ninguno":
             buscar = buscador_lexico(self._chunks)
             activo = ("lexico (REPLIEGUE: se pidió híbrido)"

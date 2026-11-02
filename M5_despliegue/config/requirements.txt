@@ -24,6 +24,12 @@ gradio-client==1.3.0
 pydantic>=2.0,<2.11
 torch==2.4.1
 transformers==4.45.2
+# Fijado aparte aunque `transformers` ya lo acote (>=0.20,<0.21): donde hay un
+# tokenizers preinstalado —Kaggle trae 0.23.1— pip no vuelve a resolver las
+# dependencias de un `transformers` que ya está satisfecho, y el import falla.
+# Mismo motivo que `gradio-client`. `transformers`, `tokenizers` y
+# `huggingface_hub` se mueven JUNTOS o no se mueven.
+tokenizers==0.20.3
 # OJO: `peft==0.20.0` NO existe en PyPI (la última publicada es 0.17.1), así que
 # ese pin rompía cualquier instalación limpia —incluida la del Space—. En Kaggle
 # hay una 0.20.0 que viene con su imagen; este rango la deja intacta (ya lo
