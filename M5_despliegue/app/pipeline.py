@@ -1165,6 +1165,7 @@ class Tutor:
             "enunciado": js.get("enunciado"),
             "pasos": pasos_numerados(lectura),
             "lecturas_coinciden": lectura.get("consistente"),
+            "diferencias": lectura.get("diferencias") or [],
             "normalizacion": lectura.get("normalizacion") or {},
             "latencia_s": round(time.perf_counter() - t0, 2),
             "herramientas": [], "pasos_llm": 0, "contextos": 0,
@@ -1452,6 +1453,17 @@ class Tutor:
         primera["consistente"] = bool(
             primera["ok"] and segunda["ok"] and lecturas_consistentes(primera, segunda))
         primera["normalizacion"] = normalizacion
+        if not primera["consistente"]:
+            from vision import diferencias_de_lectura
+            primera["diferencias"] = (diferencias_de_lectura(primera, segunda)
+                                      if primera["ok"] and segunda["ok"]
+                                      else ["alguna lectura no salió en JSON"])
+            # Al log del servidor, no a la pantalla: es para depurar el
+            # rechazo, y enseñarle al estudiante una lectura dudosa invita a
+            # confirmarla.
+            print(f"[lectura] no coinciden · {primera['diferencias']}\n"
+                  f"  1ª: {primera.get('crudo', '')[:400]!r}\n"
+                  f"  2ª: {segunda.get('crudo', '')[:400]!r}", flush=True)
         return primera
 
     @staticmethod

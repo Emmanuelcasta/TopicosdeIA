@@ -1386,3 +1386,12 @@ def test_dos_lecturas_de_un_enunciado_con_otra_operacion_no_coinciden():
     c = {"json": {"enunciado": "¿cuanto es 3/4 + 1/8 ?", "pasos": [], "respuesta_final": ""}}
     assert not lecturas_consistentes(a, b)
     assert lecturas_consistentes(a, c)
+
+
+def test_la_traza_dice_en_que_difieren_dos_lecturas_sin_ensenar_el_texto():
+    from vision import diferencias_de_lectura
+    a = {"json": {"enunciado": "3/4 + 1/8", "pasos": [], "respuesta_final": ""}}
+    b = {"json": {"enunciado": "3/4 - 1/8", "pasos": [], "respuesta_final": ""}}
+    d = diferencias_de_lectura(a, b)
+    assert d == ["operaciones del enunciado"]
+    assert diferencias_de_lectura(a, a) == []

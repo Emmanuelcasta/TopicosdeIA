@@ -240,6 +240,25 @@ def huella_lectura(lectura) -> tuple:
             tuple(numeros_de(texto)))
 
 
+def diferencias_de_lectura(a, b) -> list:
+    """Qué parte de la huella separa dos lecturas. [] si coinciden.
+
+    Solo nombres de componentes, nunca el texto: es para la traza, y enseñar
+    una transcripción que no es de fiar invita a confirmarla.
+    """
+    ha, hb = huella_lectura(a), huella_lectura(b)
+    if ha == hb:
+        return []
+    if ha[0] != hb[0]:
+        return [f"tipo de hoja: {ha[0]} / {hb[0]}"]
+    nombres = {
+        "procedimiento": ("tipo", "estructura", "pasos", "respuesta final", "números"),
+        "enunciado": ("tipo", "estructura", "respuesta final",
+                      "números del enunciado", "operaciones del enunciado"),
+    }.get(ha[0], tuple(f"campo {i}" for i in range(len(ha))))
+    return [n for n, x, y in zip(nombres, ha, hb) if x != y]
+
+
 def lecturas_consistentes(a, b) -> bool:
     """¿Dos lecturas de la misma foto dicen lo mismo?
 

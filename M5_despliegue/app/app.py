@@ -305,6 +305,8 @@ def leer_foto(imagen):
     traza = [f"lectura: {r['latencia_s']} s",
              f"pasos leídos: {len(r['pasos'])}",
              f"las dos lecturas independientes coinciden: {r.get('lecturas_coinciden')}"]
+    if r.get("diferencias"):
+        traza.append("en qué difieren: " + ", ".join(r["diferencias"]))
     if r.get("transcripcion"):
         traza.append("\nTranscripción cruda:\n" + r["transcripcion"])
     tiempo = _tiempo_legible(r["latencia_s"], carga)
