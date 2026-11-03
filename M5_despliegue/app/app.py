@@ -134,6 +134,40 @@ def presentar(texto: str) -> str:
     return limpio or (texto or "").strip()
 
 
+_PAT_PASO = re.compile(r"paso\s*(?:n\.?[ºo]\s*|número\s*)?(\d+)", re.IGNORECASE)
+
+
+def presentar_revision(r: dict) -> str:
+    """La revisión como la lee un estudiante.
+
+    Tres piezas, en este orden: qué paso señala el tutor, qué dice la
+    comprobación determinista de la aritmética, y —si las dos no coinciden— que
+    no coinciden. Tapar una de las dos sería elegir por el estudiante, y la que
+    se taparía es justo la que no se equivoca en aritmética.
+
+    Esto es presentación. `pipeline.revisar_pasos` sigue devolviendo el texto
+    crudo, que es lo que mide el evaluador.
+    """
+    texto = presentar(r.get("respuesta") or "")
+    h = r.get("verificador_aritmetico") or {}
+    tipo = h.get("tipo")
+    partes = [texto] if texto else []
+    if tipo in ("calculo", "traslado"):
+        partes.append(f"Comprobación de la aritmética: {h['detalle']}.")
+        dicho = _PAT_PASO.search(texto)
+        if dicho and h.get("paso") and int(dicho.group(1)) != int(h["paso"]):
+            partes.append(
+                f"Ojo: yo te señalo el paso {dicho.group(1)} y la comprobación "
+                f"de las cuentas señala el paso {h['paso']}. La comprobación es "
+                "determinista y no se equivoca sumando; mi lectura del "
+                "procedimiento sí puede. Mira los dos pasos.")
+    elif tipo == "ninguno":
+        partes.append("Comprobación de la aritmética: todas las igualdades "
+                      "escritas cuadran, así que si hay un error es de "
+                      "planteamiento, no de cálculo.")
+    return "\n\n".join(x for x in partes if x)
+
+
 def _formatear(r: dict) -> tuple:
     if not r.get("ok"):
         return f"⚠️ {r['respuesta']}", ""
@@ -159,6 +193,8 @@ def _formatear(r: dict) -> tuple:
             + (" · orientación EXIF corregida" if n.get("exif") else ""))
     if r.get("transcripcion"):
         detalle.append("\nLo que se leyó en la hoja:\n" + r["transcripcion"])
+    if r.get("etapa") == "diagnostico":
+        return presentar_revision(r), "\n".join(detalle)
     return presentar(r["respuesta"]), "\n".join(detalle)
 
 

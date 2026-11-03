@@ -677,3 +677,107 @@ lo verifica.
 Pestaña **Estado**: versión (commit), tiempo activo, dispositivo, adaptador
 cargado, corpus, nº de herramientas, visión y avisos. No fuerza la carga del
 modelo, así que responde aunque el modelo no esté.
+
+## 6 · Latencias de la vía visual · tres cosas distintas
+
+Se miden por separado desde el 2 de noviembre de 2026, porque mezcladas no
+significan nada. `Tutor.precargar_vision()` carga el VLM y devuelve sus
+segundos; a partir de ahí la primera lectura es una lectura en frío de verdad.
+
+| etapa | qué incluye |
+|---|---|
+| descarga + carga del VLM | 4,42 GB de `Qwen/Qwen2-VL-2B-Instruct`, una vez por sesión |
+| lectura en frío | la primera inferencia con el modelo ya en memoria |
+| lecturas en caliente | las siguientes |
+
+**Lo medido hasta ahora, en T4, y lo que no se puede concluir.** La prueba de
+humo del 2 de noviembre dio 93,9 s, 12,11 s y 8,64 s. Los 93,9 s llevaban dentro
+la descarga, así que **no** son una lectura en frío: son descarga, carga e
+inferencia sumadas, y de ahí no sale una latencia de lectura. Quedan **dos**
+observaciones en caliente, 12,11 s y 8,64 s. Con dos no hay p50 ni p95; el
+evaluador solo los calcula con 20 o más y por debajo de eso publica los tiempos
+uno a uno. Esa corrida además fue sobre el paquete de humo, no sobre el eval set.
+
+**Optimizaciones que sí se pueden hacer.** Precargar el VLM antes de la demo, de
+modo que los ~90 s se paguen sin público delante. Y el tope de 1024 px del lado
+mayor, que ya está, mantiene el coste por caso independiente de cómo salió la
+foto.
+
+**Lo que no se toca para ir más rápido.** Las dos lecturas independientes y
+`lectura_no_fiable` se quedan. Una sola lectura ahorraría la mitad del tiempo y
+quitaría la señal que detecta las transcripciones inestables; el caso `vis-10` ya
+enseñó lo que cuesta diagnosticar sobre una lectura inventada.
+
+## 7 · Lo que falta validar antes de llamar a esto producción
+
+La prueba de humo demuestra que una foto se carga y se lee. No demuestra nada
+más, y en particular no es una medición de exactitud ni una prueba de la válvula
+de ilegibles. Pendiente:
+
+- **URL pública.** No existe ninguna `*.hf.space` en el repositorio. El enlace
+  `gradio.live` de Kaggle vive mientras viva el proceso.
+- **`/health`.** Hoy el estado se ve en la pestaña **Estado**; no hay un
+  endpoint que un comprobador externo pueda consultar.
+- **Logs.** `telemetria.py` existe y está probado, pero no hay ninguna corrida
+  registrada en W&B.
+- **Errores y negativas.** Falta comprobar en el Space desplegado qué ve el
+  usuario cuando el modelo no carga, cuando la foto es ilegible y cuando la
+  configuración está degradada.
+- **Eval set visual.** Están las **12 de 12** fotos, una por caso, en
+  `m4/eval_set/imagenes_m5/m5v-NN.jpg`, copiadas sin recodificar desde los
+  originales `.jpeg` de `M5_despliegue/evalset-m5/Imagenes_manuscritas2/`. El
+  alcance bajó de 23 variantes a 12 hojas el 2026-11-03; la definición anterior
+  sigue en `evaluar_vision_m5.variantes_historico_23`.
+- **Cuatro hojas en conflicto con el JSONL.** Se leen, pero no se puntúan: su
+  respuesta esperada describe una hoja que no es la que hay. Resolverlo es una
+  decisión de diseño —repetir la foto o corregir el JSONL— y no se tomó.
+
+  | Caso | Qué pasa |
+  |---|---|
+  | `m5v-01` | la hoja pone `642 km`; el JSONL espera `942` |
+  | `m5v-05` | la hoja pone `2 × 15000 = 3000`; el JSONL dice `2 × 1500`, y su propio enunciado dice «lapiceros de 1500». Con el cero de más el paso 2 también queda mal, y el caso es `compensado`: prohíbe nombrar el paso 2 |
+  | `m5v-09` | la hoja pone `Respuesta final: 19`; su paso 2 dice `14` y el JSONL espera `14`. El caso está declarado `sin_error` |
+  | `m5v-10` | la foto es **legible**. El caso existe para medir la salvaguarda de ilegibles: con una toma nítida no se puede afirmar nada sobre la válvula |
+
+  Quedan **8 casos puntuables**. Con ese tamaño un acierto mueve la tasa 12,5
+  puntos: sirve para ver si el recorrido funciona, no para comparar
+  configuraciones.
+
+## 8 · Regresiones de la fase 2, corregidas el 2026-11-03
+
+Cuatro cosas estaban mal a la vez y las cuatro se veían en la misma pantalla.
+
+**La cuenta la hacía el modelo de memoria.** `3/4 + 1/8` devolvía `0.75` y la
+traza registraba cero llamadas a herramienta. `s08d_verificador` monta las 18,
+pero el adaptador `m1` se entrenó para RAG, no para emitir `<tool_call>`, así
+que nunca las pedía. Ahora, cuando la pregunta **es** una cuenta,
+`Tutor._aritmetica_directa` ejecuta la herramienta registrada antes de cargar
+ningún modelo y responde con su resultado exacto. La observación que se guarda
+es la de `RegistroHerramientas.ejecutar`: si la traza dice que no se ejecutó
+nada, es que no se ejecutó nada. `s08d` no entra por ahí —se midió sin
+herramientas— y sigue igual.
+
+Comprobado: `3/4 + 1/8` → `7/8 (≈ 0.875)` vía `operar_fracciones`;
+`347 × 28` → `9716` vía `evaluar_expresion`.
+
+**Una consulta mostraba la respuesta de la anterior.** No era estado del
+servidor: el evento moría a medio camino y la caja se quedaba con lo de antes.
+El botón ahora encadena dos eventos; el primero vacía las cajas sin ir al
+servidor. Si el segundo muere, lo que queda es vacío.
+
+**La app y el evaluador veían píxeles distintos.** La interfaz pasaba a
+`leer_imagen` el PIL crudo de Gradio —4160 px en una foto de móvil— y el
+evaluador reducía a 1024. La misma hoja se rechazaba en una y se leía en el
+otro. La normalización (EXIF + lado mayor) bajó a `pipeline._leer`, que es por
+donde pasan los dos.
+
+**`Unexpected token '<'`.** El cliente de Gradio recibía HTML donde esperaba
+JSON. La causa es la espera: la primera pregunta carga el modelo y tarda ~80 s,
+y el túnel de `gradio.live` no sostiene esa conexión. `TUTOR_PRECARGAR=1` mueve
+la carga al arranque de la celda, donde no hay ningún cliente esperando.
+
+**Además:** la respuesta ya no enseña la línea `Pensamiento:` del formato ReAct.
+`nucleo.analizar_salida` solo la quitaba del campo `pensamiento`; cuando no hay
+llamada a herramienta, se quedaba dentro de la respuesta. Se limpia en la capa
+de presentación, así que el evaluador sigue viendo el texto completo.
+

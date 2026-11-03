@@ -16,7 +16,7 @@ Generado por `M5_despliegue/evaluacion/validacion_m5.py`.
 | eval set de M2 (21 casos) | sí |
 | herramientas esperadas de M2 | sí |
 | eval set visual de M5 (12 hojas) | sí |
-| fotografías de M5 | 0 de 23 |
+| fotografías de M5 | 12 de 12 · una por caso · 4 en conflicto con el JSONL (m5v-01, 05, 09, 10), sin puntuar |
 | verificación del retrieval | sí |
 | URL pública del Space | **NO** |
 

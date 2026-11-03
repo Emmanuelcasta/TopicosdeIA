@@ -363,7 +363,203 @@ respondidas. Y entonces, en este orden: lectura doble consistente de una foto,
 confirmación editable de la transcripción, y revisión del procedimiento con el
 verificador. **Sin tocar los casos visuales reservados de M4.**
 
+## Paso 11 · Prueba de humo de la vía visual · ejecutada el 2 de noviembre de 2026
+
+Esta prueba **no necesita los pasos 1 a 10**. `leer_imagen` no pasa por
+`buscador_hibrido` ni por el adaptador LoRA: carga solo el VLM. Corrió en una
+sesión recién arrancada, sin `pip install` y sin desinstalar `torchao`.
+
+**Lo que esta prueba NO mide, y no se puede deducir de su salida:** exactitud de
+lectura, localización del paso con error, ni la salvaguarda de ilegibles. Las 12
+imágenes son fotos de texto tipografiado en pantalla con el identificador del
+caso impreso, no hojas manuscritas, y `caso-10.jpg` se lee bien aunque `m5v-10`
+exija justo lo contrario. El script no imprime ninguna tasa de acierto a
+propósito: un «9/12» acabaría copiado al informe.
+
+El eval set oficial sigue siendo `data/eval_set_m5_vision.jsonl`, con sus 23
+tomas de nombre exacto en `m4/eval_set/imagenes_m5/`. Este paquete no las
+sustituye y sus nombres no se tocaron para que pasaran por ellas.
+
+### El dataset, y dónde lo monta Kaggle de verdad
+
+El paquete está en `M5_despliegue/evalset-m5/kaggle_dataset_humo/` y comprimido
+en `kaggle_dataset_humo.zip`. Subido como dataset privado `evalsetm5`, Kaggle
+descomprime el ZIP y lo monta **no** en `/kaggle/input/evalsetm5/`, sino en:
+
+    /kaggle/input/datasets/emmanuelcastaedacano/evalsetm5/kaggle_dataset_humo/
+
+con `imagenes/`, `manifest.json` y `README.md` dentro. El panel *Input* del
+notebook muestra el nombre corto; la ruta del sistema de archivos lleva el prefijo
+`datasets/<usuario>/`. Vale la pena comprobarlo antes de dar una ruta por buena.
+
+### Las celdas, en orden · son las 1 a 5 del notebook
+
+**Celda 1 · clonar.** Es la primera celda de código, la que ya existía. Clona
+solo si `ProyectoIA/.git` no está, así que en una sesión nueva trae el commit de
+`integracion-m5`. Arrancarla inicia la sesión. Salida esperada: `Cloning into
+'ProyectoIA'...` y `## integracion-m5...origin/integracion-m5`.
+
+**Celda 2 · comprobar que corre el código de hoy.**
+
+```python
+!cd /kaggle/working/ProyectoIA && git log --oneline -1 && ls -la M5_despliegue/evaluacion/humo_vision.py && grep -n 'device_map' M5_despliegue/app/pipeline.py && echo '--- DATASET DE HUMO ---' && ls /kaggle/input/datasets/emmanuelcastaedacano/evalsetm5/kaggle_dataset_humo/ && ls /kaggle/input/datasets/emmanuelcastaedacano/evalsetm5/kaggle_dataset_humo/imagenes/
+```
+
+Tiene que imprimir el commit, el tamaño de `humo_vision.py`, la línea del
+`device_map` y los 12 `caso-NN.jpg`. Si falta el `device_map`, el repositorio de
+Kaggle es anterior al arreglo y la prueba morirá al generar.
+
+**Celda 3 · diagnóstico, opcional.** `ls /kaggle/input/` y un `find`. Solo hace
+falta si la celda 2 no encuentra el dataset, para localizar la ruta real.
+
+**Celda 4 · la prueba.**
+
+```python
+!cd /kaggle/working/ProyectoIA && env USE_TF=0 HUMO_CASOS=caso-01,caso-07,caso-10 HUMO_DIR=/kaggle/input/datasets/emmanuelcastaedacano/evalsetm5/kaggle_dataset_humo python -u M5_despliegue/evaluacion/humo_vision.py
+```
+
+`HUMO_DIR` es opcional: sin él el script busca el dataset solo. Se pasa para que
+la corrida no dependa de ese rastreo. `HUMO_CASOS` elige los casos.
+
+Antes de leer nada, compara el SHA-256 de cada archivo con el del
+`manifest.json`. Sin eso, un fallo de lectura no se distingue de un archivo que
+Kaggle recomprimió al subirlo.
+
+**Celda 5 · leer el JSON.** Imprime `es_eval_set_de_vision`, la integridad, una
+línea por caso y el bloque `no_mide`.
+
+### Lo que salió
+
+```
+integridad: 12/12 ok
+configuración: Revisión de foto · lectura confirmada + verificador (EXPERIMENTAL) · vision=True
+
+caso-01 (1024x331)  93.9s   ok True · etapa lectura · confirmable True · lecturas_coinciden True · 3 pasos
+caso-07 (1024x318)  12.11s  ok True · etapa lectura · confirmable True · lecturas_coinciden True · 3 pasos
+caso-10 (1024x277)   8.64s  ok True · etapa lectura · confirmable True · lecturas_coinciden True · 3 pasos
+
+escrito: M5_despliegue/resultados/humo_vision.json
+Ninguna tasa de acierto: este conjunto no la soporta.
+```
+
+Los 93,9 s del primer caso son casi todos la descarga del VLM: 4,42 GB de
+`Qwen/Qwen2-VL-2B-Instruct`. Con el modelo en caché, un caso cuesta entre 8 y 12
+segundos en la T4.
+
+`motivo_no_fiable` salió vacío en los tres, incluido `caso-10`. Es lo esperado y
+es justo el problema: la foto se lee, así que la salvaguarda no se ejerce.
+
+### Si falla
+
+- `"addmm_impl_cpu_" not implemented for 'Half'` — el VLM se quedó en CPU con
+  pesos fp16. El repositorio de Kaggle es anterior al `device_map` de
+  `pipeline.py:1067`. Vuelve a clonar.
+- `no encuentro caso-01.jpg` — el script nombra los candidatos que probó. Usa la
+  celda 3 y pasa la ruta correcta en `HUMO_DIR`.
+- `SHA DISTINTO` o `AUSENTE` en la integridad — el archivo en Kaggle no es el que
+  se construyó. Vuelve a subir el dataset antes de interpretar nada.
+- Celdas en cola con la CPU a cero — el editor perdió el kernel. Recarga la
+  pestaña; si vuelve «Draft Session off», la sesión murió y hay que arrancarla.
+
+### Qué no repetir con la sesión ya preparada
+
+Ni la celda 1 ni ninguna celda de instalación. La celda 1 vuelve a clonar y, si
+la variante con `rm -rf ProyectoIA` se usa, borra también `resultados/` y los
+adaptadores copiados. Con el repositorio ya clonado basta con las celdas 4 y 5.
+
 ---
+
+## Paso 12 · Evaluación de las 12 hojas manuscritas · fase 3
+
+Repetible tal cual. Si algo de aquí no coincide con lo que ves, para y mira
+qué cambió antes de seguir.
+
+### Lo que hay que adjuntar
+
+Panel **Add Input**, filtro *Datasets*, buscar `emmanuelcastaedacano`:
+
+| Dataset | Para qué | ¿Hace falta? |
+|---|---|---|
+| `adaptadorqwen` | el LoRA `qwen-lora` | **sí** |
+| `datasetevalm5v4` | trae `evalset-m5/Imagenes_manuscritas2/caso-01..12.jpeg`, las 12 hojas | **sí** |
+| `evalsetm5` | paquete de humo | no |
+| `evalset-m5` | fotos de texto en pantalla | no |
+
+`datasetevalm5v4` es un volcado de todo `M5_despliegue/evalset-m5/`: también
+trae las fotos de pantalla y las `vis-*` de M4. Se copia **solo**
+`Imagenes_manuscritas2/`.
+
+### Celda A · código y fotos
+
+```python
+!cd /kaggle/working/ProyectoIA && git fetch -q --depth 1 origin integracion-m5 && git reset --hard -q FETCH_HEAD && git log --oneline -1
+import pathlib,shutil
+o=pathlib.Path("/kaggle/input/datasets/emmanuelcastaedacano/datasetevalm5v4/evalset-m5/Imagenes_manuscritas2")
+d=pathlib.Path("/kaggle/working/ProyectoIA/m4/eval_set/imagenes_m5")
+d.mkdir(parents=True,exist_ok=True)
+print("origen:",o.is_dir())
+_=[shutil.copyfile(o/("caso-%02d.jpeg"%i), d/("m5v-%02d.jpg"%i)) for i in range(1,13)]
+!sha256sum /kaggle/working/ProyectoIA/m4/eval_set/imagenes_m5/*.jpg
+```
+
+Esperado: `origen: True` y doce SHA-256. El primero es
+`40100dc862e620f6bd4e93c7f3ce4d9855f968ebb86bc38e0190caee0b604dec` para
+`m5v-01.jpg`. Si un hash no coincide con el del manifiesto, la foto no es la
+misma y no se sigue.
+
+### Celda B · regresiones y contrato · sin GPU
+
+```python
+!cd /kaggle/working/ProyectoIA && USE_TF=0 python -m pytest M5_despliegue/tests/test_m5.py -q 2>&1 | tail -20
+!cd /kaggle/working/ProyectoIA && USE_TF=0 python M5_despliegue/evaluacion/evaluar_vision_m5.py --contrato
+```
+
+Esperado: `102 passed` y `fotos: 12 de 12`. Entre esas pruebas están las tres
+regresiones de la fase 2: `3/4 + 1/8` da `7/8` ejecutando `operar_fracciones`,
+`347 × 28` da `9716` ejecutando `evaluar_expresion`, y dos preguntas seguidas
+no comparten respuesta. Tardan unos 2 minutos porque cargan el corpus.
+
+### Celda C · las 12 fotos · **necesita GPU T4**
+
+```python
+!cd /kaggle/working/ProyectoIA && USE_TF=0 TUTOR_ADAPTADOR_M1=/kaggle/working/ProyectoIA/adaptadores/qwen-lora python -u M5_despliegue/evaluacion/evaluar_vision_m5.py --correr
+```
+
+Primero baja el VLM (4,42 GB, ~1 min) y lo cronometra aparte: una latencia de
+lectura que incluye la descarga no es una latencia de lectura. Luego, por foto,
+una línea con `confirmable`, `coinciden`, `pasos`, y si el caso está en
+conflicto, `BLOQUEADO, sin puntuar`.
+
+Escribe `M5_despliegue/resultados/vision_m5.json` y `vision_m5.csv`. **Los dos
+viven en `/kaggle/working` y mueren con la sesión**: hay que descargarlos desde
+el panel *Output* antes de cerrar.
+
+### Celda D · la interfaz, para mirarla
+
+```python
+%cd /kaggle/working/ProyectoIA
+!env USE_TF=0 TUTOR_CONFIG=revision_foto TUTOR_GRADIO_SHARE=1 TUTOR_PRECARGAR=1 TUTOR_ADAPTADOR_M1=/kaggle/working/ProyectoIA/adaptadores/qwen-lora python -u M5_despliegue/app/app.py
+```
+
+`TUTOR_PRECARGAR=1` es nuevo y no es cosmético: sin él la primera pregunta
+tarda ~80 s y esa espera, por el túnel de `gradio.live`, es la que acaba
+devolviendo una página HTML al cliente —`Could not parse server response:
+SyntaxError: Unexpected token '<'`— y dejando en pantalla la respuesta de la
+pregunta anterior. Con la precarga la espera se paga en la celda, donde no hay
+ningún cliente esperando.
+
+Para la ruta de solo texto, la misma celda con
+`TUTOR_CONFIG=s08d_verificador`; esa configuración no monta visión y se salta
+los 4,42 GB.
+
+### Lo que no hay que repetir
+
+* No reinstalar el entorno. Solo `pip uninstall -y torchao` (peft 0.20 exige
+  torchao > 0.16 y la imagen trae 0.10) y `pip install rank-bm25==0.2.2`.
+  Torch no se toca.
+* No usar `evalsetm5` ni `evalset-m5` ni `imagenes_jpg_humo/` como eval set:
+  son fotos de texto en pantalla.
+* No usar `imagenes_manuscritas1/`: son las `vis-*` de M4, ya gastadas.
 
 ## Qué devolver al terminar
 

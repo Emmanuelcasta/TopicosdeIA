@@ -1298,3 +1298,28 @@ def test_la_foto_se_normaliza_igual_que_en_el_evaluador():
     pequena, info2 = pipeline.normalizar_foto(Image.new("RGB", (800, 600), "white"))
     assert pequena.size == (800, 600)
     assert info2["px_despues"] == [800, 600]
+
+
+def test_la_revision_ensena_la_comprobacion_y_avisa_si_no_coincide():
+    """En m5v-03 el tutor dijo «Paso 2» y el verificador, «paso 3». El informe
+    guardaba las dos cosas y la pantalla solo enseñaba la primera."""
+    app = pytest.importorskip("app")
+    r = {"etapa": "diagnostico", "respuesta": "Diagnóstico: Paso 2",
+         "verificador_aritmetico": {"paso": 3, "tipo": "traslado",
+                                    "detalle": "el paso 3 copia mal el resultado: "
+                                               "era 39000 y está escrito 38000"}}
+    salida = app.presentar_revision(r)
+    assert "Paso 2" in salida
+    assert "39000" in salida and "38000" in salida
+    assert "paso 3" in salida
+    # y lo dice: las dos no coinciden
+    assert "no se equivoca sumando" in salida
+
+
+def test_sin_hallazgo_aritmetico_lo_dice_en_vez_de_callarse():
+    app = pytest.importorskip("app")
+    r = {"etapa": "diagnostico", "respuesta": "Diagnóstico: Paso 1",
+         "verificador_aritmetico": {"paso": None, "tipo": "ninguno",
+                                    "detalle": "todas las cuentas escritas cuadran"}}
+    salida = app.presentar_revision(r)
+    assert "planteamiento" in salida

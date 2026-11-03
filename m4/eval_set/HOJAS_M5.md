@@ -13,6 +13,22 @@ Con el par se puede medir la salvaguarda de ilegibles sin inventar un umbral: cu
 
 Guarda las fotos en `m4/eval_set/imagenes_m5/`.
 
+**Avance al 2026-11-02: 4 de 23.** Están las nítidas de `m5v-01` a `m5v-04`.
+Faltan las 19 restantes, incluidas las cuatro borrosas de esos mismos casos.
+Comprueba el inventario con:
+
+```bash
+python3 M5_despliegue/evaluacion/evaluar_vision_m5.py --contrato
+```
+
+Si fotografías con el móvil y el archivo sale `.jpeg`, basta con renombrarlo a
+`.jpg`: el lector hace `glob('*.jpg')` y un `.jpeg` le es invisible. No hace
+falta recodificar, y no conviene: se perdería calidad sin ganar nada.
+
+**Ojo con `m5v-01`:** en la hoja ya fotografiada la respuesta final se lee
+`642 km`, no `942`. Si repites esa foto, escribe `942` como dice el bloque de
+abajo; si no, hay que corregir el JSONL.
+
 **Privacidad:** sin nombres, sin datos personales, sin caras. Letra tuya o de alguien que haya dado permiso.
 
 ---
