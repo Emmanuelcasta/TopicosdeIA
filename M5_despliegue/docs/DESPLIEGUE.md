@@ -772,9 +772,34 @@ otro. La normalización (EXIF + lado mayor) bajó a `pipeline._leer`, que es por
 donde pasan los dos.
 
 **`Unexpected token '<'`.** El cliente de Gradio recibía HTML donde esperaba
-JSON. La causa es la espera: la primera pregunta carga el modelo y tarda ~80 s,
-y el túnel de `gradio.live` no sostiene esa conexión. `TUTOR_PRECARGAR=1` mueve
-la carga al arranque de la celda, donde no hay ningún cliente esperando.
+JSON. Medido el 2026-11-03 sobre `d9420a5a65465847df.gradio.live`, leyendo la
+red del navegador durante el recorrido completo:
+
+| Petición | Duró | Estado |
+|---|---|---|
+| `POST /gradio_api/upload` | — | 200 |
+| `GET /gradio_api/queue/data` · lectura de la foto | 16,85 s | **503** |
+| `GET /gradio_api/queue/data` · confirmar transcripción | <1 s | 200 |
+| `GET /gradio_api/queue/data` · revisar el procedimiento | 1,06 s | **503** |
+
+El `503` lo devuelve el **túnel de `*.gradio.live`**, no la aplicación: es el
+servicio de *share* de Gradio cortando el flujo SSE de `queue/data`. Un 503 de
+ese proxy llega como página HTML, el cliente le hace `JSON.parse` y eso es
+literalmente el `Unexpected token '<'`. Con `queue/join` en 200 y el resultado
+apareciendo igual en pantalla, el cliente se recupera casi siempre; cuando no
+se recupera, la caja se queda con lo de la consulta anterior.
+
+Lo que está en nuestra mano: `TUTOR_PRECARGAR=1` quita la espera de ~80 s de la
+primera pregunta, y el botón vacía las cajas antes de responder, así que un
+evento muerto ya no puede dejar una respuesta ajena en pantalla. Lo que **no**
+está: el túnel. El arreglo definitivo es no depender de él — un Space de
+Hugging Face o la URL local— y eso sigue pendiente.
+
+**Dependencia externa en el arranque.** La consola registra además
+`Unable to preload CSS for https://gradio.s3-us-west-2.amazonaws.com/assets/index-BkS15Xs3.css`.
+Gradio 6.26.0 sirve su frontend desde ese bucket de S3. Si la máquina de la
+demo no llega a `gradio.s3-us-west-2.amazonaws.com`, la interfaz carga sin
+estilos. Conviene comprobarlo en la red donde se vaya a presentar.
 
 **Además:** la respuesta ya no enseña la línea `Pensamiento:` del formato ReAct.
 `nucleo.analizar_salida` solo la quitaba del campo `pensamiento`; cuando no hay

@@ -215,7 +215,12 @@ _PRIMERA_LECTURA = True
 
 
 def _tiempo_legible(seg: float, incluye_carga: bool) -> str:
-    """El tiempo, dicho para un estudiante y sin esconder de qué está hecho."""
+    """El tiempo, dicho para un estudiante y sin esconder de qué está hecho.
+
+    `incluye_carga` solo es cierto si el VLM NO estaba ya cargado. Con
+    `TUTOR_PRECARGAR=1` la carga se paga al arrancar la celda, y decir aquí que
+    «la mayor parte fue cargar el modelo» sería falso.
+    """
     if incluye_carga:
         return (f"Tardó {seg:.0f} s. La mayor parte fue cargar el modelo de "
                 "visión, que solo pasa la primera vez: las siguientes fotos "
@@ -241,8 +246,11 @@ def leer_foto(imagen):
 
     oculto, visible = gr.update(visible=False), gr.update(visible=True)
     tutor = obtener_tutor()
+    # Antes de leer: si el VLM ya estaba en memoria —porque se precargó— esta
+    # lectura no incluye ninguna carga, y el mensaje no debe decir que sí.
+    ya_cargado = tutor._vlm is not None     # noqa: SLF001 — mismo paquete
     r = tutor.leer_imagen(imagen)
-    carga = _PRIMERA_LECTURA
+    carga = _PRIMERA_LECTURA and not ya_cargado
     _PRIMERA_LECTURA = False
     registrar("lectura_imagen", "", ok=r["ok"], latencia_s=r["latencia_s"],
               pasos_llm=0, n_herramientas=0)
