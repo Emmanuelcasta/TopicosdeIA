@@ -133,6 +133,113 @@ def cuenta_de(pregunta: str) -> str | None:
     return t if any(c in t for c in "+-*×xX÷:^/√") else None
 
 
+def _frac(texto: str):
+    from fractions import Fraction
+    a, b = texto.replace(" ", "").split("/")
+    return Fraction(int(a), int(b))
+
+
+def _txt(q) -> str:
+    return str(q.numerator) if q.denominator == 1 else f"{q.numerator}/{q.denominator}"
+
+
+def explicar_cuenta(cuenta: str):
+    """-> (pasos, observaciones) · la cuenta resuelta paso a paso, o None.
+
+    Los pasos los escribe Python con `Fraction`, así que son exactos por
+    construcción; el RESULTADO además lo calcula la herramienta registrada y se
+    compara. Si las dos cosas no coinciden se devuelve None y la pregunta pasa
+    al modelo: es preferible no explicar a explicar algo que la herramienta
+    contradice.
+
+    Cubre lo que un estudiante escribe en una hoja de enunciado suelto: dos
+    fracciones, un producto de enteros, y cualquier otra expresión en un solo
+    paso.
+    """
+    import math
+
+    try:
+        from herramientas import REGISTRO
+        from registro import LlamadaHerramienta
+    except Exception:  # noqa: BLE001
+        return None
+
+    pasos: list = []
+    par = _DOS_FRACCIONES.match(cuenta)
+    if par is not None:
+        a, op, b = _frac(par.group(1)), par.group(2), _frac(par.group(3))
+        op = "×" if op in "xX*×" else op
+        if op in "+-":
+            m = math.lcm(a.denominator, b.denominator)
+            if a.denominator != m or b.denominator != m:
+                pasos.append(f"Busco un denominador común: el mínimo común múltiplo "
+                             f"de {a.denominator} y {b.denominator} es {m}.")
+            na, nb = a.numerator * (m // a.denominator), b.numerator * (m // b.denominator)
+            for q, n in ((a, na), (b, nb)):
+                if q.denominator != m:
+                    pasos.append(f"{_txt(q)} = {n}/{m}, multiplicando arriba y abajo "
+                                 f"por {m // q.denominator}.")
+            bruto = na + nb if op == "+" else na - nb
+            pasos.append(f"{na}/{m} {op} {nb}/{m} = {bruto}/{m}.")
+            resultado = a + b if op == "+" else a - b
+            if f"{bruto}/{m}" != _txt(resultado):
+                g = math.gcd(abs(bruto), m)
+                pasos.append(f"Simplifico dividiendo entre {g}: {bruto}/{m} = "
+                             f"{_txt(resultado)}.")
+        elif op == "×":
+            num, den = a.numerator * b.numerator, a.denominator * b.denominator
+            pasos.append(f"Multiplico numeradores y denominadores: {_txt(a)} × "
+                         f"{_txt(b)} = {num}/{den}.")
+            resultado = a * b
+            if f"{num}/{den}" != _txt(resultado):
+                pasos.append(f"Simplifico: {num}/{den} = {_txt(resultado)}.")
+        else:                                   # ÷
+            inv = 1 / b
+            pasos.append(f"Dividir entre {_txt(b)} es multiplicar por su inverso, "
+                         f"{_txt(inv)}.")
+            num, den = a.numerator * inv.numerator, a.denominator * inv.denominator
+            pasos.append(f"{_txt(a)} × {_txt(inv)} = {num}/{den}.")
+            resultado = a / b
+            if f"{num}/{den}" != _txt(resultado):
+                pasos.append(f"Simplifico: {num}/{den} = {_txt(resultado)}.")
+        llamada = LlamadaHerramienta(
+            nombre="operar_fracciones",
+            argumentos={"fraccion_a": par.group(1).replace(" ", ""),
+                        "fraccion_b": par.group(3).replace(" ", ""),
+                        "operacion": _OPERACION_FRACCION[par.group(2)]},
+            formato="determinista")
+        esperado = _txt(resultado)
+    else:
+        producto = re.fullmatch(r"\s*(\d+)\s*[×xX*]\s*(\d+)\s*", cuenta)
+        if producto is not None and int(producto.group(2)) >= 10:
+            x, y = int(producto.group(1)), int(producto.group(2))
+            decenas, unidades = y - y % 10, y % 10
+            pasos.append(f"Descompongo {y} en {decenas} + {unidades}.")
+            pasos.append(f"{x} × {decenas} = {x * decenas}.")
+            if unidades:
+                pasos.append(f"{x} × {unidades} = {x * unidades}.")
+                pasos.append(f"{x * decenas} + {x * unidades} = {x * y}.")
+            esperado = str(x * y)
+        else:
+            esperado = None
+        llamada = LlamadaHerramienta(nombre="evaluar_expresion",
+                                     argumentos={"expresion": cuenta},
+                                     formato="determinista")
+
+    if llamada.nombre not in REGISTRO:
+        return None
+    res = REGISTRO.ejecutar(llamada)
+    if not res.ok:
+        return None
+    valor = str(res.valor)
+    if esperado is not None and valor != esperado:
+        return None                 # la herramienta contradice la explicación
+    if not pasos:
+        pasos.append(f"{cuenta} = {res.resultado}.")
+    pasos.append(f"Respuesta final: {valor}")
+    return pasos, [res.a_dict()]
+
+
 @dataclass
 class Estado:
     """Qué se pidió, qué quedó funcionando, y si lo medido sigue aplicando.
@@ -1076,16 +1183,28 @@ class Tutor:
                              "pasos tú?"),
             }
         if not base["pasos"]:
+            if (base["enunciado"] or "").strip():
+                # Solo el enunciado. No es un error de lectura: es la otra cosa
+                # que un estudiante fotografía. Se sugiere resolverlo, y el
+                # estudiante confirma tanto el texto como lo que quiere.
+                return base | {
+                    "confirmable": True,
+                    "proposito": "resolver",
+                    "motivo_no_fiable": "",
+                    "respuesta": ("Leí un enunciado sin pasos resueltos. Revisa que "
+                                  "esté bien copiado antes de que lo resuelva."),
+                    "pregunta": "¿Quieres que lo resuelva paso a paso?",
+                }
             return base | {
                 "confirmable": False,
-                "motivo_no_fiable": "no se leyó ningún paso de un procedimiento",
-                "respuesta": ("Leí la hoja pero no encuentro los pasos de un "
-                              "procedimiento matemático. Si es un ejercicio, "
-                              "fotografía la parte donde están las operaciones."),
+                "motivo_no_fiable": "no se leyó ni un enunciado ni pasos",
+                "respuesta": ("Leí la hoja pero no encuentro ni un enunciado ni los "
+                              "pasos de un procedimiento matemático."),
                 "pregunta": "¿Es esto un ejercicio de matemáticas?",
             }
         return base | {
             "confirmable": True,
+            "proposito": "revisar",
             "motivo_no_fiable": "",
             "respuesta": ("Esto es lo que leí en tu hoja. **Revísalo antes de que "
                           "lo corrija**: si transcribí mal un número, el error que "
@@ -1131,6 +1250,72 @@ class Tutor:
                                        for i, p in enumerate(pasos, 1))
         r["verificador_aritmetico"] = hallazgo
         r["latencia_s"] = round(time.perf_counter() - t0, 2)
+        return r
+
+    PROMPT_RESOLVER = (
+        "Resuelve este ejercicio para un estudiante de colegio.\n\n"
+        "Enunciado: {enunciado}\n\n"
+        "Escribe la solución en pasos cortos, uno por línea, con el formato "
+        "«Paso N: …». Cada paso que haga una cuenta debe escribirla completa con "
+        "su resultado, por ejemplo «Paso 2: 68 × 14 = 952». Termina con una línea "
+        "«Respuesta final: …». Si el enunciado no es un ejercicio de matemáticas, "
+        "o le falta un dato para resolverlo, dilo en una sola línea y no inventes "
+        "el dato.")
+
+    def resolver_enunciado(self, enunciado: str, confirmado: bool = False) -> dict:
+        """Paso 2 de una foto que solo trae el enunciado: resolverlo.
+
+        Igual que `revisar_pasos`: sin `confirmado=True` no hay solución, porque
+        sería resolver lo que un modelo de visión creyó leer.
+
+        Dos caminos, y la traza dice cuál se tomó:
+
+          · si el enunciado ES una cuenta («¿Cuánto es 3/4 + 1/8?»), los pasos
+            los escribe `explicar_cuenta` y el resultado lo calcula la
+            herramienta registrada. No interviene el modelo de lenguaje.
+          · si no, lo resuelve el modelo y después el verificador determinista
+            revisa cada igualdad que escribió. Si alguna no cuadra se dice: no
+            se corrige en silencio ni se da la solución por buena.
+        """
+        t0 = time.perf_counter()
+        falta = self._vision_disponible()
+        if falta:
+            return self._fallo(falta, t0)
+        enunciado = (enunciado or "").strip()
+        if not enunciado:
+            return self._fallo("no hay ningún enunciado que resolver", t0)
+        if not confirmado:
+            return self._fallo(
+                "la lectura todavía no está confirmada. Revisa el enunciado y "
+                "confírmalo: no resuelvo un ejercicio que quizá no es el tuyo.", t0)
+
+        cuenta = cuenta_de(enunciado)
+        explicada = explicar_cuenta(cuenta) if cuenta else None
+        if explicada is not None:
+            pasos, observaciones = explicada
+            hallazgo, _ = self._comprobar_aritmetica(pasos)
+            return {
+                "ok": True, "etapa": "solucion", "camino": "herramienta",
+                "enunciado": enunciado,
+                "pasos_solucion": pasos,
+                "respuesta": "\n".join(f"Paso {i}: {p}" if not p.startswith("Respuesta")
+                                       else p for i, p in enumerate(pasos, 1)),
+                "herramientas": [o["herramienta"] for o in observaciones],
+                "observaciones": observaciones,
+                "verificador_aritmetico": hallazgo,
+                "pasos_llm": 0, "contextos": 0, "verificador": None,
+                "latencia_s": round(time.perf_counter() - t0, 2),
+            }
+
+        r = self.responder(self.PROMPT_RESOLVER.format(enunciado=enunciado))
+        if not r.get("ok"):
+            return r
+        lineas = [l.strip() for l in (r.get("respuesta") or "").splitlines()
+                  if l.strip() and not re.match(r"(?i)^\s*(pensamiento|thought)\s*:", l)]
+        hallazgo, _ = self._comprobar_aritmetica(lineas)
+        r.update({"etapa": "solucion", "camino": "modelo", "enunciado": enunciado,
+                  "pasos_solucion": lineas, "verificador_aritmetico": hallazgo,
+                  "latencia_s": round(time.perf_counter() - t0, 2)})
         return r
 
     def _vision_disponible(self) -> str:

@@ -168,6 +168,43 @@ def presentar_revision(r: dict) -> str:
     return "\n\n".join(x for x in partes if x)
 
 
+def presentar_solucion(r: dict) -> str:
+    """La solución de un enunciado, como la lee un estudiante.
+
+    Qué se resolvió, los pasos, y cómo se comprobó. Si el verificador encontró
+    una igualdad que no cuadra en lo que escribió el modelo, se dice en grande:
+    la solución no se da por buena.
+    """
+    partes = [f"Ejercicio: {r.get('enunciado', '')}"]
+    pasos = r.get("pasos_solucion") or []
+    if pasos:
+        partes.append("\n".join(
+            p if p.lower().startswith(("paso", "respuesta")) else f"Paso {i}: {p}"
+            for i, p in enumerate(pasos, 1)))
+    else:
+        partes.append(presentar(r.get("respuesta") or ""))
+    h = r.get("verificador_aritmetico") or {}
+    if r.get("camino") == "herramienta":
+        obs = (r.get("observaciones") or [{}])[0]
+        comprobacion = (f"Comprobación: el resultado lo calculó la herramienta "
+                        f"`{obs.get('herramienta')}` ({obs.get('valor')}) y coincide "
+                        "con los pasos.")
+        if h.get("tipo") == "ninguno":
+            comprobacion += " El verificador revisó cada igualdad: todas cuadran."
+        partes.append(comprobacion)
+    elif h.get("tipo") in ("calculo", "traslado"):
+        partes.append(f"⚠️ Ojo: la comprobación determinista de las cuentas dice que "
+                      f"{h['detalle']}. Esta solución la escribió el modelo y NO "
+                      "debes darla por buena hasta revisar ese paso.")
+    elif h.get("tipo") == "ninguno":
+        partes.append("Comprobación: el verificador revisó cada igualdad escrita y "
+                      "todas cuadran. Eso comprueba las cuentas, no el planteamiento.")
+    else:
+        partes.append("Comprobación: no había igualdades que el verificador pudiera "
+                      "revisar. Revisa el razonamiento con calma.")
+    return "\n\n".join(x for x in partes if x)
+
+
 def _formatear(r: dict) -> tuple:
     if not r.get("ok"):
         return f"⚠️ {r['respuesta']}", ""
@@ -195,6 +232,8 @@ def _formatear(r: dict) -> tuple:
         detalle.append("\nLo que se leyó en la hoja:\n" + r["transcripcion"])
     if r.get("etapa") == "diagnostico":
         return presentar_revision(r), "\n".join(detalle)
+    if r.get("etapa") == "solucion":
+        return presentar_solucion(r), "\n".join(detalle)
     return presentar(r["respuesta"]), "\n".join(detalle)
 
 
@@ -212,6 +251,10 @@ def responder_texto(pregunta: str):
 
 
 _PRIMERA_LECTURA = True
+
+# Los dos propósitos de una foto. El estudiante elige; la lectura solo sugiere.
+RESOLVER = "Resolver ejercicio"
+REVISAR = "Revisar procedimiento"
 
 
 def _tiempo_legible(seg: float, incluye_carga: bool) -> str:
@@ -257,7 +300,7 @@ def leer_foto(imagen):
 
     if not r.get("ok"):
         return (f"⚠️ {r['respuesta']}", oculto, oculto, "", "",
-                False, "", oculto)
+                False, "", oculto, gr.update(value=REVISAR))
 
     traza = [f"lectura: {r['latencia_s']} s",
              f"pasos leídos: {len(r['pasos'])}",
@@ -278,27 +321,49 @@ def leer_foto(imagen):
         # El panel de edición se abre VACÍO: se ofrece escribir los pasos a
         # mano, pero no se enseña la transcripción que acaba de declararse no
         # fiable, porque verla invita a confirmarla.
-        return (aviso, visible, visible, "", "", False, "\n".join(traza), oculto)
+        return (aviso, visible, visible, "", "", False, "\n".join(traza), oculto,
+                gr.update(value=REVISAR))
 
-    aviso = ("### ✅ Esto es lo que leí en tu hoja\n\n"
-             "**Revísalo antes de que lo corrija.** Si transcribí mal un número, "
-             "el error que te señale sería mío, no tuyo.\n\n"
-             f"{tiempo}")
+    if r.get("proposito") == "resolver":
+        sugerido = RESOLVER
+        aviso = ("### ✅ Leí un enunciado, sin pasos resueltos\n\n"
+                 "**Revisa que esté bien copiado** y elige qué quieres que haga. "
+                 "Si transcribí mal un número, resolvería otro ejercicio.\n\n"
+                 f"{tiempo}")
+    else:
+        sugerido = REVISAR
+        aviso = ("### ✅ Esto es lo que leí en tu hoja\n\n"
+                 "**Revísalo antes de que lo corrija.** Si transcribí mal un número, "
+                 "el error que te señale sería mío, no tuyo.\n\n"
+                 f"{tiempo}")
+    traza.append(f"propósito sugerido: {sugerido.lower()} (lo confirma el estudiante)")
     return (aviso, visible, oculto, "\n".join(r["pasos"]),
-            r.get("enunciado") or "", False, "\n".join(traza), oculto)
+            r.get("enunciado") or "", False, "\n".join(traza), oculto,
+            gr.update(value=sugerido))
 
 
-def confirmar_transcripcion(texto_pasos: str):
-    """Etapa 3 -> 4. Abre la revisión solo si hay pasos que revisar."""
+def confirmar_transcripcion(texto_pasos: str, enunciado: str = "",
+                            proposito: str = REVISAR):
+    """Etapa 3 -> 4. Abre el paso 4 solo si hay algo que resolver o revisar."""
     import gradio as gr
 
+    cerrado = (gr.update(visible=False), False, gr.update())
     pasos = [l.strip() for l in (texto_pasos or "").splitlines() if l.strip()]
+    if proposito == RESOLVER:
+        if not (enunciado or "").strip():
+            return ("⚠️ No hay ningún enunciado que resolver. Escríbelo arriba, o "
+                    "toma otra foto.",) + cerrado
+        return ("### ✅ Enunciado confirmado\n\nAhora sí puedo resolverlo.",
+                gr.update(visible=True), True,
+                gr.update(value="Resolver el ejercicio"))
     if not pasos:
-        return ("⚠️ No hay ningún paso que revisar. Escribe al menos uno, o "
-                "toma otra foto.", gr.update(visible=False), False)
+        return ("⚠️ No hay ningún paso que revisar. Escríbelos, elige «Resolver "
+                "ejercicio» si la hoja solo trae el enunciado, o toma otra foto.",
+                ) + cerrado
     return (f"### ✅ Transcripción confirmada · {len(pasos)} pasos\n\n"
             "Ahora sí puedo revisar el procedimiento.",
-            gr.update(visible=True), True)
+            gr.update(visible=True), True,
+            gr.update(value="Revisar el procedimiento"))
 
 
 def otra_foto():
@@ -307,16 +372,31 @@ def otra_foto():
 
     oculto = gr.update(visible=False)
     return ("### Paso 1 · Sube otra foto de la hoja", oculto, oculto,
-            "", "", False, "", "", oculto, None)
+            "", "", False, "", "", oculto, None, gr.update(value=REVISAR))
+
+
+def resolver_foto(enunciado: str, confirmado: bool):
+    """Etapa 5, propósito «resolver»: el enunciado confirmado, paso a paso."""
+    tutor = obtener_tutor()
+    r = tutor.resolver_enunciado(enunciado, confirmado=bool(confirmado))
+    registrar("resolucion_enunciado", enunciado, ok=r["ok"],
+              latencia_s=r["latencia_s"], pasos_llm=r.get("pasos_llm", 0),
+              n_herramientas=len(r.get("herramientas", [])))
+    respuesta, detalle = _formatear(r)
+    if r.get("ok"):
+        detalle = f"camino: {r.get('camino')}\n" + detalle
+    return respuesta, detalle
 
 
 def revisar_foto(texto_pasos: str, pregunta: str, confirmado: bool,
-                 enunciado: str = ""):
+                 enunciado: str = "", proposito: str = REVISAR):
     """Etapa 5. Diagnostica los pasos confirmados.
 
     `confirmado` lo pone el botón de la etapa 3, no el estudiante marcando una
     casilla al azar: sin él, `revisar_pasos` se niega y lo dice.
     """
+    if proposito == RESOLVER:
+        return resolver_foto(enunciado, confirmado)
     tutor = obtener_tutor()
     pasos = [l.strip() for l in (texto_pasos or "").splitlines() if l.strip()]
     r = tutor.revisar_pasos(pasos, pregunta, enunciado=enunciado or None,
@@ -377,13 +457,19 @@ def construir():
 
             with gr.Group(visible=False) as panel_edicion:
                 gr.Markdown(
-                    "### Paso 2 · Revisa y edita los pasos\n"
+                    "### Paso 2 · Revisa y edita lo que leí\n"
                     "Un paso por línea. **Corrige lo que esté mal transcrito.** "
-                    "Si el error es de lectura, el diagnóstico sería sobre una "
+                    "Si el error es de lectura, la respuesta sería sobre una "
                     "hoja que no escribiste.")
-                enunciado_box = gr.Textbox(label="Enunciado del ejercicio (opcional)",
-                                           lines=1)
-                pasos_box = gr.Textbox(label="Los pasos de tu hoja", lines=8)
+                proposito = gr.Radio(
+                    [RESOLVER, REVISAR], value=REVISAR,
+                    label="¿Qué quieres que haga?",
+                    info="Resolver: la hoja solo trae el enunciado. Revisar: la "
+                         "hoja trae tus pasos y busco el primero incorrecto.")
+                enunciado_box = gr.Textbox(label="Enunciado del ejercicio", lines=2)
+                pasos_box = gr.Textbox(
+                    label="Los pasos de tu hoja (vacío si solo hay enunciado)",
+                    lines=8)
                 gr.Markdown("### Paso 3 · Confirma la transcripción")
                 boton_confirmar = gr.Button("Confirmar transcripción",
                                             variant="primary")
@@ -397,28 +483,36 @@ def construir():
                 boton_otra = gr.Button("Tomar otra foto", variant="primary")
 
             with gr.Group(visible=False) as panel_revision:
-                gr.Markdown("### Paso 4 · Revisar el procedimiento")
+                gr.Markdown("### Paso 4 · Resolver o revisar")
                 preg_img = gr.Textbox(
                     label="Tu pregunta", lines=2,
                     value="Revisa mi procedimiento: ¿en qué paso me equivoqué?")
                 boton_rev = gr.Button("Revisar el procedimiento", variant="primary")
-                salida_img = gr.Textbox(label="Revisión", lines=8)
+                salida_img = gr.Textbox(label="Resultado", lines=12)
 
             traza_img = gr.Textbox(label="Cómo se obtuvo", lines=6)
 
+            # Leer de nuevo, o cambiar el propósito, invalida lo confirmado y
+            # vacía el resultado anterior: nada de una foto vieja sobrevive.
             boton_leer.click(
+                _vaciar_texto, None, [salida_img, traza_img], queue=False).then(
                 leer_foto, img,
                 [aviso, panel_edicion, panel_ilegible, pasos_box, enunciado_box,
-                 confirmado, traza_img, panel_revision])
+                 confirmado, traza_img, panel_revision, proposito])
+            proposito.change(
+                lambda: (False, gr.update(visible=False), ""), None,
+                [confirmado, panel_revision, salida_img], queue=False)
             boton_confirmar.click(
-                confirmar_transcripcion, pasos_box,
-                [aviso, panel_revision, confirmado])
+                confirmar_transcripcion, [pasos_box, enunciado_box, proposito],
+                [aviso, panel_revision, confirmado, boton_rev])
             boton_otra.click(
                 otra_foto, None,
                 [aviso, panel_edicion, panel_ilegible, pasos_box, enunciado_box,
-                 confirmado, traza_img, salida_img, panel_revision, img])
+                 confirmado, traza_img, salida_img, panel_revision, img, proposito])
             boton_rev.click(
-                revisar_foto, [pasos_box, preg_img, confirmado, enunciado_box],
+                _vaciar_texto, None, [salida_img, traza_img], queue=False).then(
+                revisar_foto,
+                [pasos_box, preg_img, confirmado, enunciado_box, proposito],
                 [salida_img, traza_img])
 
         with gr.Tab("Estado"):

@@ -183,6 +183,17 @@ def numeros_de(texto: str) -> list:
     return [n.replace(",", ".") for n in _PAT_NUMERO.findall(texto or "")]
 
 
+_PAT_OPERACION = re.compile(r"(?<=\d)\s*([+\-×xX*÷:])\s*(?=\d)")
+
+
+def operaciones_de(texto: str) -> tuple:
+    """Las operaciones escritas ENTRE números, normalizadas: × y x valen igual.
+
+    Una barra de fracción no cuenta como operación: «3/4» es un número.
+    """
+    return tuple("×" if o in "xX*×" else o for o in _PAT_OPERACION.findall(texto or ""))
+
+
 def huella_lectura(lectura) -> tuple:
     """Huella conservadora para comparar dos lecturas de la MISMA foto.
 
@@ -215,6 +226,16 @@ def huella_lectura(lectura) -> tuple:
     pasos_normalizados = tuple(normalizar_paso(paso) for paso in pasos)
     respuesta_final = normalizar_paso(js.get("respuesta_final", ""))
     texto = " ".join(map(str, pasos)) + " " + str(js.get("respuesta_final", ""))
+    if not pasos:
+        # Una hoja que solo trae el enunciado. Sin pasos, la huella de arriba
+        # quedaría vacía y dos lecturas que discrepan en la cuenta —«3/4 + 1/8»
+        # frente a «3/4 - 1/8»— coincidirían. Aquí lo que se resuelve ES el
+        # enunciado, así que sus números y sus operaciones entran en la huella.
+        # Solo en este caso: con pasos, el enunciado sigue fuera, como cuando
+        # se midieron las 12 hojas.
+        enunciado = str(js.get("enunciado") or "")
+        return ("enunciado", estructura, respuesta_final,
+                tuple(numeros_de(enunciado)), operaciones_de(enunciado))
     return ("procedimiento", estructura, pasos_normalizados, respuesta_final,
             tuple(numeros_de(texto)))
 
@@ -595,7 +616,9 @@ INSTRUCCION_VER = (
     "Devuelve SOLO un JSON con esta forma:\n"
     '{"enunciado": "...", "pasos": ["...", "..."], "respuesta_final": "..."}\n'
     "Un elemento de `pasos` por cada línea escrita.\n"
-    "Si la hoja no se puede leer, o no contiene un procedimiento matemático, "
+    "Si la hoja solo tiene el enunciado de un ejercicio, sin pasos resueltos, "
+    'devuelve el enunciado y `"pasos": []`.\n'
+    "Si la hoja no se puede leer, o no contiene nada de matemáticas, "
     'devuelve {"ilegible": true, "motivo": "..."}.'
 )
 
@@ -609,8 +632,9 @@ INSTRUCCION_VER_INDEPENDIENTE = (
     "cuenta ni completes números poco claros.\n"
     "Devuelve SOLO un JSON con esta forma:\n"
     '{"enunciado": "...", "pasos": ["...", "..."], "respuesta_final": "..."}\n'
-    "Un elemento de `pasos` por cada línea escrita. Si no puedes leerla con "
-    "claridad, o no hay un procedimiento matemático, devuelve "
+    "Un elemento de `pasos` por cada línea escrita. Si solo hay un enunciado, "
+    'sin pasos resueltos, devuelve el enunciado y `"pasos": []`. Si no puedes '
+    "leerla con claridad, o no hay nada de matemáticas, devuelve "
     '{"ilegible": true, "motivo": "..."}.'
 )
 

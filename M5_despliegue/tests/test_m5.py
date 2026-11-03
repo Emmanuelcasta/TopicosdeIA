@@ -1323,3 +1323,66 @@ def test_sin_hallazgo_aritmetico_lo_dice_en_vez_de_callarse():
                                     "detalle": "todas las cuentas escritas cuadran"}}
     salida = app.presentar_revision(r)
     assert "planteamiento" in salida
+
+
+# --------------------------------------------------------------------------
+# Foto con solo el enunciado: resolver, no revisar
+# --------------------------------------------------------------------------
+
+def test_explica_la_suma_de_fracciones_como_lo_haria_un_profesor():
+    pasos, obs = pipeline.explicar_cuenta("3/4 + 1/8")
+    texto = "\n".join(pasos)
+    assert "3/4 = 6/8" in texto
+    assert "6/8 + 1/8 = 7/8" in texto
+    assert pasos[-1] == "Respuesta final: 7/8"
+    assert obs[0]["herramienta"] == "operar_fracciones" and obs[0]["valor"] == "7/8"
+
+
+def test_explica_un_producto_descomponiendo_y_lo_confirma_la_herramienta():
+    pasos, obs = pipeline.explicar_cuenta("347 × 28")
+    assert "347 × 20 = 6940." in pasos and "347 × 8 = 2776." in pasos
+    assert "6940 + 2776 = 9716." in pasos
+    assert obs[0]["herramienta"] == "evaluar_expresion" and obs[0]["valor"] == "9716"
+
+
+def test_resolver_sin_confirmar_se_niega():
+    r = pipeline.Tutor("revision_foto").resolver_enunciado("¿Cuánto es 3/4 + 1/8?")
+    assert not r["ok"] and "confirm" in r["respuesta"]
+
+
+def test_resolver_una_cuenta_no_carga_el_modelo_y_registra_la_herramienta():
+    r = pipeline.Tutor("revision_foto").resolver_enunciado(
+        "¿Cuánto es 3/4 + 1/8?", confirmado=True)
+    assert r["ok"] and r["camino"] == "herramienta" and r["pasos_llm"] == 0
+    assert r["herramientas"] == ["operar_fracciones"]
+    assert r["verificador_aritmetico"]["tipo"] == "ninguno"
+
+
+def test_la_solucion_dice_como_se_comprobo():
+    app = pytest.importorskip("app")
+    r = pipeline.Tutor("revision_foto").resolver_enunciado(
+        "¿Cuánto es 3/4 + 1/8?", confirmado=True)
+    salida = app.presentar_solucion(r)
+    assert "6/8 + 1/8 = 7/8" in salida and "operar_fracciones" in salida
+    assert "Pensamiento" not in salida
+
+
+def test_si_el_modelo_escribe_una_cuenta_mal_la_solucion_lo_avisa():
+    app = pytest.importorskip("app")
+    r = {"etapa": "solucion", "camino": "modelo", "enunciado": "bus",
+         "pasos_solucion": ["Paso 1: 68 × 14 = 942", "Respuesta final: 942"],
+         "verificador_aritmetico": {"paso": 1, "tipo": "calculo",
+                                    "detalle": "el paso 1 no cuadra: 68 × 14 da 952"}}
+    salida = app.presentar_solucion(r)
+    assert "NO debes darla por buena" in salida and "952" in salida
+
+
+def test_dos_lecturas_de_un_enunciado_con_otra_operacion_no_coinciden():
+    """Sin pasos, la huella antigua quedaba vacía: «3/4 + 1/8» y «3/4 - 1/8»
+    pasaban por la misma lectura."""
+    from vision import lecturas_consistentes
+    a = {"json": {"enunciado": "¿Cuánto es 3/4 + 1/8?", "pasos": [], "respuesta_final": ""}}
+    b = {"json": {"enunciado": "¿Cuánto es 3/4 - 1/8?", "pasos": [], "respuesta_final": ""}}
+    c = {"json": {"enunciado": "¿cuanto es 3/4 + 1/8 ?", "pasos": [], "respuesta_final": ""}}
+    assert not lecturas_consistentes(a, b)
+    assert lecturas_consistentes(a, c)
