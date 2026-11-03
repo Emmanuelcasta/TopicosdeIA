@@ -1036,6 +1036,56 @@ class Tutor:
         """
         return self.leer_imagen(imagen)
 
+    def _cargar_vlm(self) -> bool:
+        """Carga el VLM una sola vez. -> True si está listo.
+
+        Separado de `_leer` para poder medirlo aparte: mientras la carga vivía
+        dentro de la primera lectura, los 93,9 s de esa lectura eran descarga,
+        carga e inferencia sumadas, y de ahí no sale ninguna latencia de lectura.
+        No cambia nada del comportamiento: las dos lecturas independientes y la
+        salvaguarda de `lectura_no_fiable` siguen exactamente igual.
+        """
+        if self._vlm is not None:
+            return True
+        try:
+            import torch
+            from transformers import AutoProcessor, Qwen2VLForConditionalGeneration
+
+            # El dispositivo se resuelve aquí y no se lee de `estado`: la vía
+            # visual se puede invocar sin haber cargado el modelo de texto, y
+            # entonces `estado.dispositivo` todavía vale "desconocido".
+            cuda = torch.cuda.is_available()
+            if self.estado.dispositivo == "desconocido":
+                self.estado.dispositivo = "cuda" if cuda else "cpu"
+
+            proc = AutoProcessor.from_pretrained(VLM_ID, max_pixels=1024 * 1024)
+            # `device_map` es obligatorio, no una optimización. Sin él el VLM
+            # se queda en CPU con pesos fp16 y `generate` muere con
+            # «"addmm_impl_cpu_" not implemented for 'Half'», que es el mismo
+            # par dtype/dispositivo que ya resuelve `scripts/nb_m4.py`.
+            vlm = Qwen2VLForConditionalGeneration.from_pretrained(
+                VLM_ID,
+                torch_dtype=torch.float16 if cuda else torch.float32,
+                device_map="auto" if cuda else None).eval()
+            self._vlm = (vlm, proc, torch)
+            return True
+        except Exception:  # noqa: BLE001
+            return False
+
+    def precargar_vision(self) -> dict:
+        """Carga el VLM ahora y dice cuánto costó. -> dict con `segundos`.
+
+        Para medir: deja la descarga y la carga fuera de la primera lectura.
+        Para la demo: permite pagar los 90 s antes de que haya alguien mirando,
+        en vez de durante la primera foto del público.
+        """
+        ya = self._vlm is not None
+        t0 = time.perf_counter()
+        ok = self._cargar_vlm()
+        return {"ok": ok, "ya_estaba_cargado": ya,
+                "segundos": round(time.perf_counter() - t0, 2),
+                "dispositivo": self.estado.dispositivo}
+
     def _leer(self, imagen):
         """Carga el VLM una vez y hace dos lecturas independientes.
 
@@ -1044,30 +1094,8 @@ class Tutor:
         no una certificación de verdad; por eso el estudiante aún debe confirmar
         o corregir el texto antes de que exista un diagnóstico.
         """
-        if self._vlm is None:
-            try:
-                import torch
-                from transformers import AutoProcessor, Qwen2VLForConditionalGeneration
-
-                # El dispositivo se resuelve aquí y no se lee de `estado`: la vía
-                # visual se puede invocar sin haber cargado el modelo de texto, y
-                # entonces `estado.dispositivo` todavía vale "desconocido".
-                cuda = torch.cuda.is_available()
-                if self.estado.dispositivo == "desconocido":
-                    self.estado.dispositivo = "cuda" if cuda else "cpu"
-
-                proc = AutoProcessor.from_pretrained(VLM_ID, max_pixels=1024 * 1024)
-                # `device_map` es obligatorio, no una optimización. Sin él el VLM
-                # se queda en CPU con pesos fp16 y `generate` muere con
-                # «"addmm_impl_cpu_" not implemented for 'Half'», que es el mismo
-                # par dtype/dispositivo que ya resuelve `scripts/nb_m4.py`.
-                vlm = Qwen2VLForConditionalGeneration.from_pretrained(
-                    VLM_ID,
-                    torch_dtype=torch.float16 if cuda else torch.float32,
-                    device_map="auto" if cuda else None).eval()
-                self._vlm = (vlm, proc, torch)
-            except Exception:  # noqa: BLE001
-                return None
+        if not self._cargar_vlm():
+            return None
 
         from vision import (INSTRUCCION_VER, INSTRUCCION_VER_INDEPENDIENTE,
                             json_de, lecturas_consistentes)

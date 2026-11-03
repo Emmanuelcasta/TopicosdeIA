@@ -138,6 +138,13 @@ def main() -> int:
     t = pipeline.Tutor("revision_foto")
     print(f"configuración: {t.cfg.nombre}  ·  vision={t.cfg.vision}")
 
+    # La descarga y la carga del VLM, cronometradas aparte. Dentro de la primera
+    # lectura eran indistinguibles de ella, y una latencia de lectura que incluye
+    # 4,42 GB de descarga no es una latencia de lectura.
+    carga = t.precargar_vision()
+    print(f"carga del VLM: {carga['segundos']} s  ·  dispositivo "
+          f"{carga['dispositivo']}  ·  ok={carga['ok']}")
+
     filas = []
     for nombre in casos:
         ruta = imgs / f"{nombre}.jpg"
@@ -150,7 +157,10 @@ def main() -> int:
         r = t.leer_imagen(im)
         seg = round(time.perf_counter() - t0, 2)
 
-        print(f"\n--- {nombre}  ({im.width}x{im.height})  {seg}s")
+        frio = not filas
+        print(f"\n--- {nombre}  ({im.width}x{im.height})  {seg}s"
+              + ("   [lectura EN FRÍO, sin la carga del modelo]" if frio
+                 else "   [lectura en caliente]"))
         print(f"  ok:                 {r.get('ok')}")
         print(f"  etapa:              {r.get('etapa')}")
         print(f"  confirmable:        {r.get('confirmable')}")
@@ -166,6 +176,7 @@ def main() -> int:
         filas.append({
             "caso": nombre, "estado": "leido" if r.get("ok") else "fallo",
             "px": [im.width, im.height], "segundos": seg,
+            "lectura": "fria" if frio else "caliente",
             "confirmable": r.get("confirmable"),
             "lecturas_coinciden": r.get("lecturas_coinciden"),
             "motivo_no_fiable": r.get("motivo_no_fiable"),
@@ -188,6 +199,10 @@ def main() -> int:
         ],
         "eval_set_oficial": "data/eval_set_m5_vision.jsonl · 23 tomas pendientes",
         "origen_imagenes": str(imgs),
+        "carga_del_vlm": carga,
+        "latencias": ("descarga+carga del VLM, lectura en frío y lecturas en "
+                      "caliente se informan por separado. Con tres casos no hay "
+                      "muestra para p50 ni p95: se dan los tiempos uno a uno."),
         "integridad": integridad,
         "casos": filas,
     }

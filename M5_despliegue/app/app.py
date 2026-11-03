@@ -140,37 +140,104 @@ def responder_texto(pregunta: str):
     return _formatear(r)
 
 
-def leer_foto(imagen):
-    """Paso 1 de la revisión: enseña lo leído y pide confirmación.
+_PRIMERA_LECTURA = True
 
-    -> (mensaje, pasos editables, confirmación desmarcada, traza). Nunca un
-    diagnóstico: eso es `revisar_foto`, y solo con la casilla marcada.
+
+def _tiempo_legible(seg: float, incluye_carga: bool) -> str:
+    """El tiempo, dicho para un estudiante y sin esconder de qué está hecho."""
+    if incluye_carga:
+        return (f"Tardó {seg:.0f} s. La mayor parte fue cargar el modelo de "
+                "visión, que solo pasa la primera vez: las siguientes fotos "
+                "tardan unos pocos segundos.")
+    return f"Tardó {seg:.1f} s."
+
+
+def leer_foto(imagen):
+    """Etapa 1 -> 2. Lee la hoja y abre el panel de edición. Nunca diagnostica.
+
+    Tres salidas posibles, y las tres terminan en una pantalla distinta:
+
+      error           no hay foto, o la vía visual no está activa
+      no fiable       se para y se ofrece otra foto o escribir los pasos
+      lectura buena   se abre el panel para revisar y corregir la transcripción
+
+    Lo que nunca ocurre es pasar directo al diagnóstico: esa fue la lección de
+    `vis-10`, donde el VLM inventó una cuenta y el tutor la diagnosticó sin dudar.
     """
+    global _PRIMERA_LECTURA
+
+    import gradio as gr
+
+    oculto, visible = gr.update(visible=False), gr.update(visible=True)
     tutor = obtener_tutor()
     r = tutor.leer_imagen(imagen)
+    carga = _PRIMERA_LECTURA
+    _PRIMERA_LECTURA = False
     registrar("lectura_imagen", "", ok=r["ok"], latencia_s=r["latencia_s"],
               pasos_llm=0, n_herramientas=0)
+
     if not r.get("ok"):
-        return f"⚠️ {r['respuesta']}", "", False, ""
-    cuerpo = r["respuesta"] + "\n\n**" + r["pregunta"] + "**"
-    if not r.get("confirmable"):
-        cuerpo = (f"🟠 **Lectura no fiable.** {r['respuesta']}\n\n"
-                  f"**{r['pregunta']}**\n\nMotivo observable: "
-                  f"{r['motivo_no_fiable']}")
-    traza = [f"latencia de la lectura: {r['latencia_s']} s",
+        return (f"⚠️ {r['respuesta']}", oculto, oculto, "", "",
+                False, "", oculto)
+
+    traza = [f"lectura: {r['latencia_s']} s",
              f"pasos leídos: {len(r['pasos'])}",
-             f"se puede diagnosticar: {'sí, tras confirmar' if r.get('confirmable') else 'NO'}"]
+             f"las dos lecturas independientes coinciden: {r.get('lecturas_coinciden')}"]
     if r.get("transcripcion"):
         traza.append("\nTranscripción cruda:\n" + r["transcripcion"])
-    # Los pasos van a un cuadro EDITABLE: corregir la transcripción es parte del
-    # flujo, no una excepción. Si el tutor leyó mal un número, el error que
-    # señalaría sería suyo.
-    return cuerpo, "\n".join(r["pasos"]), False, "\n".join(traza)
+    tiempo = _tiempo_legible(r["latencia_s"], carga)
+
+    if not r.get("confirmable"):
+        # Aquí se PARA. No se enseña una transcripción que el propio sistema
+        # acaba de declarar no fiable: verla invita a confirmarla.
+        aviso = ("### 🟠 No pude leer bien esta hoja\n\n"
+                 f"{r['respuesta']}\n\n"
+                 f"**Lo que observé:** {r['motivo_no_fiable']}.\n\n"
+                 f"{tiempo}\n\n"
+                 "No voy a adivinar qué escribiste. Toma otra foto, o escribe "
+                 "tus pasos a mano abajo y los reviso igual.")
+        # El panel de edición se abre VACÍO: se ofrece escribir los pasos a
+        # mano, pero no se enseña la transcripción que acaba de declararse no
+        # fiable, porque verla invita a confirmarla.
+        return (aviso, visible, visible, "", "", False, "\n".join(traza), oculto)
+
+    aviso = ("### ✅ Esto es lo que leí en tu hoja\n\n"
+             "**Revísalo antes de que lo corrija.** Si transcribí mal un número, "
+             "el error que te señale sería mío, no tuyo.\n\n"
+             f"{tiempo}")
+    return (aviso, visible, oculto, "\n".join(r["pasos"]),
+            r.get("enunciado") or "", False, "\n".join(traza), oculto)
+
+
+def confirmar_transcripcion(texto_pasos: str):
+    """Etapa 3 -> 4. Abre la revisión solo si hay pasos que revisar."""
+    import gradio as gr
+
+    pasos = [l.strip() for l in (texto_pasos or "").splitlines() if l.strip()]
+    if not pasos:
+        return ("⚠️ No hay ningún paso que revisar. Escribe al menos uno, o "
+                "toma otra foto.", gr.update(visible=False), False)
+    return (f"### ✅ Transcripción confirmada · {len(pasos)} pasos\n\n"
+            "Ahora sí puedo revisar el procedimiento.",
+            gr.update(visible=True), True)
+
+
+def otra_foto():
+    """Vuelve a la etapa 1 y borra todo lo anterior. Sin estado colgando."""
+    import gradio as gr
+
+    oculto = gr.update(visible=False)
+    return ("### Paso 1 · Sube otra foto de la hoja", oculto, oculto,
+            "", "", False, "", "", oculto, None)
 
 
 def revisar_foto(texto_pasos: str, pregunta: str, confirmado: bool,
                  enunciado: str = ""):
-    """Paso 2: diagnostica los pasos confirmados. Sin la casilla, no hay nada."""
+    """Etapa 5. Diagnostica los pasos confirmados.
+
+    `confirmado` lo pone el botón de la etapa 3, no el estudiante marcando una
+    casilla al azar: sin él, `revisar_pasos` se niega y lo dice.
+    """
     tutor = obtener_tutor()
     pasos = [l.strip() for l in (texto_pasos or "").splitlines() if l.strip()]
     r = tutor.revisar_pasos(pasos, pregunta, enunciado=enunciado or None,
@@ -181,8 +248,8 @@ def revisar_foto(texto_pasos: str, pregunta: str, confirmado: bool,
     respuesta, detalle = _formatear(r)
     v = r.get("verificador_aritmetico")
     if v:
-        detalle = (f"comprobación determinista: {v['detalle']} (tipo {v['tipo']})\n"
-                   + detalle)
+        detalle = (f"comprobación determinista de la aritmética: {v['detalle']} "
+                   f"(tipo {v['tipo']})\n" + detalle)
     return respuesta, detalle
 
 
@@ -208,36 +275,66 @@ def construir():
         # La pestaña de visión solo si la configuración activa la incluye. En
         # S08-D no existe: ofrecerla sugeriría que forma parte de lo que midió
         # 18/21, y la vía visual nunca se midió junto con ese retrieval.
+        #
+        # Cinco etapas, y cada una aparece solo cuando llega su turno. Antes
+        # estaban las tres a la vez y la casilla de confirmación se podía marcar
+        # sin haber leído nada: la pantalla sugería que el orden daba igual.
         with gr.Tab("Revisar una foto", visible=tutor.cfg.vision):
-            gr.Markdown("### Paso 1 · Subir la foto y revisar lo que se leyó"
-                        + AVISO_VISION)
+            confirmado = gr.State(False)
+
+            gr.Markdown("## Revisar una foto de tu hoja" + AVISO_VISION)
+
+            gr.Markdown("### Paso 1 · Sube la foto")
             img = gr.Image(label="Foto de la hoja", type="pil")
             boton_leer = gr.Button("Leer la hoja", variant="primary")
-            mensaje = gr.Markdown()
 
-            gr.Markdown("### Paso 2 · Confirmar la lectura\n"
-                        "Un paso por línea. **Corrige lo que esté mal transcrito**: "
-                        "si el error es de lectura, el diagnóstico sería sobre una "
-                        "hoja que no escribiste.")
-            enunciado_box = gr.Textbox(label="Enunciado (opcional)", lines=1)
-            pasos_box = gr.Textbox(label="Los pasos de tu hoja", lines=8)
-            confirmar = gr.Checkbox(
-                label="Confirmo que esto es lo que escribí en la hoja",
-                value=False)
+            aviso = gr.Markdown()
 
-            gr.Markdown("### Paso 3 · Revisión")
-            preg_img = gr.Textbox(label="Tu pregunta", lines=2,
-                                  value="Revisa mi procedimiento: ¿en qué paso me equivoqué?")
-            boton_rev = gr.Button("Revisar los pasos confirmados",
-                                  variant="primary")
-            salida_img = gr.Textbox(label="Revisión", lines=8)
-            traza_img = gr.Textbox(label="Cómo se obtuvo", lines=8)
+            with gr.Group(visible=False) as panel_edicion:
+                gr.Markdown(
+                    "### Paso 2 · Revisa y edita los pasos\n"
+                    "Un paso por línea. **Corrige lo que esté mal transcrito.** "
+                    "Si el error es de lectura, el diagnóstico sería sobre una "
+                    "hoja que no escribiste.")
+                enunciado_box = gr.Textbox(label="Enunciado del ejercicio (opcional)",
+                                           lines=1)
+                pasos_box = gr.Textbox(label="Los pasos de tu hoja", lines=8)
+                gr.Markdown("### Paso 3 · Confirma la transcripción")
+                boton_confirmar = gr.Button("Confirmar transcripción",
+                                            variant="primary")
 
-            boton_leer.click(leer_foto, img,
-                             [mensaje, pasos_box, confirmar, traza_img])
-            boton_rev.click(revisar_foto,
-                            [pasos_box, preg_img, confirmar, enunciado_box],
-                            [salida_img, traza_img])
+            with gr.Group(visible=False) as panel_ilegible:
+                gr.Markdown(
+                    "### La lectura no es de fiar\n"
+                    "Puedes tomar otra foto —con más luz y la hoja plana— o "
+                    "escribir los pasos arriba y confirmarlos. Las dos rutas "
+                    "llegan a la misma revisión.")
+                boton_otra = gr.Button("Tomar otra foto", variant="primary")
+
+            with gr.Group(visible=False) as panel_revision:
+                gr.Markdown("### Paso 4 · Revisar el procedimiento")
+                preg_img = gr.Textbox(
+                    label="Tu pregunta", lines=2,
+                    value="Revisa mi procedimiento: ¿en qué paso me equivoqué?")
+                boton_rev = gr.Button("Revisar el procedimiento", variant="primary")
+                salida_img = gr.Textbox(label="Revisión", lines=8)
+
+            traza_img = gr.Textbox(label="Cómo se obtuvo", lines=6)
+
+            boton_leer.click(
+                leer_foto, img,
+                [aviso, panel_edicion, panel_ilegible, pasos_box, enunciado_box,
+                 confirmado, traza_img, panel_revision])
+            boton_confirmar.click(
+                confirmar_transcripcion, pasos_box,
+                [aviso, panel_revision, confirmado])
+            boton_otra.click(
+                otra_foto, None,
+                [aviso, panel_edicion, panel_ilegible, pasos_box, enunciado_box,
+                 confirmado, traza_img, salida_img, panel_revision, img])
+            boton_rev.click(
+                revisar_foto, [pasos_box, preg_img, confirmado, enunciado_box],
+                [salida_img, traza_img])
 
         with gr.Tab("Estado"):
             estado_txt = gr.Textbox(label="Comprobación de salud", lines=14,
