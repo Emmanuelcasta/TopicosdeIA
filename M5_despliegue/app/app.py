@@ -20,6 +20,7 @@ Ejecución local:
 from __future__ import annotations
 
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -115,21 +116,55 @@ def _cabecera(tutor) -> str:
             f"\n\nQué monta:\n{piezas}")
 
 
+_PAT_PENSAMIENTO = re.compile(
+    r"^[ \t]*(?:Pensamiento|Thought|Razonamiento)\s*:.*$", re.IGNORECASE | re.MULTILINE)
+
+
+def presentar(texto: str) -> str:
+    """La respuesta como la lee un estudiante, sin el razonamiento interno.
+
+    El formato ReAct del prompt hace que el modelo escriba «Pensamiento: …»
+    antes de actuar. `nucleo.analizar_salida` solo quita esa etiqueta del campo
+    `pensamiento`; cuando no hay llamada a herramienta, la línea se queda
+    dentro de la respuesta y acababa en pantalla. Quitarla aquí, en la capa de
+    presentación, deja intacto lo que ve el evaluador.
+    """
+    limpio = _PAT_PENSAMIENTO.sub("", texto or "")
+    limpio = re.sub(r"\n{3,}", "\n\n", limpio).strip()
+    return limpio or (texto or "").strip()
+
+
 def _formatear(r: dict) -> tuple:
     if not r.get("ok"):
         return f"⚠️ {r['respuesta']}", ""
     detalle = [f"latencia: {r['latencia_s']} s", f"pasos del modelo: {r['pasos_llm']}"]
     if r["herramientas"]:
-        detalle.append("herramientas: " + ", ".join(r["herramientas"]))
+        detalle.append("herramientas ejecutadas: " + ", ".join(r["herramientas"]))
+        for o in r.get("observaciones") or []:
+            detalle.append(f"  {o['herramienta']}({o['argumentos']}) -> "
+                           f"{o['resultado'] if o['ok'] else o['error']}")
+    else:
+        detalle.append("herramientas ejecutadas: ninguna")
     if r.get("contextos"):
         detalle.append(f"pasajes consultados: {r['contextos']}")
     if r.get("verificador"):
         v = r["verificador"]
         detalle.append(f"verificador aritmético: paso {v['paso']} ({v['tipo']}) "
                        f"{v['detalle']}" + ("" if v["reintento"] else " · sin reintento"))
+    n = r.get("normalizacion") or {}
+    if n.get("px_antes"):
+        detalle.append(
+            f"foto normalizada: {n['px_antes'][0]}×{n['px_antes'][1]} -> "
+            f"{n['px_despues'][0]}×{n['px_despues'][1]} px"
+            + (" · orientación EXIF corregida" if n.get("exif") else ""))
     if r.get("transcripcion"):
         detalle.append("\nLo que se leyó en la hoja:\n" + r["transcripcion"])
-    return r["respuesta"], "\n".join(detalle)
+    return presentar(r["respuesta"]), "\n".join(detalle)
+
+
+def _vaciar_texto():
+    """Deja las dos cajas en blanco antes de empezar. Sin ir al servidor."""
+    return "", ""
 
 
 def responder_texto(pregunta: str):
@@ -267,7 +302,13 @@ def construir():
             boton = gr.Button("Responder", variant="primary")
             salida = gr.Textbox(label="Respuesta", lines=8)
             traza = gr.Textbox(label="Cómo se obtuvo", lines=4)
-            boton.click(responder_texto, entrada, [salida, traza])
+            # Dos eventos encadenados a propósito. El primero vacía las cajas
+            # sin tocar el servidor; el segundo responde. Si el segundo muere
+            # —el túnel de `gradio.live` devolvió HTML y el cliente no supo
+            # leerlo—, lo que queda en pantalla es vacío, no la respuesta de la
+            # pregunta anterior haciéndose pasar por la de esta.
+            boton.click(_vaciar_texto, None, [salida, traza], queue=False).then(
+                responder_texto, entrada, [salida, traza])
             gr.Examples([["¿Cuánto es 3/4 + 1/8?"],
                          ["¿Cuál es la nota mínima aprobatoria del colegio?"],
                          ["Explica por qué 9 es un número primo."]], entrada)
@@ -364,6 +405,21 @@ def lanzar():
     print(f"torch.distributed.tensor: {COMPAT_TORCH['accion'] or '—'}")
     if COMPAT_TORCH.get("error"):
         print(f"  AVISO: {COMPAT_TORCH['error']}")
+    # La primera pregunta carga el modelo y tarda ~80 s. Por el túnel de
+    # `gradio.live` esa espera es la que acaba devolviendo una página HTML de
+    # error al cliente («Unexpected token '<'»), y la caja se queda con la
+    # respuesta anterior. Precargar mueve esa espera al arranque de la celda,
+    # donde no hay ningún cliente esperando.
+    if _bandera_activa("TUTOR_PRECARGAR"):
+        import time as _t
+
+        t0 = _t.perf_counter()
+        tutor = obtener_tutor()
+        tutor._cargar_modelo()      # noqa: SLF001 — mismo paquete, a propósito
+        print(f"precarga del modelo de texto: {_t.perf_counter() - t0:.1f} s · "
+              f"listo={tutor.estado.listo}")
+        if tutor.cfg.vision:
+            print("precarga del VLM: " + str(tutor.precargar_vision()))
     return construir().launch(
         server_name="0.0.0.0",
         server_port=int(os.environ.get("PORT", 7860)),

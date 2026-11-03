@@ -1207,3 +1207,94 @@ def test_el_guion_de_kaggle_dice_como_distinguir_completo_de_degradado():
     assert "requirements-kaggle.txt" in guion
     # Y el paso 0 ya no pide un commit que ya está hecho.
     assert "git commit" not in guion.split("## Contexto")[0]
+
+
+# --------------------------------------------------------------------------
+# La vía aritmética directa
+#
+# Regresión de la fase 2. `s08d_verificador` monta las 18 herramientas, pero el
+# adaptador `m1` se entrenó para RAG, no para emitir `<tool_call>`: ante
+# «¿Cuánto es 3/4 + 1/8?» contestaba `0.75` de cabeza y la traza registraba
+# cero llamadas. Estas pruebas corren sin GPU: la vía directa responde antes de
+# cargar ningún modelo.
+# --------------------------------------------------------------------------
+
+@pytest.mark.parametrize("pregunta, cuenta", [
+    ("¿Cuánto es 3/4 + 1/8?", "3/4 + 1/8"),
+    ("347 × 28", "347 × 28"),
+    ("Calcula 1764 ÷ 7", "1764 ÷ 7"),
+    ("cuanto es 2+2?", "2+2"),
+    ("resultado de (5+3)*2", "(5+3)*2"),
+])
+def test_reconoce_una_cuenta(pregunta, cuenta):
+    assert pipeline.cuenta_de(pregunta) == cuenta
+
+
+@pytest.mark.parametrize("pregunta", [
+    "Un bus recorre 68 km cada día. ¿Cuántos kilómetros recorre en 14 días?",
+    "¿Cuál es la nota mínima aprobatoria del colegio?",
+    "Explica por qué 9 es un número primo.",
+    "3/4",
+    "9716",
+    "",
+])
+def test_no_confunde_un_enunciado_con_una_cuenta(pregunta):
+    assert pipeline.cuenta_de(pregunta) is None
+
+
+@pytest.mark.parametrize("pregunta, valor, herramienta", [
+    ("¿Cuánto es 3/4 + 1/8?", "7/8", "operar_fracciones"),
+    ("347 × 28", "9716", "evaluar_expresion"),
+])
+def test_la_cuenta_la_ejecuta_una_herramienta_de_verdad(pregunta, valor, herramienta):
+    r = pipeline.Tutor("s08d_verificador").responder(pregunta)
+    assert r["ok"]
+    assert r["herramientas"] == [herramienta]
+    assert r["observaciones"][0]["ok"]
+    assert r["observaciones"][0]["valor"] == valor
+    assert valor in r["respuesta"]
+    assert r["pasos_llm"] == 0
+
+
+def test_la_linea_base_medida_no_cambia_de_camino():
+    """`s08d` se midió 18/21 SIN herramientas. Aquí no entra la vía directa."""
+    assert pipeline.Tutor("s08d")._aritmetica_directa("347 × 28") is None
+
+
+def test_dos_preguntas_seguidas_no_comparten_respuesta():
+    """Regresión: la segunda consulta mostraba la respuesta de la primera."""
+    t = pipeline.Tutor("s08d_verificador")
+    a = t.responder("347 × 28")
+    b = t.responder("¿Cuánto es 3/4 + 1/8?")
+    assert "9716" in a["respuesta"] and "7/8" not in a["respuesta"]
+    assert "7/8" in b["respuesta"] and "9716" not in b["respuesta"]
+
+
+def test_el_boton_vacia_las_cajas_antes_de_responder():
+    """Si el evento de respuesta muere, queda vacío, no lo de la vez anterior."""
+    app = pytest.importorskip("app")
+    assert app._vaciar_texto() == ("", "")
+
+
+def test_la_respuesta_no_ensena_el_razonamiento_interno():
+    app = pytest.importorskip("app")
+    crudo = "Pensamiento: Necesitamos multiplicar el recorrido por 14.\nRespuesta final: 952"
+    assert app.presentar(crudo) == "Respuesta final: 952"
+    assert "Pensamiento" not in app.presentar(crudo)
+
+
+def test_la_foto_se_normaliza_igual_que_en_el_evaluador():
+    """La app pasaba el PIL crudo de Gradio y el evaluador reducía a 1024: la
+    misma hoja se rechazaba en una y se leía en el otro."""
+    pytest.importorskip("PIL")
+    from PIL import Image
+
+    grande = Image.new("RGB", (4160, 1345), "white")
+    chica, info = pipeline.normalizar_foto(grande)
+    assert max(chica.size) == pipeline.LADO_MAYOR_FOTO
+    assert info["px_antes"] == [4160, 1345]
+    assert info["px_despues"] == list(chica.size)
+    # Una imagen que ya cabe no se toca.
+    pequena, info2 = pipeline.normalizar_foto(Image.new("RGB", (800, 600), "white"))
+    assert pequena.size == (800, 600)
+    assert info2["px_despues"] == [800, 600]

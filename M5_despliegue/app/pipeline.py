@@ -49,6 +49,89 @@ CUANTIZAR = os.environ.get("TUTOR_CUANTIZAR", "").lower() in ("1", "true", "int4
 # La configuración se ELIGE, no se deduce de qué adaptador haya en el disco.
 CONFIG = os.environ.get("TUTOR_CONFIG")
 
+# El lado mayor con el que se lee una foto. La app y el evaluador tienen que
+# ver los MISMOS píxeles: antes la interfaz pasaba el PIL crudo de Gradio
+# —4160 px en una foto de móvil— y el evaluador reducía a 1024, así que
+# `caso-01` se rechazaba en la una y se leía en el otro.
+LADO_MAYOR_FOTO = int(os.environ.get("TUTOR_LADO_MAYOR", "1024"))
+
+
+def normalizar_foto(imagen, lado_mayor: int = LADO_MAYOR_FOTO):
+    """Orientación EXIF corregida y lado mayor acotado. -> (imagen, dict).
+
+    El dict dice qué se hizo, para que la traza no tenga que adivinarlo. Si PIL
+    no está o la imagen no es una imagen, se devuelve tal cual: normalizar es
+    una mejora, no un requisito para que la vía visual arranque.
+    """
+    info = {"exif": False, "px_antes": None, "px_despues": None}
+    try:
+        from PIL import Image, ImageOps
+    except Exception:  # noqa: BLE001
+        return imagen, info
+    if not isinstance(imagen, Image.Image):
+        return imagen, info
+    info["px_antes"] = list(imagen.size)
+    try:
+        girada = ImageOps.exif_transpose(imagen)
+        info["exif"] = girada.size != imagen.size or girada is not imagen
+        imagen = girada
+    except Exception:  # noqa: BLE001
+        pass
+    if imagen.mode != "RGB":
+        imagen = imagen.convert("RGB")
+    if lado_mayor > 0 and max(imagen.size) > lado_mayor:
+        escala = lado_mayor / max(imagen.size)
+        imagen = imagen.resize(
+            (max(1, round(imagen.width * escala)), max(1, round(imagen.height * escala))),
+            Image.LANCZOS)
+    info["px_despues"] = list(imagen.size)
+    return imagen, info
+
+
+# --------------------------------------------------------------------------
+# Aritmética directa
+#
+# `s08d_verificador` monta las 18 herramientas, pero el adaptador `m1` se
+# entrenó para RAG, no para emitir `<tool_call>`: ante «¿Cuánto es 3/4 + 1/8?»
+# contestaba `0.75` de cabeza y la traza registraba cero llamadas. Cuando la
+# pregunta ES una cuenta no hay nada que decidir, así que se ejecuta la
+# herramienta registrada y se responde con su resultado exacto. El modelo sigue
+# a cargo de todo lo demás, y la observación que se guarda es la que devuelve
+# `RegistroHerramientas.ejecutar`: la misma que registraría el agente.
+#
+# Solo se activa con `herramientas=True`. `s08d` se midió sin herramientas y
+# no se toca.
+# --------------------------------------------------------------------------
+
+_PREFIJOS_CUENTA = re.compile(
+    r"^(?:cu[aá]nto\s+(?:es|da|vale|son)|cu[aá]nto|calcula(?:r)?|resuelve|opera|"
+    r"(?:el\s+)?resultado\s+de)\b[\s:]*", re.IGNORECASE)
+_SOLO_CUENTA = re.compile(r"^[0-9\s.,/+\-*×xX÷:^()√]+$")
+_UNA_FRACCION = re.compile(r"^-?\d+\s*/\s*\d+$")
+_DOS_FRACCIONES = re.compile(
+    r"^(-?\d+\s*/\s*\d+)\s*([+\-*×xX÷])\s*(-?\d+\s*/\s*\d+)$")
+_OPERACION_FRACCION = {"+": "suma", "-": "resta", "*": "multiplicacion",
+                       "×": "multiplicacion", "x": "multiplicacion",
+                       "X": "multiplicacion", "÷": "division"}
+
+
+def cuenta_de(pregunta: str) -> str | None:
+    """La cuenta que pide la pregunta, o None si la pregunta es otra cosa.
+
+    Deliberadamente estrecho: un enunciado con palabras («un bus recorre 68 km
+    cada día…») NO es una cuenta y se va al modelo. Aquí solo entra lo que ya
+    viene escrito como operación.
+    """
+    t = (pregunta or "").strip().strip("¿?").strip()
+    t = _PREFIJOS_CUENTA.sub("", t).strip().strip("¿?").strip().rstrip("=").strip()
+    if not t or len(t) > 120 or not _SOLO_CUENTA.match(t):
+        return None
+    if not any(c.isdigit() for c in t):
+        return None
+    if _UNA_FRACCION.match(t):      # «3/4» no es una cuenta, es un número
+        return None
+    return t if any(c in t for c in "+-*×xX÷:^/√") else None
+
 
 @dataclass
 class Estado:
@@ -825,6 +908,22 @@ class Tutor:
         if not pregunta:
             return self._fallo("escribe una pregunta", t0)
 
+        # Antes de cargar 1,5 B de pesos: si la pregunta es una cuenta, la
+        # calcula la herramienta y se acabó.
+        directa = self._aritmetica_directa(pregunta)
+        if directa is not None:
+            respuesta, observaciones = directa
+            return {
+                "ok": True,
+                "respuesta": respuesta,
+                "herramientas": [o["herramienta"] for o in observaciones],
+                "observaciones": observaciones,
+                "pasos_llm": 0,
+                "contextos": 0,
+                "verificador": None,
+                "latencia_s": round(time.perf_counter() - t0, 2),
+            }
+
         self._cargar_modelo()
         if not self.estado.listo:
             return self._fallo(self.estado.resumen(), t0)
@@ -841,11 +940,51 @@ class Tutor:
             "ok": True,
             "respuesta": salida.respuesta,
             "herramientas": [o["herramienta"] for o in salida.observaciones],
+            "observaciones": list(salida.observaciones),
             "pasos_llm": salida.pasos_llm,
             "contextos": len(salida.contextos),
             "verificador": hallazgo,
             "latencia_s": round(time.perf_counter() - t0, 2),
         }
+
+    def _aritmetica_directa(self, pregunta: str):
+        """-> (respuesta, [observación]) si la pregunta es una cuenta, o None.
+
+        La observación es la de `RegistroHerramientas.ejecutar`: si aquí no se
+        ejecutó nada, la traza tampoco dirá que se ejecutó algo.
+        """
+        if not self.cfg.herramientas:
+            return None
+        cuenta = cuenta_de(pregunta)
+        if cuenta is None:
+            return None
+        try:
+            from herramientas import REGISTRO
+            from registro import LlamadaHerramienta
+        except Exception:  # noqa: BLE001
+            return None
+
+        par = _DOS_FRACCIONES.match(cuenta)
+        if par is not None and "operar_fracciones" in REGISTRO:
+            # Con fracciones el resultado exacto es una fracción: 3/4 + 1/8 son
+            # 7/8, no «0.875 aproximado». `operar_fracciones` lo formatea así.
+            llamada = LlamadaHerramienta(
+                nombre="operar_fracciones",
+                argumentos={"fraccion_a": par.group(1).replace(" ", ""),
+                            "fraccion_b": par.group(3).replace(" ", ""),
+                            "operacion": _OPERACION_FRACCION[par.group(2)]},
+                formato="determinista")
+        elif "evaluar_expresion" in REGISTRO:
+            llamada = LlamadaHerramienta(nombre="evaluar_expresion",
+                                         argumentos={"expresion": cuenta},
+                                         formato="determinista")
+        else:
+            return None
+
+        resultado = REGISTRO.ejecutar(llamada)
+        if not resultado.ok:
+            return None            # que lo intente el modelo y lo explique
+        return f"{cuenta} = {resultado.resultado}", [resultado.a_dict()]
 
     def _reintentar_con_verificador(self, pregunta, salida):
         """Una sola segunda pasada si la aritmética de la respuesta no cuadra.
@@ -919,6 +1058,7 @@ class Tutor:
             "enunciado": js.get("enunciado"),
             "pasos": pasos_numerados(lectura),
             "lecturas_coinciden": lectura.get("consistente"),
+            "normalizacion": lectura.get("normalizacion") or {},
             "latencia_s": round(time.perf_counter() - t0, 2),
             "herramientas": [], "pasos_llm": 0, "contextos": 0,
         }
@@ -1100,6 +1240,11 @@ class Tutor:
         from vision import (INSTRUCCION_VER, INSTRUCCION_VER_INDEPENDIENTE,
                             json_de, lecturas_consistentes)
 
+        # Aquí, y no en la interfaz: las dos lecturas y el evaluador tienen que
+        # ver exactamente los mismos píxeles, venga la imagen de Gradio, del
+        # evaluador o de un test.
+        imagen, normalizacion = normalizar_foto(imagen)
+
         vlm, proc, torch = self._vlm
 
         def transcribir(instruccion):
@@ -1121,6 +1266,7 @@ class Tutor:
         # no estructurada también impide diagnosticar desde la foto.
         primera["consistente"] = bool(
             primera["ok"] and segunda["ok"] and lecturas_consistentes(primera, segunda))
+        primera["normalizacion"] = normalizacion
         return primera
 
     @staticmethod
