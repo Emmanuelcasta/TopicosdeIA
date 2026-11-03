@@ -1049,10 +1049,22 @@ class Tutor:
                 import torch
                 from transformers import AutoProcessor, Qwen2VLForConditionalGeneration
 
+                # El dispositivo se resuelve aquí y no se lee de `estado`: la vía
+                # visual se puede invocar sin haber cargado el modelo de texto, y
+                # entonces `estado.dispositivo` todavía vale "desconocido".
+                cuda = torch.cuda.is_available()
+                if self.estado.dispositivo == "desconocido":
+                    self.estado.dispositivo = "cuda" if cuda else "cpu"
+
                 proc = AutoProcessor.from_pretrained(VLM_ID, max_pixels=1024 * 1024)
+                # `device_map` es obligatorio, no una optimización. Sin él el VLM
+                # se queda en CPU con pesos fp16 y `generate` muere con
+                # «"addmm_impl_cpu_" not implemented for 'Half'», que es el mismo
+                # par dtype/dispositivo que ya resuelve `scripts/nb_m4.py`.
                 vlm = Qwen2VLForConditionalGeneration.from_pretrained(
-                    VLM_ID, torch_dtype=torch.float16
-                    if self.estado.dispositivo == "cuda" else torch.float32).eval()
+                    VLM_ID,
+                    torch_dtype=torch.float16 if cuda else torch.float32,
+                    device_map="auto" if cuda else None).eval()
                 self._vlm = (vlm, proc, torch)
             except Exception:  # noqa: BLE001
                 return None
