@@ -546,12 +546,25 @@ def test_una_hoja_ilegible_detiene_el_flujo(monkeypatch):
 
 
 def test_una_hoja_sin_pasos_tampoco_se_diagnostica(monkeypatch):
+    """Antes una hoja sin pasos no era confirmable. Desde que existe el modo
+    «resolver», un enunciado suelto sí lo es —es la otra cosa que un estudiante
+    fotografía—, pero sigue sin haber DIAGNÓSTICO: no hay pasos que juzgar, se
+    sugiere resolver y el estudiante confirma. Si el texto no es matemáticas
+    (esta lista de mercado), lo dice la resolución, no la lectura."""
     t = _tutor_con_lectura(monkeypatch, {
         "ok": True, "consistente": True,
         "json": {"enunciado": "Arroz, leche, huevos", "pasos": []}})
     r = t.leer_imagen(object())
+    assert r["pasos"] == []
+    assert r["proposito"] == "resolver"
+    assert "paso" not in (r["respuesta"] or "").lower().replace("pasos resueltos", "")
+
+
+def test_una_hoja_sin_enunciado_ni_pasos_no_es_confirmable(monkeypatch):
+    t = _tutor_con_lectura(monkeypatch, {
+        "ok": True, "consistente": True, "json": {"enunciado": "", "pasos": []}})
+    r = t.leer_imagen(object())
     assert r["confirmable"] is False
-    assert "no encuentro los pasos" in r["respuesta"]
 
 
 def test_sin_confirmacion_no_hay_diagnostico():
