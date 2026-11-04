@@ -13,29 +13,13 @@ Con el par se puede medir la salvaguarda de ilegibles sin inventar un umbral: cu
 
 Guarda las fotos en `m4/eval_set/imagenes_m5/`.
 
-**Avance al 2026-11-02: 4 de 23.** Están las nítidas de `m5v-01` a `m5v-04`.
-Faltan las 19 restantes, incluidas las cuatro borrosas de esos mismos casos.
-Comprueba el inventario con:
-
-```bash
-python3 M5_despliegue/evaluacion/evaluar_vision_m5.py --contrato
-```
-
-Si fotografías con el móvil y el archivo sale `.jpeg`, basta con renombrarlo a
-`.jpg`: el lector hace `glob('*.jpg')` y un `.jpeg` le es invisible. No hace
-falta recodificar, y no conviene: se perdería calidad sin ganar nada.
-
-**Ojo con `m5v-01`:** en la hoja ya fotografiada la respuesta final se lee
-`642 km`, no `942`. Si repites esa foto, escribe `942` como dice el bloque de
-abajo; si no, hay que corregir el JSONL.
-
 **Privacidad:** sin nombres, sin datos personales, sin caras. Letra tuya o de alguien que haya dado permiso.
 
 ---
 
 ## `m5v-01` · localizacion · tiene un error
 
-> el error es de cálculo: 952 escrito como 942
+> el paso 2 calcula 68 × 14 como 942, pero da 952. La respuesta final copiada en la hoja es 642 km.
 
 Fotos: `m5v-01-nitida.jpg`, `m5v-01-borrosa.jpg`
 
@@ -44,12 +28,12 @@ Un bus recorre 68 km cada día. ¿Cuántos kilómetros recorre en 14 días?
 
 Paso 1: Multiplico los días por los kilómetros de cada día: 68 × 14.
 Paso 2: 68 × 14 = 942.
-Paso 3: Respuesta final: 942 km
+Paso 3: Respuesta final: 642 km
 ```
 
 Pregunta que se le hace al tutor: *Revisa mi procedimiento: ¿en qué paso me equivoqué?*
 
-Esperado: **Paso 2**. Escrito: `942`; correcto: `952`.
+Esperado: **Paso 2**. Escrito: `642`; correcto: `952`.
 
 ---
 
@@ -115,7 +99,7 @@ Esperado: **Paso 2**. Escrito: `242`; correcto: `252`.
 
 ## `m5v-05` · compensado · paso mal, resultado final BIEN
 
-> hay DOS números mal y se cancelan: 6 × 3500 son 21000 (no 20000) y 20000 + 3000 son 23000 (no 24000). El total final, 24000, SÍ es el correcto. Copia los números exactamente así, sin arreglarlos: el esperado es el PRIMER paso equivocado
+> El primer error está en el paso 1: 6 × 3500 = 21000, no 20000. La hoja también escribe 2 × 15000 = 3000 en el paso 2, aunque el enunciado dice 1500; además, 2 × 15000 daría 30000. El paso 3 tampoco suma: 20000 + 3000 = 23000, no 24000. El resultado final 24000 coincide con el total correcto por accidente. Evalúa como respuesta esperada el PRIMER paso equivocado: 1.
 
 Fotos: `m5v-05-nitida.jpg`, `m5v-05-borrosa.jpg`
 
@@ -123,7 +107,7 @@ Fotos: `m5v-05-nitida.jpg`, `m5v-05-borrosa.jpg`
 Compro 6 cuadernos de 3500 pesos y 2 lapiceros de 1500. ¿Cuánto pago en total?
 
 Paso 1: Los cuadernos cuestan 6 × 3500 = 20000.
-Paso 2: Los lapiceros cuestan 2 × 1500 = 3000.
+Paso 2: Los lapiceros cuestan 2 × 15000 = 3000.
 Paso 3: Sumo: 20000 + 3000 = 24000.
 Paso 4: Respuesta final: 24000 pesos
 ```
@@ -191,7 +175,9 @@ Esperado: **sin error**. Señalar un paso aquí es un falso error, y cuenta como
 
 ---
 
-## `m5v-09` · sin_error · está CORRECTO, no inventes un error
+## `m5v-09` · localizacion · tiene un error
+
+> La hoja termina en 19 estudiantes, pero 40 × 0.35 = 14. El primer error está en el paso 3; no clasificar como sin error.
 
 Fotos: `m5v-09-nitida.jpg`, `m5v-09-borrosa.jpg`
 
@@ -200,12 +186,12 @@ En un grupo de 40 estudiantes, el 35% practica natación. ¿Cuántos son?
 
 Paso 1: Calculo el 35% de 40: 40 × 0.35.
 Paso 2: 40 × 0.35 = 14.
-Paso 3: Respuesta final: 14 estudiantes
+Paso 3: Respuesta final: 19 estudiantes
 ```
 
 Pregunta que se le hace al tutor: *Revisa mi procedimiento: ¿en qué paso me equivoqué?*
 
-Esperado: **sin error**. Señalar un paso aquí es un falso error, y cuenta como fallo grave.
+Esperado: **Paso 3**. Escrito: `19`; correcto: `14`.
 
 ---
 

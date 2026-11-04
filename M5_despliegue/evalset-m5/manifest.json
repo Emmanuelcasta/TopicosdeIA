@@ -1,22 +1,22 @@
 {
-  "version": 3,
+  "version": 4,
   "nombre": "evalset-m5-vision",
-  "descripcion": "Manifiesto de las fotos del eval set visual de M5. NO es un formato de entrada: ningún código lo lee. Documenta qué hay en disco y cuánto se aparta de lo que el lector real espera.",
+  "descripcion": "Manifiesto del eval set visual de M5. Registra el contrato vigente de 12 fotos, las transcripciones verificadas contra las hojas y la única limitación de captura pendiente.",
   "contrato_real": {
     "lo_que_lee_el_codigo": "data/eval_set_m5_vision.jsonl",
-    "formato": "JSONL · un objeto por línea. No existe ningún lector de JSON ni de CSV. m4/eval_set/eval_set_m5.csv es una salida de entrega, no una entrada.",
+    "formato": "JSONL · un objeto por línea; fuente generada por scripts/eval_set_m5_vision_fuente.py.",
     "generador": "scripts/eval_set_m5_vision_fuente.py",
     "directorio_de_fotos": "m4/eval_set/imagenes_m5/",
-    "estado_del_directorio": "existe · 12 de 12. Verificado con `evaluar_vision_m5.py --contrato` el 2026-11-03, en local y en Kaggle.",
-    "patron_de_busqueda": "*.jpg  ·  un archivo .jpeg es invisible para el lector",
+    "estado_del_directorio": "12 de 12 imágenes JPG presentes, una por caso; inventario revisado el 2026-11-04.",
+    "patron_de_busqueda": "*.jpg · las fotos del evaluador se nombran m5v-NN.jpg.",
     "nombres_de_archivo": {
-      "vigente": "<id>.jpg, por ejemplo m5v-07.jpg",
-      "anterior": "<id>-nitida.jpg y <id>-borrosa.jpg",
-      "patron": "*.jpg · un archivo .jpeg sigue siendo invisible para el lector"
+      "vigente": "<id>.jpg, m5v-01.jpg a m5v-12.jpg",
+      "anterior": "pares <id>-nitida.jpg y <id>-borrosa.jpg, conservados en el JSONL como referencia histórica",
+      "patron": "*.jpg"
     },
-    "unico_consumidor_automatico": "M5_despliegue/evaluacion/validacion_m5.py:218-223 · hace IMAGENES_M5.glob('*.jpg') y lo compara contra los nombres de imagen_nitida e imagen_borrosa del JSONL. Solo cuenta: no mide nada.",
-    "evaluador_de_vision": "no existe como script. validacion_m5.py:147 declara el experimento E5 con «como: pendiente de notebook; TUTOR_CONFIG=revision_foto».",
-    "este_manifiesto": "sin lector. `grep -rn evalset-m5` sobre el repositorio no devuelve nada fuera de este archivo. Cambiarlo no cambia ninguna medición."
+    "unico_consumidor_automatico": "M5_despliegue/evaluacion/evaluar_vision_m5.py:106-139 · solicita una foto <id>.jpg por caso y toma del JSONL la etiqueta de captura; validacion_m5.py comprueba requisitos de despliegue.",
+    "evaluador_de_vision": "M5_despliegue/evaluacion/evaluar_vision_m5.py · separa lectura y calificación; --contrato no carga modelos y --correr ejecuta el scorecard.",
+    "este_manifiesto": "documenta el contrato y el estado; la fuente de verdad de casos es el JSONL."
   },
   "campos_caso": {
     "id": "identificador único, por ejemplo m5v-01",
@@ -54,10 +54,10 @@
     "pasos": [
       "Multiplico los días por los kilómetros de cada día: 68 × 14.",
       "68 × 14 = 942.",
-      "Respuesta final: 942 km"
+      "Respuesta final: 642 km"
     ],
     "paso_error": 2,
-    "valor_final_escrito": "942",
+    "valor_final_escrito": "642",
     "valor_correcto": "952",
     "evaluacion": {
       "tipo": "contiene_alguna",
@@ -77,7 +77,7 @@
     },
     "criterio": "exacto",
     "check": "68*14",
-    "nota_foto": "el error es de cálculo: 952 escrito como 942"
+    "nota_foto": "el paso 2 calcula 68 × 14 como 942, pero da 952. La respuesta final copiada en la hoja es 642 km."
   },
   "casos": [
     {
@@ -85,18 +85,18 @@
       "bloque": "localizacion",
       "criterio": "exacto",
       "archivo_en_disco": "caso-01.jpeg",
-      "archivo_que_pide_el_lector": "m5v-01-nitida.jpg",
-      "borrosa_que_pide_el_lector": "m5v-01-borrosa.jpg",
-      "conforme": false,
+      "archivo_que_pide_el_lector": "m5v-01.jpg",
+      "borrosa_que_pide_el_lector": null,
+      "conforme": true,
       "pregunta": "Revisa mi procedimiento: ¿en qué paso me equivoqué?",
       "enunciado": "Un bus recorre 68 km cada día. ¿Cuántos kilómetros recorre en 14 días?",
       "pasos": [
         "Multiplico los días por los kilómetros de cada día: 68 × 14.",
         "68 × 14 = 942.",
-        "Respuesta final: 942 km"
+        "Respuesta final: 642 km"
       ],
       "paso_error": 2,
-      "valor_final_escrito": "942",
+      "valor_final_escrito": "642",
       "valor_correcto": "952",
       "evaluacion": {
         "tipo": "contiene_alguna",
@@ -115,16 +115,16 @@
         ]
       },
       "check": "68*14",
-      "nota_foto": "el error es de cálculo: 952 escrito como 942"
+      "nota_foto": "el paso 2 calcula 68 × 14 como 942, pero da 952. La respuesta final copiada en la hoja es 642 km."
     },
     {
       "id": "m5v-02",
       "bloque": "localizacion",
       "criterio": "exacto",
       "archivo_en_disco": "caso-02.jpeg",
-      "archivo_que_pide_el_lector": "m5v-02-nitida.jpg",
-      "borrosa_que_pide_el_lector": "m5v-02-borrosa.jpg",
-      "conforme": false,
+      "archivo_que_pide_el_lector": "m5v-02.jpg",
+      "borrosa_que_pide_el_lector": null,
+      "conforme": true,
       "pregunta": "Revisa mi procedimiento: ¿en qué paso me equivoqué?",
       "enunciado": "Un salón tiene 1240 sillas y se retiran 365. ¿Cuántas sillas quedan?",
       "pasos": [
@@ -159,9 +159,9 @@
       "bloque": "localizacion",
       "criterio": "exacto",
       "archivo_en_disco": "caso-03.jpeg",
-      "archivo_que_pide_el_lector": "m5v-03-nitida.jpg",
-      "borrosa_que_pide_el_lector": "m5v-03-borrosa.jpg",
-      "conforme": false,
+      "archivo_que_pide_el_lector": "m5v-03.jpg",
+      "borrosa_que_pide_el_lector": null,
+      "conforme": true,
       "pregunta": "Revisa mi procedimiento: ¿en qué paso me equivoqué?",
       "enunciado": "Una camiseta cuesta 52000 pesos y tiene 25% de descuento. ¿Cuánto se paga?",
       "pasos": [
@@ -196,9 +196,9 @@
       "bloque": "localizacion",
       "criterio": "exacto",
       "archivo_en_disco": "caso-04.jpeg",
-      "archivo_que_pide_el_lector": "m5v-04-nitida.jpg",
-      "borrosa_que_pide_el_lector": "m5v-04-borrosa.jpg",
-      "conforme": false,
+      "archivo_que_pide_el_lector": "m5v-04.jpg",
+      "borrosa_que_pide_el_lector": null,
+      "conforme": true,
       "pregunta": "Revisa mi procedimiento: ¿en qué paso me equivoqué?",
       "enunciado": "Se reparten 1764 semillas en partes iguales entre 7 materas. ¿Cuántas recibe cada una?",
       "pasos": [
@@ -233,14 +233,14 @@
       "bloque": "compensado",
       "criterio": "exacto",
       "archivo_en_disco": "caso-05.jpeg",
-      "archivo_que_pide_el_lector": "m5v-05-nitida.jpg",
-      "borrosa_que_pide_el_lector": "m5v-05-borrosa.jpg",
-      "conforme": false,
+      "archivo_que_pide_el_lector": "m5v-05.jpg",
+      "borrosa_que_pide_el_lector": null,
+      "conforme": true,
       "pregunta": "Revisa mi procedimiento: ¿en qué paso me equivoqué?",
       "enunciado": "Compro 6 cuadernos de 3500 pesos y 2 lapiceros de 1500. ¿Cuánto pago en total?",
       "pasos": [
         "Los cuadernos cuestan 6 × 3500 = 20000.",
-        "Los lapiceros cuestan 2 × 1500 = 3000.",
+        "Los lapiceros cuestan 2 × 15000 = 3000.",
         "Sumo: 20000 + 3000 = 24000.",
         "Respuesta final: 24000 pesos"
       ],
@@ -264,16 +264,16 @@
         ]
       },
       "check": "6*3500+2*1500",
-      "nota_foto": "hay DOS números mal y se cancelan: 6 × 3500 son 21000 (no 20000) y 20000 + 3000 son 23000 (no 24000). El total final, 24000, SÍ es el correcto. Copia los números exactamente así, sin arreglarlos: el esperado es el PRIMER paso equivocado"
+      "nota_foto": "El primer error está en el paso 1: 6 × 3500 = 21000, no 20000. La hoja también escribe 2 × 15000 = 3000 en el paso 2, aunque el enunciado dice 1500; además, 2 × 15000 daría 30000. El paso 3 tampoco suma: 20000 + 3000 = 23000, no 24000. El resultado final 24000 coincide con el total correcto por accidente. Evalúa como respuesta esperada el PRIMER paso equivocado: 1."
     },
     {
       "id": "m5v-06",
       "bloque": "compensado",
       "criterio": "exacto",
       "archivo_en_disco": "caso-06.jpeg",
-      "archivo_que_pide_el_lector": "m5v-06-nitida.jpg",
-      "borrosa_que_pide_el_lector": "m5v-06-borrosa.jpg",
-      "conforme": false,
+      "archivo_que_pide_el_lector": "m5v-06.jpg",
+      "borrosa_que_pide_el_lector": null,
+      "conforme": true,
       "pregunta": "Revisa mi procedimiento: ¿en qué paso me equivoqué?",
       "enunciado": "Un recorrido tiene 3 tramos: 12 km, 18 km y 25 km. ¿Cuántos kilómetros son en total?",
       "pasos": [
@@ -308,9 +308,9 @@
       "bloque": "sin_error",
       "criterio": "valvula",
       "archivo_en_disco": "caso-07.jpeg",
-      "archivo_que_pide_el_lector": "m5v-07-nitida.jpg",
-      "borrosa_que_pide_el_lector": "m5v-07-borrosa.jpg",
-      "conforme": false,
+      "archivo_que_pide_el_lector": "m5v-07.jpg",
+      "borrosa_que_pide_el_lector": null,
+      "conforme": true,
       "pregunta": "Revisa mi procedimiento: ¿en qué paso me equivoqué?",
       "enunciado": "Un paquete trae 18 galletas. ¿Cuántas galletas hay en 15 paquetes?",
       "pasos": [
@@ -346,9 +346,9 @@
       "bloque": "sin_error",
       "criterio": "valvula",
       "archivo_en_disco": "caso-08.jpeg",
-      "archivo_que_pide_el_lector": "m5v-08-nitida.jpg",
-      "borrosa_que_pide_el_lector": "m5v-08-borrosa.jpg",
-      "conforme": false,
+      "archivo_que_pide_el_lector": "m5v-08.jpg",
+      "borrosa_que_pide_el_lector": null,
+      "conforme": true,
       "pregunta": "Revisa mi procedimiento: ¿en qué paso me equivoqué?",
       "enunciado": "De un rollo de 7/8 de metro se usan 3/8. ¿Cuánto queda?",
       "pasos": [
@@ -382,49 +382,48 @@
     },
     {
       "id": "m5v-09",
-      "bloque": "sin_error",
-      "criterio": "valvula",
+      "bloque": "localizacion",
+      "criterio": "exacto",
       "archivo_en_disco": "caso-09.jpeg",
-      "archivo_que_pide_el_lector": "m5v-09-nitida.jpg",
-      "borrosa_que_pide_el_lector": "m5v-09-borrosa.jpg",
-      "conforme": false,
+      "archivo_que_pide_el_lector": "m5v-09.jpg",
+      "borrosa_que_pide_el_lector": null,
+      "conforme": true,
       "pregunta": "Revisa mi procedimiento: ¿en qué paso me equivoqué?",
       "enunciado": "En un grupo de 40 estudiantes, el 35% practica natación. ¿Cuántos son?",
       "pasos": [
         "Calculo el 35% de 40: 40 × 0.35.",
         "40 × 0.35 = 14.",
-        "Respuesta final: 14 estudiantes"
+        "Respuesta final: 19 estudiantes"
       ],
-      "paso_error": null,
-      "valor_final_escrito": "14",
+      "paso_error": 3,
+      "valor_final_escrito": "19",
       "valor_correcto": "14",
       "evaluacion": {
         "tipo": "contiene_alguna",
         "claves": [
-          "sin error",
-          "no hay error",
-          "está correcto",
-          "es correcto",
-          "todo bien",
-          "ningún paso"
+          "paso 3",
+          "paso 3:",
+          "el paso 3",
+          "paso número 3",
+          "paso n.º 3"
         ],
         "prohibido": [
           "paso 1",
           "paso 2",
-          "paso 3",
-          "paso 4"
+          "paso 4",
+          "paso 5"
         ]
       },
       "check": "40*0.35",
-      "nota_foto": null
+      "nota_foto": "La hoja termina en 19 estudiantes, pero 40 × 0.35 = 14. El primer error está en el paso 3; no clasificar como sin error."
     },
     {
       "id": "m5v-10",
       "bloque": "adversarial",
       "criterio": "valvula",
       "archivo_en_disco": "caso-10.jpeg",
-      "archivo_que_pide_el_lector": null,
-      "borrosa_que_pide_el_lector": "m5v-10-borrosa.jpg",
+      "archivo_que_pide_el_lector": "m5v-10.jpg",
+      "borrosa_que_pide_el_lector": "m5v-10.jpg",
       "conforme": false,
       "pregunta": "Revisa mi procedimiento: ¿en qué paso me equivoqué?",
       "enunciado": "Un pedido tiene 37 cajas con 46 unidades cada una. ¿Cuántas unidades son?",
@@ -463,9 +462,9 @@
       "bloque": "adversarial",
       "criterio": "valvula",
       "archivo_en_disco": "caso-11.jpeg",
-      "archivo_que_pide_el_lector": "m5v-11-nitida.jpg",
-      "borrosa_que_pide_el_lector": "m5v-11-borrosa.jpg",
-      "conforme": false,
+      "archivo_que_pide_el_lector": "m5v-11.jpg",
+      "borrosa_que_pide_el_lector": null,
+      "conforme": true,
       "pregunta": "Revisa mi procedimiento: ¿en qué paso me equivoqué?",
       "enunciado": "Revisa mi procedimiento: ¿en qué paso me equivoqué?",
       "pasos": [
@@ -504,9 +503,9 @@
       "bloque": "adversarial",
       "criterio": "valvula",
       "archivo_en_disco": "caso-12.jpeg",
-      "archivo_que_pide_el_lector": "m5v-12-nitida.jpg",
-      "borrosa_que_pide_el_lector": "m5v-12-borrosa.jpg",
-      "conforme": false,
+      "archivo_que_pide_el_lector": "m5v-12.jpg",
+      "borrosa_que_pide_el_lector": null,
+      "conforme": true,
       "pregunta": "Revisa mi procedimiento: ¿en qué paso me equivoqué?",
       "enunciado": "¿Cuánto me costó el tercer artículo?",
       "pasos": [
@@ -540,23 +539,17 @@
     }
   ],
   "desajustes": [
-    "DIRECTORIO · las fotos están en M5_despliegue/evalset-m5/imagenes/ y el lector busca en m4/eval_set/imagenes_m5/.",
-    "EXTENSIÓN · son .jpeg y el glob es *.jpg: el lector no ve ni una.",
-    "NOMBRE · son caso-NN.jpeg y el lector pide m5v-NN-nitida.jpg.",
-    "COBERTURA · 12 archivos frente a las 23 fotos que nombra el JSONL: faltan las 11 variantes borrosas de m5v-01..m5v-09, m5v-11 y m5v-12.",
-    "m5v-10 · su imagen_nitida es null por construcción y caso-10.jpeg se lee perfectamente. Tal cual, no mide la salvaguarda y contaría como fallo.",
-    "MEDIO · son fotos de una pantalla con texto tipografiado, no de hojas manuscritas como pide m4/eval_set/HOJAS_M5.md. Leer tipografía limpia es una tarea distinta y más fácil: el resultado sobreestimaría la visión.",
-    "IDENTIFICADOR IMPRESO · cada imagen lleva su m5v-NN visible, así que el modelo lo lee y la transcripción no es comparable carácter a carácter."
+    "m5v-10 · la única foto se requiere borrosa para medir la salvaguarda, pero la toma actual es legible. No puntuar este caso como prueba de ilegibilidad hasta reemplazarla por una toma realmente movida o desenfocada."
   ],
   "para_ser_conforme": [
-    "Fotografiar las 12 hojas a mano, dos tomas cada una, y m5v-10 solo borrosa.",
-    "Nombrarlas m5v-NN-nitida.jpg y m5v-NN-borrosa.jpg, extensión .jpg.",
-    "Guardarlas en m4/eval_set/imagenes_m5/, o mover IMAGENES_M5 en validacion_m5.py:57 a esta carpeta. Lo segundo es un cambio de harness."
+    "Repetir únicamente la foto de m5v-10 con movimiento o desenfoque suficiente para que los números no se lean; conservar los otros 11 archivos.",
+    "Copiar la nueva toma como m4/eval_set/imagenes_m5/m5v-10.jpg y adjuntar la versión actualizada del dataset a Kaggle.",
+    "Correr primero evaluar_vision_m5.py --contrato y luego el scorecard con la revisión de código que se vaya a presentar; registrar hash/commit y no mezclar corridas de versiones distintas."
   ],
   "fotos_presentes": 12,
   "fotos_que_pide_el_lector": 12,
   "fotos_visibles_para_el_lector": 12,
-  "uso_admitido": "prueba de humo del pipeline visual: que ver() devuelva JSON, que la transcripción sea editable y que el verificador aritmético corra. NO sirve como eval set de exactitud de visión de M5.",
+  "uso_admitido": "Evaluación de desarrollo sobre 12 hojas manuscritas, separando fidelidad de lectura y calidad del diagnóstico. La muestra es pequeña; no sustenta por sí sola una afirmación de generalización.",
   "fuente_de_verdad": "data/eval_set_m5_vision.jsonl, generado por scripts/eval_set_m5_vision_fuente.py",
   "fotos_manuscritas": {
     "que_son": "Las 12 hojas manuscritas reales del eval set visual de M5. Sustituyen a las fotos de texto en pantalla del paquete de humo.",
@@ -565,9 +558,9 @@
     "conversion": "ninguna. Los doce ya son JPEG; solo cambia la extensión, porque el lector hace glob('*.jpg') y un .jpeg le es invisible. La copia es byte a byte idéntica: no se recodificó.",
     "aviso_de_nombres": "M5_despliegue/evalset-m5/imagenes/caso-01..12.jpeg son OTRAS fotos (texto en pantalla, paquete de humo). Mismo nombre, contenido distinto, SHA-256 distinto.",
     "el_id_va_escrito_en_la_hoja": "cada hoja lleva su número arriba. No revela el paso con error, pero el modelo puede leerlo.",
-    "revisadas_a_mano_el": "2026-11-03",
-    "conformes": 8,
-    "en_conflicto": 4,
+    "revisadas_a_mano_el": "2026-11-04",
+    "conformes": 11,
+    "en_conflicto": 1,
     "archivos": [
       {
         "caso": "m5v-01",
@@ -575,8 +568,8 @@
         "copia_que_lee_el_evaluador": "m4/eval_set/imagenes_m5/m5v-01.jpg",
         "sha256": "40100dc862e620f6bd4e93c7f3ce4d9855f968ebb86bc38e0190caee0b604dec",
         "copia_identica_al_original": true,
-        "estado": "CONFLICTO",
-        "comparacion_con_el_jsonl": "la hoja escribe «Respuesta final: 642 km»; el JSONL espera 942 en `valor_final_escrito` y en el paso 3. El paso con error sigue siendo el 2. No se retomó la foto: el SHA-256 es el mismo del 2026-11-02."
+        "estado": "OK · REFERENCIA CORREGIDA",
+        "comparacion_con_el_jsonl": "El JSONL ahora conserva la hoja: paso 2 = 942 y respuesta final = 642 km. El primer error sigue en el paso 2 porque 68 × 14 = 952."
       },
       {
         "caso": "m5v-02",
@@ -611,8 +604,8 @@
         "copia_que_lee_el_evaluador": "m4/eval_set/imagenes_m5/m5v-05.jpg",
         "sha256": "52d83eb7cd6ddab55eb92de1efa539db2c413810bd4b3685f51380badd72369f",
         "copia_identica_al_original": true,
-        "estado": "CONFLICTO",
-        "comparacion_con_el_jsonl": "la hoja escribe «2 × 15000 = 3000»; el JSONL dice «2 × 1500 = 3000» y el enunciado de la propia hoja dice «lapiceros de 1500». Con el cero de más el paso 2 también queda mal, y el caso es `compensado`: esperaba que el único primer error fuera el paso 1 y prohíbe nombrar el paso 2. Además la hoja tiene 3 pasos y el JSONL 4 (falta la línea «Respuesta final»)."
+        "estado": "OK · REFERENCIA CORREGIDA",
+        "comparacion_con_el_jsonl": "El JSONL ahora transcribe 2 × 15000 = 3000 como aparece en la hoja. Se mantiene el primer error en paso 1 y se documentan inconsistencias posteriores; el resultado final correcto ocurre por accidente."
       },
       {
         "caso": "m5v-06",
@@ -647,8 +640,8 @@
         "copia_que_lee_el_evaluador": "m4/eval_set/imagenes_m5/m5v-09.jpg",
         "sha256": "343d0a353ea605fd7e313a4aeefd75694ec0988bfe23e9c0ff94948932cbd0de",
         "copia_identica_al_original": true,
-        "estado": "CONFLICTO",
-        "comparacion_con_el_jsonl": "la hoja escribe «Respuesta final: 19 estudiantes»; su propio paso 2 dice «40 × 0.35 = 14» y el JSONL espera 14. El caso está declarado `sin_error`, y con un 19 al final sí hay un error en el paso 3. El 4 del paso 2 es abierto y el glifo del paso 3 es un 9 cerrado: son dígitos distintos en la misma letra."
+        "estado": "OK · REFERENCIA CORREGIDA",
+        "comparacion_con_el_jsonl": "El JSONL ahora registra respuesta final 19 estudiantes; se reclasifica como localizacion, error en paso 3, valor correcto 14."
       },
       {
         "caso": "m5v-10",
@@ -656,8 +649,8 @@
         "copia_que_lee_el_evaluador": "m4/eval_set/imagenes_m5/m5v-10.jpg",
         "sha256": "cb17c85ae6dc48e5a9d416f58a8a7f28425904e74aa2779cfc48530734b74514",
         "copia_identica_al_original": true,
-        "estado": "CONFLICTO",
-        "comparacion_con_el_jsonl": "la foto es LEGIBLE y nítida. El JSONL pide explícitamente que esta hoja se fotografíe en movimiento, porque el caso existe para medir la salvaguarda de ilegibles. Con esta toma no se puede afirmar nada sobre la válvula, ni a favor ni en contra."
+        "estado": "CONFLICTO DE CAPTURA",
+        "comparacion_con_el_jsonl": "La transcripción coincide, pero la foto es legible y nítida aunque el caso requiere una toma ilegible. No puntuar como prueba de la salvaguarda hasta reemplazar la imagen."
       },
       {
         "caso": "m5v-11",
@@ -678,7 +671,16 @@
         "comparacion_con_el_jsonl": "coincide literalmente. Caso de dato ausente."
       }
     ],
-    "por_que_importan_los_conflictos": "Un caso en conflicto se LEE —la evidencia de lectura sigue sirviendo— pero no se puntúa: su respuesta esperada describe una hoja que no es la que hay. Puntuarlo sería medir el eval set contra sí mismo. Resolverlo es una decisión de diseño: repetir la foto, o corregir el JSONL. No se hizo ninguna de las dos."
+    "por_que_importan_los_conflictos": "Un caso en conflicto se LEE —la evidencia de lectura sigue sirviendo— pero no se puntúa: su respuesta esperada describe una hoja que no es la que hay. Puntuarlo sería medir el eval set contra sí mismo. Resolverlo es una decisión de diseño: repetir la foto, o corregir el JSONL. No se hizo ninguna de las dos.",
+    "resolucion_conflictos_jsonl": {
+      "fecha": "2026-11-04",
+      "criterio": "Se conserva la evidencia manuscrita original; se actualiza la transcripción de referencia cuando la hoja difiere del JSONL. No se modifica la respuesta manuscrita ni se fuerza el caso para mejorar el score.",
+      "casos": {
+        "m5v-01": "Transcripción final corregida a 642 km; el paso 2 conserva 68 × 14 = 942 y sigue siendo el primer paso erróneo.",
+        "m5v-05": "Transcripción del paso 2 corregida a 2 × 15000 = 3000. El paso 1 es el primer error; se documentan también las inconsistencias posteriores y que 24000 coincide con el total correcto por accidente.",
+        "m5v-09": "Transcripción final corregida a 19 estudiantes; se reclasifica de sin_error a localizacion, con paso_error=3 y valor_correcto=14."
+      }
+    }
   },
   "dataset_de_kaggle": {
     "verificado": "2026-11-03, sesión del notebook tutor-matematicas",
@@ -700,9 +702,9 @@
   "fotos_manuscritas_presentes": 12,
   "fotos_manuscritas_faltantes": 0,
   "alcance": {
-    "vigente": "12 fotos · una por caso · m5v-01.jpg a m5v-12.jpg",
+    "vigente": "12 fotos · una por caso · m5v-01.jpg a m5v-12.jpg.",
     "anterior": "23 archivos · pares nitida/borrosa. Se conserva en `evaluar_vision_m5.variantes_historico_23` y en este bloque: un alcance que cambia sin dejar rastro convierte «faltan 19» en «estaba completo» sin que nadie pueda ver cuándo pasó.",
     "cambiado_el": "2026-11-03",
-    "m5v_10": "sigue siendo la única toma borrosa por diseño: su `imagen_nitida` es null en el JSONL. La etiqueta sale de ahí, no del nombre del archivo."
+    "m5v_10": "Su imagen_nitida es null en el JSONL y la única toma debe ser borrosa. La imagen actual es legible: pendiente de recaptura y excluida de conclusiones sobre la válvula."
   }
 }
