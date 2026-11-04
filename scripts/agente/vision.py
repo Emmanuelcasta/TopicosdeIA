@@ -209,19 +209,23 @@ def huella_lectura(lectura) -> tuple:
     if js.get("ilegible"):
         return ("ilegible",)
     if isinstance(js.get("lineas"), list):
-        # Lectura por líneas (M5). Se compara el TEXTO completo, normalizado,
-        # no la lista: que una copia parta una línea en dos no cambia lo que
-        # leyó. Una palabra, un número o una operación distinta sí.
+        # Lectura por líneas (M5). Se compara el ESQUELETO MATEMÁTICO, estricto
+        # y en orden: cada número, cada operación entre números, cuántos pasos
+        # numerados hay y si hay respuesta final. Un 306 frente a un 312, un +
+        # frente a un −, un paso de más o de menos: se para la hoja.
+        #
+        # Las palabras no se comparan, y es una decisión, no un descuido. En la
+        # corrida del 2026-11-04 dos copias de m5v-03 idénticas en todos los
+        # números discreparon solo en «¿Cuánto» / «Cuantos», y eso paraba la
+        # hoja. Lo que el verificador y el tutor usan son los números y las
+        # operaciones; las palabras las ve y las corrige el estudiante antes de
+        # confirmar. Que una copia parta una línea en dos tampoco cuenta.
         texto = " ".join(_norm(str(x)).replace("×", "x")
                          for x in js["lineas"] if any(c.isalnum() for c in str(x)))
-        # La puntuación no es lo que se mide: «¿cuánto» y «cuánto» son la misma
-        # lectura. Se conservan letras, cifras, operadores y el separador
-        # decimal ENTRE cifras, que sí cambia un número.
         texto = _PAT_DECIMAL.sub(r"\1.\2", texto)
-        texto = _PAT_PUNTUACION.sub(" ", texto)
-        texto = " ".join(texto.split())
-        return ("lineas", bool(texto), texto, tuple(numeros_de(texto)),
-                operaciones_de(texto))
+        return ("lineas", bool(texto.strip()), tuple(numeros_de(_sin_marcas(texto))),
+                operaciones_de(texto), len(_PAT_MARCA_PASO.findall(texto)),
+                bool(_MENCIONA_FINAL.search(texto)))
     pasos = js.get("pasos")
     if not isinstance(pasos, list):
         return ("estructura_invalida", tuple(sorted(map(str, js))))
@@ -269,7 +273,8 @@ def diferencias_de_lectura(a, b) -> list:
         "procedimiento": ("tipo", "estructura", "pasos", "respuesta final", "números"),
         "enunciado": ("tipo", "estructura", "respuesta final",
                       "números del enunciado", "operaciones del enunciado"),
-        "lineas": ("tipo", "hay texto", "texto", "números", "operaciones"),
+        "lineas": ("tipo", "hay texto", "números", "operaciones",
+                   "cantidad de pasos", "respuesta final"),
     }.get(ha[0], tuple(f"campo {i}" for i in range(len(ha))))
     return [n for n, x, y in zip(nombres, ha, hb) if x != y]
 
@@ -718,8 +723,16 @@ INSTRUCCION_COPIAR_INDEPENDIENTE = (
     'Devuelve SOLO un JSON: {"lineas": ["...", "..."]}'
 )
 
+_PAT_MARCA_PASO = re.compile(r"\bpaso\s*\d+", re.IGNORECASE)
+
+
+def _sin_marcas(texto: str) -> str:
+    """Sin «Paso N» ni la numeración del ejercicio: esos números no son cuentas."""
+    texto = _PAT_MARCA_PASO.sub(" ", texto)
+    return re.sub(r"(?:^|\s)\d{1,2}\s*[.)](?=\s|$)", " ", texto)
+
+
 _PAT_DECIMAL = re.compile(r"(\d)[.,](\d)")
-_PAT_PUNTUACION = re.compile(r"[^\w\s+\-*/÷=%.]|(?<!\d)\.|\.(?!\d)")
 _PAT_LINEAS = re.compile(r'"lineas"\s*:\s*\[(.*)', re.DOTALL)
 _PAT_CADENA = re.compile(r'"((?:[^"\\]|\\.)*)"')
 
@@ -733,12 +746,19 @@ def lineas_de(crudo: str):
     aparece esa clave, None.
     """
     js = json_de(crudo or "")
-    if isinstance(js, dict) and isinstance(js.get("lineas"), list):
+    if (isinstance(js, dict) and isinstance(js.get("lineas"), list)
+            and all(isinstance(x, str) for x in js["lineas"])):
         return js["lineas"]
     m = _PAT_LINEAS.search(crudo or "")
     if not m:
         return None
-    return [json.loads(f'"{s}"') for s in _PAT_CADENA.findall(m.group(1))]
+    # También cuando las líneas llegan envueltas en objetos mal formados, como
+    # `[{"texto": "…", "numero": "Paso 1 …", "numero": "Paso 2 …"}]` —caso
+    # real, con claves repetidas que `json` colapsa—: se toman las cadenas que
+    # NO son claves, en el orden en que aparecen.
+    resto = m.group(1)
+    return [json.loads(f'"{c.group(1)}"') for c in _PAT_CADENA.finditer(resto)
+            if not re.match(r"\s*:", resto[c.end():])]
 
 
 _LINEA_DE_PASO = re.compile(r"^\s*paso\s*\d|=|respuesta\s*final", re.IGNORECASE)

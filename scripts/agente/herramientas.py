@@ -81,6 +81,11 @@ _SUPERINDICES = {"²": "**2", "³": "**3", "⁴": "**4", "⁵": "**5"}
 
 def normalizar_expresion(texto: str, x_es_por: bool = False) -> str:
     t = texto.strip().lower()
+    if "÷" in t or ":" in t:
+        # «7/8 ÷ 3/8» es (7/8) ÷ (3/8) = 7/3. Al pasar ÷ a «/» sin paréntesis
+        # quedaba 7/8/3/8, que se evalúa de izquierda a derecha y da 7/192: el
+        # verificador marcaba como error una división de fracciones correcta.
+        t = re.sub(r"(?<![\d.)])(\d+)\s*/\s*(\d+)(?![\d.(])", r"(\1/\2)", t)
     t = t.replace("×", "*").replace("·", "*").replace("÷", "/").replace("−", "-").replace("–", "-")
     t = t.replace("^", "**").replace(":", "/")
     for s, r in _SUPERINDICES.items():

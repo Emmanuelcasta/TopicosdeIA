@@ -1469,3 +1469,41 @@ def test_partir_una_linea_en_dos_no_es_otra_lectura_pero_otro_numero_si():
     c = {"json": {"lineas": ["24 x 13 = 306"]}}
     d = {"json": {"lineas": ["24 x 13 = 312"]}}
     assert not lecturas_consistentes(c, d)
+
+
+def test_el_verificador_divide_fracciones_bien():
+    """Caso real de la sonda: el verificador dijo «7/8 ÷ 3/8 da 7/192» y marcó
+    como error un paso aritméticamente correcto (7/3)."""
+    pytest.importorskip("sympy")
+    from verificador_aritmetico import revisar_hoja
+    h = revisar_hoja(["Dividimos: 7/8 ÷ 3/8 = 7/3."])
+    assert h.tipo == "ninguno", h.detalle
+    h = revisar_hoja(["7/8 ÷ 3/8 = 7/192"])
+    assert h.tipo == "calculo" and "7/3" in h.detalle
+
+
+def test_recupera_lineas_envueltas_en_objetos_mal_formados():
+    """Caso real (m5v-03, segunda lectura): claves repetidas que `json` colapsa."""
+    from vision import lineas_de
+    crudo = ('{"lineas": [{"texto": "Una camiseta cuesta 52000 pesos", '
+             '"numero": "Paso 1: El descuento es 52000 x 0.25 = 13000", '
+             '"numero": "Paso 2: Resto 52000 - 13000 = 39000"}]}')
+    assert lineas_de(crudo) == ["Una camiseta cuesta 52000 pesos",
+                                "Paso 1: El descuento es 52000 x 0.25 = 13000",
+                                "Paso 2: Resto 52000 - 13000 = 39000"]
+
+
+
+def test_una_palabra_distinta_no_para_la_hoja_un_numero_si():
+    """Decisión documentada en `huella_lectura`: m5v-03 se paraba por
+    «¿Cuánto» / «Cuantos» con todos los números iguales. Las palabras las
+    corrige el estudiante; los números y las operaciones, no se negocian."""
+    from vision import lecturas_consistentes
+    L = lambda *x: {"json": {"lineas": list(x)}}
+    assert lecturas_consistentes(L("¿Cuánto se paga?", "Paso 1: 52000 x 0.25 = 13000"),
+                                 L("Cuantos se paga?", "Paso 1: 52000 x 0.25 = 13000"))
+    assert not lecturas_consistentes(L("Paso 1: 52000 x 0.25 = 13000"),
+                                     L("Paso 1: 52000 x 0.35 = 13000"))
+    assert not lecturas_consistentes(L("Paso 1: 3 + 4 = 7"), L("Paso 1: 3 - 4 = 7"))
+    assert not lecturas_consistentes(L("Paso 1: 3 + 4 = 7", "Paso 2: 7 x 2 = 14"),
+                                     L("Paso 1: 3 + 4 = 7"))
