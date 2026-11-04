@@ -915,3 +915,57 @@ paso 4 no aparece hasta confirmar, y una foto nueva lo vuelve a ocultar.
 - m5v-12: el dato que falta no se detecta.
 - `scripts/tests/test_m4_vision.py::test_dos_lecturas_iguales_son_consistentes`
   falla, ya fallaba antes de estos cambios y contradice la regla de palabras.
+
+## 11 · Ronda de corrección del 2026-11-04 (tarde) · m5v-10 fuera de la ronda
+
+Kaggle T4, 1024 px. Corrida reportada: `a98d805`, 2026-11-04T17:05:10Z, 11
+fotos legibles (m5v-10 excluida: esta ronda no evalúa fotos borrosas).
+Resultados en `M5_despliegue/resultados/vision_m5.{json,csv}` y
+`vision_m5_tabla.md`. Las corridas anteriores, incluidas las intermedias de
+esta ronda (`708fa01`, `9d3ad72`, `4825044`), están en
+`resultados/historico/`. **Evaluación de desarrollo**: se iteró sobre estas
+mismas hojas; no es evidencia de generalización.
+
+**Cambios.**
+- Lectura doble: la redacción distinta ya no para la hoja. Números, signos,
+  operaciones y palabras que cambian el sentido se MUESTRAN al estudiante, con
+  lo que dice cada lectura, antes de confirmar. Solo bloquea una lectura vacía.
+  Fuera de los datos: la numeración de líneas del VLM y el rótulo de la hoja.
+- Resolver: hasta tres borradores del modelo; el código rehace las cuentas;
+  solo votan los que usan los datos del enunciado y la operación que este
+  nombra; la solución es confiable si dos coinciden y si no se avisa.
+- Revisar: el enunciado confirmado se resuelve aparte. Mismo resultado → sin
+  error (aunque el tutor señale un paso). Distinto → el primer paso que opera
+  con los mismos datos que la referencia pero de otra forma es el error de
+  planteamiento, salvo que use la operación que nombra el enunciado.
+  Enunciado sin datos con pasos numéricos → falta un dato. Cada conclusión
+  lleva su motivo.
+- Evaluador: usa el enunciado LEÍDO (hasta `b439be5` se pasaba el de
+  referencia al diagnóstico) y puntúa resolver y revisar por separado.
+- Se probó 1536 px: no corrige m5v-09 y alarga y desordena la lectura. Se
+  queda 1024.
+
+**Scorecard (`a98d805`).** Resolver 11/11. Revisar 10/11, 0 errores
+inventados (el tutor solo, 4/11). El fallo es de lectura: m5v-09, las dos
+lecturas ven «14» donde la hoja dice «19», no hay discrepancia que mostrar y
+el diagnóstico sale «sin error». Discrepancias mostradas: m5v-01 (942 / 9412,
+642 / 6412) y m5v-04 (una lectura omitió el enunciado).
+
+**Latencias.** Carga del VLM 13,2 s; lectura 4,0–16,5 s; resolver 5,4–22,6 s
+(2–3 llamadas al modelo); revisar 0,8 s con error de cálculo, 7–17 s cuando
+resuelve el enunciado aparte.
+
+**Probado en la app** (`a98d805`, sesión de Kaggle): resolver con el recorte
+del enunciado de m5v-07 → 270, tras confirmar; revisar m5v-02 → «Paso 1», con
+el motivo y la solución de referencia.
+
+**Pendiente.**
+- m5v-09: lectura numérica de «19» (y en general, dígitos manuscritos que
+  ambas lecturas confunden igual).
+- La explicación de resolver es el borrador del modelo con las cuentas
+  corregidas: acierta el resultado pero puede traer líneas sobrantes
+  («18 ÷ 1 = 18», una «Respuesta final» intermedia).
+- En modo resolver la caja «Tu pregunta» sigue diciendo «Revisa mi
+  procedimiento» (texto de interfaz; fase 4).
+- Las pistas de operación son vocabulario escolar general, pero se
+  escribieron mirando estas hojas: hace falta un conjunto nuevo para medirlas.
