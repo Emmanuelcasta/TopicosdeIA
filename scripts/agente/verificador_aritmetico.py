@@ -513,6 +513,62 @@ def borrador_valido(pasos, enunciado: str) -> tuple:
     return True, ""
 
 
+def _es_trivial(linea: str) -> bool:
+    """«18 ÷ 1 = 18», «68 × 1 = 68»: una igualdad que no hace nada."""
+    pares = igualdades_de(linea)
+    if not pares:
+        return False
+    for izq, der in pares:
+        a, b = _valor(izq), _valor(der)
+        ops = operaciones_de(izq)
+        if a is None or a != b or not ops or not ops <= {"×", "÷"}:
+            return False
+        if "1" not in [n.strip() for n in _NUMERO.findall(izq)]:
+            return False
+    return True
+
+
+_ROTULO_PREGUNTA = re.compile(r"^\s*(pregunta|planteamiento|datos)\s*:", re.IGNORECASE)
+
+
+def limpiar_solucion(lineas) -> list:
+    """El borrador elegido, como se le enseña a un estudiante.
+
+    Corrida de a98d805 en la app: el resultado era correcto, pero la
+    explicación traía «Pregunta: …», una «Respuesta final» a mitad de camino y
+    «18 ÷ 1 = 18». Aquí se quita lo que no explica nada y se numera de nuevo:
+      · las líneas de rótulo («Pregunta:», «Datos:») del borrador;
+      · toda «Respuesta final» que no sea la última, y la última va al final;
+      · las igualdades triviales (× 1, ÷ 1) y las líneas repetidas.
+    Las cuentas ya vienen rehechas por `corregir_cuentas`; no se toca ningún
+    número.
+    """
+    contenidos = [_PREFIJO_PASO.sub("", str(l)).strip() for l in (lineas or [])]
+    contenidos = [c for c in contenidos if c]
+    finales = [c for c in contenidos if _MENCIONA_FINAL.search(c)
+               and any(ch.isdigit() for ch in c)]
+    final = finales[-1] if finales else None
+    pasos, vistos = [], set()
+    for c in contenidos:
+        if _es_trivial(c):
+            # La línea de texto que anunciaba esa cuenta vacía tampoco explica
+            # nada («Dividimos … entre …» seguido de «18 ÷ 1 = 18»).
+            if pasos and not any(ch.isdigit() for ch in pasos[-1]):
+                pasos.pop()
+            continue
+        if _MENCIONA_FINAL.search(c) or _ROTULO_PREGUNTA.match(c):
+            continue
+        clave = re.sub(r"\W+", " ", c.lower()).strip()
+        if clave in vistos:
+            continue
+        vistos.add(clave)
+        pasos.append(c)
+    salida = [f"Paso {i}: {c}" for i, c in enumerate(pasos, 1)]
+    if final:
+        salida.append("Respuesta final: " + _MENCIONA_FINAL.split(final)[-1].lstrip(" :.").strip())
+    return salida or [str(l) for l in (lineas or [])]
+
+
 # Cantidades escritas con palabras: si el enunciado las trae, sí tiene datos.
 _NUMEROS_EN_PALABRAS = re.compile(
     r"\b(uno|una|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|once|doce|"

@@ -1438,7 +1438,8 @@ class Tutor:
                       else validos) or borradores
         elegido = max(candidatos, key=lambda x: x["cuentas"]) if mayoria is not None \
             else candidatos[0]
-        lineas, cambios = elegido["lineas"], elegido["cambios"]
+        from verificador_aritmetico import limpiar_solucion
+        lineas, cambios = limpiar_solucion(elegido["lineas"]), elegido["cambios"]
         hallazgo, _ = self._comprobar_aritmetica(lineas)
         respuesta = "\n".join(lineas)
         if cambios:

@@ -1807,3 +1807,22 @@ def test_la_respuesta_final_con_cuenta_vale_su_resultado():
     assert valor_final(["Respuesta final: 1/2 de metro"]) == Fraction(1, 2)
     pasos, cambios = corregir_cuentas(["Respuesta final: 40 × 0.35 estudiantes"])
     assert pasos == ["Respuesta final: 40 × 0.35 = 14 estudiantes"] and cambios
+
+
+def test_la_solucion_que_ve_el_estudiante_no_trae_lineas_sobrantes():
+    """App con a98d805, m5v-07: el resultado era 270 pero la explicación traía
+    «Pregunta: …», una «Respuesta final» intermedia y «18 ÷ 1 = 18»."""
+    pytest.importorskip("sympy")
+    from verificador_aritmetico import limpiar_solucion
+    borrador = ["Paso 1: Pregunta: cuántas galletas hay en 15 paquetes.",
+                "Respuesta final: 270 galletas.",
+                "Paso 1: Dividimos el número de galletas en un paquete entre el total.",
+                "Paso 4: Respaso final: 18 ÷ 1 = 18.",
+                "Paso 2: Multiplicamos por el número de paquetes: 18 × 15 = 270.",
+                "Respuesta final: 270 galletas"]
+    assert limpiar_solucion(borrador) == [
+        "Paso 1: Multiplicamos por el número de paquetes: 18 × 15 = 270.",
+        "Respuesta final: 270 galletas"]
+    # Una solución limpia no cambia.
+    limpia = ["Paso 1: 1240 - 365 = 875", "Respuesta final: 875 sillas"]
+    assert limpiar_solucion(limpia) == limpia
