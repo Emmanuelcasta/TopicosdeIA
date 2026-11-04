@@ -841,6 +841,7 @@ def lineas_de(crudo: str):
             if not re.match(r"\s*:", resto[c.end():])]
 
 
+_MARCA_DE_PASO = re.compile(r"^\s*paso\s*\d+\s*[:.\-]", re.IGNORECASE)
 _LINEA_DE_PASO = re.compile(r"^\s*paso\s*\d|=|respuesta\s*final", re.IGNORECASE)
 _NUMERACION_DEL_EJERCICIO = re.compile(r"^\s*\d{1,2}\s*[.)]\s*")
 
@@ -875,6 +876,18 @@ def estructurar_lineas(lineas) -> dict:
         # «7.» arriba de la hoja numera el ejercicio; no es parte de él.
         enunciado[0] = _NUMERACION_DEL_EJERCICIO.sub("", enunciado[0])
     pasos = lineas[corte:]
+    if any(_MARCA_DE_PASO.match(x) for x in pasos):
+        # Si la hoja rotula sus pasos («Paso 1: …»), una línea sin rótulo es la
+        # continuación del paso anterior que la copia partió en dos, no un paso
+        # nuevo. Sin esto, dos copias de la misma hoja tenían distinta
+        # cantidad de pasos solo por dónde cortó cada una la línea.
+        unidos = []
+        for x in pasos:
+            if unidos and not _MARCA_DE_PASO.match(x):
+                unidos[-1] = f"{unidos[-1]} {x}"
+            else:
+                unidos.append(x)
+        pasos = unidos
     final = next((re.split(r"respuesta\s*final\s*[:.]?", p, flags=re.IGNORECASE)[-1].strip()
                   for p in reversed(pasos) if _MENCIONA_FINAL.search(p)), None)
     return {"enunciado": " ".join(x for x in enunciado if x), "pasos": pasos,
