@@ -531,6 +531,30 @@ def _es_trivial(linea: str) -> bool:
 _ROTULO_PREGUNTA = re.compile(r"^\s*(pregunta|planteamiento|datos)\s*:", re.IGNORECASE)
 
 
+_RESULTADO_PREVIO = re.compile(
+    r"\b(?:el|ese|este|dicho)\s+resultado(?:\s+(?:anterior|obtenido|del paso \d+))?\b",
+    re.IGNORECASE)
+
+
+def _sin_referencias_huerfanas(pasos) -> list:
+    """«Multiplicamos el resultado por …» cuando ningún paso anterior dejó un
+    resultado (la limpieza quitó «18 ÷ 1 = 18»): «el resultado» pasa a ser el
+    número con el que opera la cuenta de esa línea, «Multiplicamos 18 por …».
+    Si la línea no tiene cuenta, la frase se queda: no hay con qué cambiarla.
+    """
+    salida, hubo_resultado = [], False
+    for c in pasos:
+        if not hubo_resultado and _RESULTADO_PREVIO.search(c):
+            expr = expresiones_de(c)
+            numeros = _NUMERO.findall(expr[0]) if expr else []
+            if numeros:
+                c = _RESULTADO_PREVIO.sub(numeros[0].strip(), c, count=1)
+        if igualdades_de(c):
+            hubo_resultado = True
+        salida.append(c)
+    return salida
+
+
 def limpiar_solucion(lineas) -> list:
     """El borrador elegido, como se le enseña a un estudiante.
 
@@ -563,6 +587,7 @@ def limpiar_solucion(lineas) -> list:
             continue
         vistos.add(clave)
         pasos.append(c)
+    pasos = _sin_referencias_huerfanas(pasos)
     salida = [f"Paso {i}: {c}" for i, c in enumerate(pasos, 1)]
     if final:
         salida.append("Respuesta final: " + _MENCIONA_FINAL.split(final)[-1].lstrip(" :.").strip())

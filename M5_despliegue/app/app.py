@@ -691,7 +691,9 @@ def construir():
             _titulo(1, "Sube la foto y elige qué necesitas")
             with gr.Row(equal_height=False):
                 img = gr.Image(label="Foto de la hoja", type="pil", height=300,
-                               scale=3)
+                               scale=3,
+                               placeholder="# Arrastra aquí la foto de tu hoja\n"
+                                           "o haz clic para elegirla · JPG o PNG")
                 with gr.Column(scale=2):
                     proposito = gr.Radio(
                         [RESOLVER, REVISAR], value=REVISAR,

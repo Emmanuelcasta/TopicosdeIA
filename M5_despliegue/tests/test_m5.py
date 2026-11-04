@@ -1823,6 +1823,15 @@ def test_la_solucion_que_ve_el_estudiante_no_trae_lineas_sobrantes():
     assert limpiar_solucion(borrador) == [
         "Paso 1: Multiplicamos por el número de paquetes: 18 × 15 = 270.",
         "Respuesta final: 270 galletas"]
+    # La redacción real de eb2ea45 en Kaggle: «el resultado» de un paso que la
+    # limpieza quitó. Se cambia por el número con el que opera la cuenta.
+    real = list(borrador)
+    real[4] = "Paso 2: Multiplicamos el resultado por el número de paquetes: 18 × 15 = 270."
+    assert limpiar_solucion(real)[0] == (
+        "Paso 1: Multiplicamos 18 por el número de paquetes: 18 × 15 = 270.")
+    # Con un resultado anterior de verdad, la frase se respeta.
+    con_previo = ["Paso 1: 12 + 18 = 30", "Paso 2: Le sumo el resultado al tercero: 30 + 25 = 55"]
+    assert "el resultado" in limpiar_solucion(con_previo)[1]
     # Una solución limpia no cambia.
     limpia = ["Paso 1: 1240 - 365 = 875", "Respuesta final: 875 sillas"]
     assert limpiar_solucion(limpia) == limpia
