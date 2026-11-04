@@ -1755,3 +1755,42 @@ def test_las_abstenciones_del_tutor_se_respetan():
     d = _decidir(["8500 + 12300 = 20800", "Respuesta final: 20800 pesos"],
                  "dato no disponible")
     assert d["conclusion"] == "dato no disponible"
+
+
+# --------------------------------------------------------------------------
+# Borradores de solución: datos del enunciado y operación que este nombra
+# --------------------------------------------------------------------------
+
+def test_un_borrador_que_inventa_un_dato_no_vota():
+    pytest.importorskip("sympy")
+    from verificador_aritmetico import borrador_valido
+    e = "En un grupo de 40 estudiantes, el 35% practica natación. ¿Cuántos son?"
+    assert borrador_valido(["Paso 1: 40 × 0.35 = 14", "Respuesta final: 14"], e)[0]
+    ok, motivo = borrador_valido(["Paso 1: 40 × 0.35 = 14", "Paso 2: 14 ÷ 2 = 7"], e)
+    assert not ok and "2" in motivo
+
+
+def test_un_borrador_con_la_operacion_contraria_al_enunciado_no_vota():
+    """«se usan 3/8, ¿cuánto queda?» resuelto como división (corrida 9d3ad72)."""
+    pytest.importorskip("sympy")
+    from verificador_aritmetico import borrador_valido
+    e = "De un rollo de 7/8 de metro se usan 3/8. ¿Cuánto queda?"
+    assert not borrador_valido(["Paso 1: 7/8 ÷ 3/8 = 7/8 × 8/3 = 7/3"], e)[0]
+    assert borrador_valido(["Paso 1: 7/8 - 3/8 = 4/8 = 1/2"], e)[0]
+    # Dividir fracciones con el inverso sí es usar los datos del enunciado.
+    assert borrador_valido(["Paso 1: 7/8 ÷ 3/8 = 7/8 × 8/3 = 7/3"],
+                           "Se reparten 7/8 de litro en partes iguales de 3/8")[0]
+
+
+def test_el_enunciado_veta_un_planteamiento_que_usa_su_operacion():
+    """Si la hoja resta y el enunciado dice «queda», la referencia que divide
+    no puede acusarla de mal planteada."""
+    pytest.importorskip("sympy")
+    from verificador_aritmetico import (operaciones_esperadas, operandos_de,
+                                        revisar_planteamiento)
+    hoja = ["7/8 - 3/8 = 4/8", "Respuesta final: 1/2"]
+    ref = ["Paso 1: 7/8 ÷ 3/8 = 7/3", "Respuesta final: 7/3"]
+    from fractions import Fraction as F
+    h = revisar_planteamiento(hoja, F(7, 3), {F(7, 3)}, operandos_referencia=operandos_de(ref),
+                              esperadas=operaciones_esperadas("se usan 3/8, ¿cuánto queda?"))
+    assert h is None or h.tipo != "planteamiento"

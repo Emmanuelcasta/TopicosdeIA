@@ -1276,7 +1276,8 @@ class Tutor:
             referencia = self._referencia(enunciado)
             if referencia is not None:
                 h = revisar_planteamiento(pasos, referencia["final"], referencia["valores"],
-                                          operandos_referencia=referencia["operandos"])
+                                          operandos_referencia=referencia["operandos"],
+                                          esperadas=referencia["esperadas"])
                 if h is not None:
                     planteamiento = {"paso": h.paso, "tipo": h.tipo, "detalle": h.detalle}
         if r.get("ok"):
@@ -1400,8 +1401,11 @@ class Tutor:
         # corrida del 2026-11-05 un único borrador planteó «7/8 de metro, se
         # usan 3/8, ¿cuánto queda?» como una división, y como referencia eso
         # inventaba un error en una hoja correcta.
-        from verificador_aritmetico import corregir_cuentas, valor_final
+        from verificador_aritmetico import (borrador_valido, corregir_cuentas,
+                                            igualdades_de, valor_final)
         borradores, r = [], None
+        # Solo votan los borradores VÁLIDOS: los que no inventan datos y usan la
+        # operación que nombra el enunciado (`borrador_valido`).
         for plantilla in self.PROMPTS_RESOLVER:
             ri = self.responder(plantilla.format(enunciado=enunciado))
             if not ri.get("ok"):
@@ -1410,18 +1414,25 @@ class Tutor:
             lineas = [l.strip() for l in (ri.get("respuesta") or "").splitlines()
                       if l.strip() and not re.match(r"(?i)^\s*(pensamiento|thought)\s*:", l)]
             lineas, cambios = corregir_cuentas(lineas)
+            valido, motivo = borrador_valido(lineas, enunciado)
             borradores.append({"lineas": lineas, "cambios": cambios,
-                               "final": valor_final(lineas),
-                               "crudo": ri.get("respuesta")})
-            finales = [x["final"] for x in borradores if x["final"] is not None]
+                               "final": valor_final(lineas), "valido": valido,
+                               "motivo": motivo, "crudo": ri.get("respuesta"),
+                               "cuentas": sum(len(igualdades_de(l)) for l in lineas)})
+            finales = [x["final"] for x in borradores if x["valido"] and x["final"] is not None]
             if any(finales.count(f) >= 2 for f in finales):
                 break
         if r is None:
             return self._fallo("el modelo no respondió", t0)
-        finales = [x["final"] for x in borradores if x["final"] is not None]
+        finales = [x["final"] for x in borradores if x["valido"] and x["final"] is not None]
         mayoria = next((f for f in finales if finales.count(f) >= 2), None)
-        elegido = next((x for x in borradores if mayoria is not None and x["final"] == mayoria),
-                       borradores[0])
+        validos = [x for x in borradores if x["valido"]]
+        # Entre los que coinciden, el que escribe más cuentas: se puede
+        # comprobar y sirve de referencia. Sin acuerdo, el primero válido.
+        candidatos = ([x for x in validos if x["final"] == mayoria] if mayoria is not None
+                      else validos) or borradores
+        elegido = max(candidatos, key=lambda x: x["cuentas"]) if mayoria is not None \
+            else candidatos[0]
         lineas, cambios = elegido["lineas"], elegido["cambios"]
         hallazgo, _ = self._comprobar_aritmetica(lineas)
         respuesta = "\n".join(lineas)
@@ -1438,7 +1449,9 @@ class Tutor:
                   "respuesta_modelo": elegido["crudo"], "respuesta": respuesta,
                   "pasos_solucion": lineas, "cuentas_corregidas": cambios,
                   "confiable": confiable,
+                  "pasos_acordes": [l for x in candidatos if confiable for l in x["lineas"]],
                   "borradores": [{"final": None if x["final"] is None else str(x["final"]),
+                                  "valido": x["valido"], "motivo": x["motivo"],
                                   "pasos": x["lineas"]} for x in borradores],
                   "verificador_aritmetico": hallazgo,
                   "latencia_s": round(time.perf_counter() - t0, 2)})
@@ -1461,7 +1474,8 @@ class Tutor:
         enunciado porque el modelo decodifica en greedy: misma entrada, misma
         salida, y así resolver y revisar la misma hoja no la resuelven dos veces.
         """
-        from verificador_aritmetico import operandos_de, valor_final, valores_de
+        from verificador_aritmetico import (operaciones_esperadas, operandos_de,
+                                            valor_final, valores_de)
 
         enunciado = (enunciado or "").strip()
         if not enunciado or not any(c.isdigit() for c in enunciado):
@@ -1471,12 +1485,16 @@ class Tutor:
             r = self.resolver_enunciado(enunciado, confirmado=True)
             pasos = r.get("pasos_solucion") or []
             final = valor_final(pasos)
-            # Solo una solución en la que dos borradores coinciden: una sola
-            # lectura del modelo no basta para acusar a la hoja de nada.
+            # Solo una solución en la que dos borradores válidos coinciden: una
+            # sola lectura del modelo no basta para acusar a la hoja de nada.
+            # Las cuentas ya las rehízo el código; valores y datos se toman de
+            # TODOS los borradores que coinciden.
+            acordes = r.get("pasos_acordes") or pasos
             ok = (r.get("ok") and final is not None and r.get("confiable", True)
-                  and (r.get("verificador_aritmetico") or {}).get("tipo") == "ninguno")
-            cache[enunciado] = ({"final": final, "valores": valores_de(pasos),
-                                 "operandos": operandos_de(pasos),
+                  and (r.get("verificador_aritmetico") or {}).get("tipo") != "calculo")
+            cache[enunciado] = ({"final": final, "valores": valores_de(acordes),
+                                 "operandos": operandos_de(acordes),
+                                 "esperadas": operaciones_esperadas(enunciado),
                                  "texto": "\n".join(pasos)} if ok else None)
         return cache[enunciado]
 

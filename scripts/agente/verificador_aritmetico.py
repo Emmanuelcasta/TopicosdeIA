@@ -268,7 +268,8 @@ def operandos_de(pasos) -> set:
 
 def revisar_planteamiento(pasos, final_referencia, valores_referencia,
                           hasta: int | None = None,
-                          operandos_referencia: set | None = None) -> Hallazgo | None:
+                          operandos_referencia: set | None = None,
+                          esperadas: set | None = None) -> Hallazgo | None:
     """Compara la hoja con el enunciado resuelto aparte. None si no se puede.
 
       · «coincide»       la hoja llega al mismo resultado que la referencia.
@@ -302,6 +303,10 @@ def revisar_planteamiento(pasos, final_referencia, valores_referencia,
             break
         for e in expresiones_de(paso):
             v = _valor(e)
+            # Si el enunciado nombra la operación y el paso la usa, no se le
+            # acusa de mal planteado aunque la referencia diga otra cosa.
+            if esperadas and operaciones_de(e) & esperadas:
+                continue
             if (v is not None and v not in referencia
                     and (operandos_referencia is None
                          or _operandos(e) in operandos_referencia)):
@@ -383,6 +388,111 @@ def corregir_cuentas(pasos) -> tuple:
                 texto = texto[:inicio] + bueno + texto[inicio + len(m.group()):]
         salida.append(texto)
     return salida, cambios
+
+
+# --------------------------------------------------------------------------
+# ¿Un borrador usa los datos del enunciado y la operación que este pide?
+#
+# El modelo de 1.5B inventa datos («39000 × 14», «14 ÷ 2») y a veces elige la
+# operación contraria a la que dice el enunciado («se usan 3/8, ¿cuánto
+# queda?» resuelto como 7/8 ÷ 3/8, dos veces). Dos comprobaciones, ambas de
+# vocabulario escolar general y no de estas hojas:
+#   · un dato que no está en el enunciado ni sale de una cuenta anterior;
+#   · una palabra del enunciado que fija la operación («quedan», «se
+#     retiran», «reparten», «en total», «cada», «%»).
+# --------------------------------------------------------------------------
+
+_PALABRAS_NUMERO = {"dos": [2], "tres": [3], "cuatro": [4], "cinco": [5], "seis": [6],
+                    "siete": [7], "ocho": [8], "nueve": [9], "diez": [10], "doce": [12],
+                    "mitad": [2, Fraction(1, 2)], "medio": [2, Fraction(1, 2)],
+                    "media": [2, Fraction(1, 2)], "doble": [2], "triple": [3],
+                    "tercio": [3, Fraction(1, 3)], "cuarto": [4, Fraction(1, 4)],
+                    "docena": [12], "cien": [100], "mil": [1000]}
+
+
+def datos_del_enunciado(enunciado: str) -> set:
+    """Los valores que un procedimiento puede usar sin calcularlos: los números
+    del enunciado, sus formas de porcentaje (25 % -> 0.25, 0.75, 75) y las
+    cantidades escritas con palabras. 1 y 100 siempre."""
+    import unicodedata
+    t = unicodedata.normalize("NFKD", (enunciado or "").lower())
+    t = "".join(c for c in t if not unicodedata.combining(c))
+    datos = {Fraction(1), Fraction(100)}
+    for m in re.finditer(r"(\d+(?:[.,]\d+)?(?:\s*/\s*\d+)?)\s*(%|por ?ciento)?", t):
+        v = _valor(m.group(1))
+        if v is None:
+            continue
+        datos.add(v)
+        if m.group(2):
+            datos |= {v / 100, 1 - v / 100, 100 - v}
+    for palabra, valores in _PALABRAS_NUMERO.items():
+        if re.search(rf"\b{palabra}\b", t):
+            datos |= {Fraction(x) for x in valores}
+    # El inverso de un dato (dividir por 3/8 es multiplicar por 8/3).
+    datos |= {1 / v for v in list(datos) if v}
+    return datos
+
+
+def datos_ajenos(pasos, enunciado: str) -> list:
+    """Los operandos que un procedimiento usa sin que salgan del enunciado ni
+    de una cuenta anterior. [] si todos tienen origen."""
+    conocidos = set(datos_del_enunciado(enunciado))
+    ajenos = []
+    for p in pasos or []:
+        texto = _PREFIJO_PASO.sub("", str(p))
+        for e in expresiones_de(texto):
+            for n in _NUMERO.findall(e.replace("−", "-")):
+                v = _valor(n)
+                if v is not None and abs(v) not in conocidos and n not in ajenos:
+                    ajenos.append(n.strip())
+            v = _valor(e)
+            if v is not None:
+                conocidos.add(v)
+        for a, b in igualdades_de(texto):
+            for x in (_valor(a), _valor(b)):
+                if x is not None:
+                    conocidos.add(x)
+    return ajenos
+
+
+_PISTAS_DE_OPERACION = {
+    "-": r"\b(queda|quedan|quedaron|sobra|sobran|retir\w*|se usan?|uso|gast\w*|pierd\w*|"
+         r"perd\w*|regal\w*|quit\w*|diferencia|faltan?|descuento)\b",
+    "+": r"\b(en total|juntos|juntas|suman|anad\w*|agreg\w*)\b",
+    "÷": r"\b(repart\w*|partes iguales)\b",
+    "×": r"\b(cada|por cada|veces)\b|%|por ?ciento",
+}
+
+
+def operaciones_esperadas(enunciado: str) -> set:
+    """Las operaciones que el enunciado pide con palabras. Vacío si no dice."""
+    import unicodedata
+    t = unicodedata.normalize("NFKD", (enunciado or "").lower())
+    t = "".join(c for c in t if not unicodedata.combining(c))
+    return {op for op, pista in _PISTAS_DE_OPERACION.items() if re.search(pista, t)}
+
+
+def operaciones_de(expr: str) -> set:
+    """Las operaciones de una cuenta, normalizadas: × x * -> ×, ÷ : -> ÷."""
+    ops = set()
+    for o in re.findall(r"(?<=[\d)\s])\s*([+\-−×xX*÷:])\s*(?=[\d(-])", expr or ""):
+        ops.add({"x": "×", "X": "×", "*": "×", "×": "×", "÷": "÷", ":": "÷",
+                 "−": "-", "-": "-", "+": "+"}[o])
+    return ops
+
+
+def borrador_valido(pasos, enunciado: str) -> tuple:
+    """-> (válido, motivo). Un borrador vale si no inventa datos y, cuando el
+    enunciado nombra la operación, la usa en algún paso."""
+    ajenos = datos_ajenos(pasos, enunciado)
+    if ajenos:
+        return False, f"usa datos que no están en el enunciado: {', '.join(ajenos[:3])}"
+    esperadas = operaciones_esperadas(enunciado)
+    usadas = {o for p in pasos or [] for e in expresiones_de(str(p)) for o in operaciones_de(e)}
+    if esperadas and usadas and not (esperadas & usadas):
+        return False, ("no usa la operación que pide el enunciado "
+                       f"({', '.join(sorted(esperadas))})")
+    return True, ""
 
 
 # Cantidades escritas con palabras: si el enunciado las trae, sí tiene datos.
