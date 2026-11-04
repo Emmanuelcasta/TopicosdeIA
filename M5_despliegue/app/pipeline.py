@@ -1453,6 +1453,10 @@ class Tutor:
         primera["consistente"] = bool(
             primera["ok"] and segunda["ok"] and lecturas_consistentes(primera, segunda))
         primera["normalizacion"] = normalizacion
+        # La segunda lectura no se enseña nunca al estudiante, pero quien depura
+        # un rechazo necesita verla. Va aparte, con el JSON ya interpretado.
+        primera["segunda"] = {"crudo": segunda.get("crudo"), "json": segunda.get("json"),
+                              "ok": segunda.get("ok")}
         if not primera["consistente"]:
             from vision import diferencias_de_lectura
             primera["diferencias"] = (diferencias_de_lectura(primera, segunda)
