@@ -806,3 +806,50 @@ estilos. Conviene comprobarlo en la red donde se vaya a presentar.
 llamada a herramienta, se quedaba dentro de la respuesta. Se limpia en la capa
 de presentación, así que el evaluador sigue viendo el texto completo.
 
+
+## 9 · Dos modos de foto y lectura por líneas · corrida del 2026-11-04
+
+Kaggle T4, commits `1bab37e` (scorecard y sondas) y `29a78ba` (interfaz).
+Resultados en `M5_despliegue/resultados/vision_m5.{json,csv}` (scorecard) y
+`pruebas_manuales.jsonl` (sondas exploratorias, **no** son scorecard).
+
+**Qué cambió en la lectura.** El VLM ya no decide qué es enunciado y qué es
+paso: copia líneas (`INSTRUCCION_COPIAR`) y `estructurar_lineas` las separa por
+una regla visible —el enunciado acaba en la primera línea con «Paso N», «=» o
+«Respuesta final»—. Las dos redacciones se eligieron con `sonda_prompts.py`
+sobre 9 hojas que no son el scorecard. Las de M4 (`INSTRUCCION_VER*`) no se
+tocaron: `nb_m4.py` las usa.
+
+**Decisión que conviene revisar.** La doble lectura compara el esqueleto
+matemático —cada número, cada operación, cuántos «Paso N», si hay respuesta
+final—, no las palabras. m5v-03 se paraba por «¿Cuánto» / «Cuantos» con todos
+los números iguales. Las palabras las corrige el estudiante antes de confirmar.
+Si se quiere exigir también el texto, es un cambio de una línea en
+`huella_lectura`, y se vuelven a parar hojas legibles.
+
+**Scorecard de 12 fotos.** 12 leídas · 10 confirmables · 2 paradas por la doble
+lectura (m5v-01: 942 / 9412; m5v-04: una copia omitió el enunciado) · 4
+bloqueadas por conflicto con el JSONL · 7 puntuables · **1 acierto** (m5v-06).
+Los seis fallos son del diagnóstico del modelo, no de la lectura. Muestra de 7:
+no sirve para comparar configuraciones.
+
+**Latencias.** Precarga del modelo de texto 22,5 s; del VLM 5,9 s con la caché
+caliente (14,3 s en el scorecard; la primera descarga de una sesión nueva baja
+3,09 + 4,42 GB). Lectura en frío 13,7 s; en caliente entre 4,0 y 17,2 s (11
+observaciones, sin p50/p95). Resolver un enunciado: 3,3 a 25 s. Revisar: ~1 s
+tras la lectura.
+
+**Formatos.** `gr.Image(type="pil")` acepta lo que abre Pillow. Probados en la
+interfaz: PNG (modo resolver) y JPG (modo revisar); en la sonda, JPG y PNG del
+mismo recorte dan la misma lectura. HEIC de iPhone **no** se abre sin
+`pillow-heif`, que no está instalado. El eval set sigue en `.jpg`.
+
+**Errores conocidos, abiertos.**
+- El diagnóstico acierta 1 de 7. El verificador sí señala el paso correcto
+  cuando el error es de cálculo (m5v-03), y la pantalla muestra el desacuerdo.
+- En modo resolver el modelo puede plantear mal: en el recorte de m5v-08 dividió
+  donde había que restar. El verificador no lo detecta: comprueba cuentas, no
+  planteamientos.
+- El verificador lee mal igualdades encadenadas («a ÷ b = c × d = e» compara a ÷ b
+  con c); da un falso «no cuadra». Pendiente.
+- Una hoja sin ninguna cifra ya no se resuelve (m5v-11 inventó «68 ÷ 2 = 34»).
