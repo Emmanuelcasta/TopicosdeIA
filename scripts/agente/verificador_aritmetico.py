@@ -227,7 +227,16 @@ def valor_final(pasos) -> Fraction | None:
     pasos = [_PREFIJO_PASO.sub("", str(p)) for p in (pasos or [])]
     for p in reversed(pasos):
         if _MENCIONA_FINAL.search(p):
-            return _primer_numero(_MENCIONA_FINAL.split(p)[-1])
+            cola = _MENCIONA_FINAL.split(p)[-1]
+            # «Respuesta final: 52000 × 0.75 = 39000» es 39000, no 52000; y
+            # «Respuesta final: 40 × 0.35» es 14 (corrida de 4825044).
+            pares = igualdades_de(cola)
+            if pares and _valor(pares[-1][1]) is not None:
+                return _valor(pares[-1][1])
+            expr = expresiones_de(cola)
+            if expr and _valor(expr[-1]) is not None:
+                return _valor(expr[-1])
+            return _primer_numero(cola)
     for p in reversed(pasos):
         pares = igualdades_de(p)
         if pares:
@@ -379,7 +388,16 @@ def corregir_cuentas(pasos) -> tuple:
                     break
             if not arreglado:
                 break
-        if _MENCIONA_FINAL.search(texto) and not igualdades_de(texto) and ultimo is not None:
+        cola = _MENCIONA_FINAL.split(texto)[-1] if _MENCIONA_FINAL.search(texto) else ""
+        expr = expresiones_de(cola) if not igualdades_de(cola) else []
+        if expr and _valor(expr[-1]) is not None:
+            # «Respuesta final: 40 × 0.35» -> se escribe el resultado.
+            valor = _fmt_legible(_valor(expr[-1]))
+            fin = texto.rfind(expr[-1]) + len(expr[-1])
+            texto = f"{texto[:fin]} = {valor}{texto[fin:]}"
+            cambios.append(f"respuesta final {expr[-1]} = {valor} (el borrador no la calculaba)")
+            ultimo = _valor(expr[-1])
+        elif _MENCIONA_FINAL.search(texto) and not igualdades_de(texto) and ultimo is not None:
             m = _NUMERO.search(_MENCIONA_FINAL.split(texto)[-1])
             if m and _valor(m.group()) is not None and _valor(m.group()) != ultimo:
                 inicio = texto.rfind(m.group())

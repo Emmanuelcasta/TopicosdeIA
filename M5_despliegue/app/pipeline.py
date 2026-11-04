@@ -1413,6 +1413,11 @@ class Tutor:
             r = r or ri
             lineas = [l.strip() for l in (ri.get("respuesta") or "").splitlines()
                       if l.strip() and not re.match(r"(?i)^\s*(pensamiento|thought)\s*:", l)]
+            # Una «Respuesta final» sin ninguna cifra en mitad del borrador
+            # («Respuesta final: Pasa de días a kilómetros.») no es la respuesta.
+            lineas = [l for i, l in enumerate(lineas)
+                      if not (re.match(r"(?i)^\s*respuesta\s*final", l)
+                              and not any(c.isdigit() for c in l) and i < len(lineas) - 1)]
             lineas, cambios = corregir_cuentas(lineas)
             valido, motivo = borrador_valido(lineas, enunciado)
             borradores.append({"lineas": lineas, "cambios": cambios,

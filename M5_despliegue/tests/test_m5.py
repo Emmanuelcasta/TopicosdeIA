@@ -1794,3 +1794,16 @@ def test_el_enunciado_veta_un_planteamiento_que_usa_su_operacion():
     h = revisar_planteamiento(hoja, F(7, 3), {F(7, 3)}, operandos_referencia=operandos_de(ref),
                               esperadas=operaciones_esperadas("se usan 3/8, ¿cuánto queda?"))
     assert h is None or h.tipo != "planteamiento"
+
+
+def test_la_respuesta_final_con_cuenta_vale_su_resultado():
+    """Corrida 4825044: «52000 × 0.75 = 39000» se leía como 52000 y
+    «40 × 0.35» como 40."""
+    pytest.importorskip("sympy")
+    from fractions import Fraction
+    from verificador_aritmetico import corregir_cuentas, valor_final
+    assert valor_final(["Respuesta final: 52000 × 0.75 = 39000"]) == 39000
+    assert valor_final(["Respuesta final: 40 × 0.35"]) == 14
+    assert valor_final(["Respuesta final: 1/2 de metro"]) == Fraction(1, 2)
+    pasos, cambios = corregir_cuentas(["Respuesta final: 40 × 0.35 estudiantes"])
+    assert pasos == ["Respuesta final: 40 × 0.35 = 14 estudiantes"] and cambios

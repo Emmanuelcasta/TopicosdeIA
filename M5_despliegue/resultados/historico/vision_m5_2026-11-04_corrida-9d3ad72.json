@@ -1,0 +1,1211 @@
+{
+  "tipo": "evaluación de la vía visual de M5",
+  "commit": "9d3ad72",
+  "fecha": "2026-11-04T16:47:58+00:00",
+  "naturaleza": "evaluación de DESARROLLO: estas 12 hojas se han usado para depurar la lectura, el verificador y la regla de diagnóstico. No es evidencia de generalización.",
+  "excluidos_de_la_puntuacion": {
+    "m5v-10": "fuera de la ronda: su foto es legible y el caso mide fotos borrosas, que esta ronda no evalúa."
+  },
+  "parcial": false,
+  "eval_set": "data/eval_set_m5_vision.jsonl",
+  "inventario": {
+    "directorio": "/kaggle/working/ProyectoIA/m4/eval_set/imagenes_m5",
+    "existe_el_directorio": true,
+    "pedidas": 12,
+    "presentes": 12,
+    "faltan": [],
+    "nombres_inesperados": [],
+    "completo": true
+  },
+  "carga_del_vlm": {
+    "ok": true,
+    "ya_estaba_cargado": false,
+    "segundos": 13.02,
+    "dispositivo": "cuda"
+  },
+  "variantes": [
+    {
+      "archivo": "m5v-01.jpg",
+      "caso": "m5v-01",
+      "bloque": "localizacion",
+      "variante": "nitida",
+      "estado": "leido",
+      "lectura": {
+        "segundos": 13.27,
+        "px": [
+          1024,
+          575
+        ],
+        "ok": true,
+        "confirmable": true,
+        "pide_otra_foto": false,
+        "motivo_no_fiable": "",
+        "lecturas_coinciden": false,
+        "diferencias": [
+          "números del paso 2",
+          "números del paso 3"
+        ],
+        "discrepancias_mostradas": [
+          "Paso 2: una lectura dice «68 x 14 = 942» y la otra «68 x 14 = 9412».",
+          "Paso 3: una lectura dice «Respuesta Final: 642 km» y la otra «Respuesta Final: 6412 km»."
+        ],
+        "diferencias_inocuas": [],
+        "enunciado_fiel": true,
+        "proposito": "revisar",
+        "enunciado": "Un bus recorre 68 km cada día. Cuántos kilómetros recorre en 14 días?",
+        "transcripcion": "Enunciado: Un bus recorre 68 km cada día. Cuántos kilómetros recorre en 14 días?\nPaso 1: Multiplicar los días por la distancia de cada día: 68 x 14\nPaso 2: 68 x 14 = 942\nPaso 3: Respuesta Final: 642 km",
+        "pasos": [
+          "Multiplicar los días por la distancia de cada día: 68 x 14",
+          "68 x 14 = 942",
+          "Respuesta Final: 642 km"
+        ],
+        "n_pasos": 3,
+        "n_pasos_esperados": 3,
+        "numero_escrito_preservado": true,
+        "lectura_fiel": false,
+        "lectura": "fria"
+      },
+      "esperado": "paso 2",
+      "solucion": {
+        "segundos": 22.53,
+        "ok": true,
+        "camino": "modelo",
+        "respuesta": "Paso 1: Multiplicamos el recorrido diario por los días.\nPaso 2: 68 × 14 = 952.\nRespuesta final: 952 kilómetros",
+        "pasos_solucion": [
+          "Paso 1: Multiplicamos el recorrido diario por los días.",
+          "Paso 2: 68 × 14 = 952.",
+          "Respuesta final: 952 kilómetros"
+        ],
+        "verificador_aritmetico": {
+          "paso": null,
+          "tipo": "ninguno",
+          "detalle": "todas las cuentas escritas cuadran"
+        },
+        "error": null,
+        "calificacion": {
+          "criterio": "resultado",
+          "esperado": "952",
+          "obtenido": "952",
+          "acierto": true
+        }
+      },
+      "diagnostico": {
+        "segundos": 0.8,
+        "ok": true,
+        "respuesta": "Diagnóstico: Paso 2\n\nPor qué: el paso 2 no cuadra: 68 x 14 da 952, y está escrito 942.",
+        "verificador_aritmetico": {
+          "paso": 2,
+          "tipo": "calculo",
+          "detalle": "el paso 2 no cuadra: 68 x 14 da 952, y está escrito 942"
+        },
+        "pasos_llm": 1,
+        "herramientas": [],
+        "respuesta_modelo": "Diagnóstico: Paso 2",
+        "diagnostico_final": {
+          "conclusion": "paso 2",
+          "fuente": "ambos",
+          "modelo": "paso 2",
+          "verificador_paso": 2,
+          "planteamiento_paso": null,
+          "comprobados": [],
+          "motivo": "el paso 2 no cuadra: 68 x 14 da 952, y está escrito 942",
+          "desacuerdo": false
+        },
+        "planteamiento": null,
+        "referencia": null,
+        "modo": "revisar",
+        "error": null
+      },
+      "calificacion": {
+        "criterio": "exacto",
+        "claves_halladas": [
+          "paso 2",
+          "el paso 2"
+        ],
+        "prohibido_hallado": [],
+        "acierto": true,
+        "acierto_solo_tutor": true,
+        "fallo_grave": false
+      },
+      "fuente_del_fallo": "—"
+    },
+    {
+      "archivo": "m5v-02.jpg",
+      "caso": "m5v-02",
+      "bloque": "localizacion",
+      "variante": "nitida",
+      "estado": "leido",
+      "lectura": {
+        "segundos": 13.0,
+        "px": [
+          1024,
+          355
+        ],
+        "ok": true,
+        "confirmable": true,
+        "pide_otra_foto": false,
+        "motivo_no_fiable": "",
+        "lecturas_coinciden": true,
+        "diferencias": [],
+        "discrepancias_mostradas": [],
+        "diferencias_inocuas": [],
+        "enunciado_fiel": true,
+        "proposito": "revisar",
+        "enunciado": "Un salon tiene 1240 sillas y se retiran 365 ¿Cuántas sillas quedan?",
+        "transcripcion": "Enunciado: Un salon tiene 1240 sillas y se retiran 365 ¿Cuántas sillas quedan?\nPaso 1: Para saber lo que queda, sumo: 1240 + 365\nPaso 2: 1240 + 365 = 1605\nPaso 3: Respuesta final: 1605 sillas",
+        "pasos": [
+          "Para saber lo que queda, sumo: 1240 + 365",
+          "1240 + 365 = 1605",
+          "Respuesta final: 1605 sillas"
+        ],
+        "n_pasos": 3,
+        "n_pasos_esperados": 3,
+        "numero_escrito_preservado": true,
+        "lectura_fiel": true,
+        "lectura": "caliente"
+      },
+      "esperado": "paso 1",
+      "solucion": {
+        "segundos": 6.46,
+        "ok": true,
+        "camino": "modelo",
+        "respuesta": "Pregunta: Restamos las sillas retiradas al total.\nRespuesta final: 875",
+        "pasos_solucion": [
+          "Pregunta: Restamos las sillas retiradas al total.",
+          "Respuesta final: 875"
+        ],
+        "verificador_aritmetico": {
+          "paso": null,
+          "tipo": "no_evaluable",
+          "detalle": "no hay ninguna igualdad aritmética que comprobar"
+        },
+        "error": null,
+        "calificacion": {
+          "criterio": "resultado",
+          "esperado": "875",
+          "obtenido": "875",
+          "acierto": true
+        }
+      },
+      "diagnostico": {
+        "segundos": 6.99,
+        "ok": true,
+        "respuesta": "Diagnóstico: Sin error\n\nPor qué: todas las cuentas que se pueden comprobar cuadran; el planteamiento no se pudo comprobar por separado.\n\nOjo: el tutor, por su cuenta, había concluido otra cosa. La conclusión de arriba se apoya en la comprobación determinista; si no te convence, revísala con tu profesor.",
+        "verificador_aritmetico": {
+          "paso": null,
+          "tipo": "ninguno",
+          "detalle": "todas las cuentas escritas cuadran"
+        },
+        "pasos_llm": 1,
+        "herramientas": [],
+        "respuesta_modelo": "Diagnóstico: Paso 2",
+        "diagnostico_final": {
+          "conclusion": "sin error",
+          "fuente": "verificador",
+          "modelo": "paso 2",
+          "verificador_paso": null,
+          "planteamiento_paso": null,
+          "comprobados": [
+            2,
+            3
+          ],
+          "motivo": "todas las cuentas que se pueden comprobar cuadran; el planteamiento no se pudo comprobar por separado",
+          "desacuerdo": true
+        },
+        "planteamiento": null,
+        "referencia": null,
+        "modo": "revisar",
+        "error": null
+      },
+      "calificacion": {
+        "criterio": "exacto",
+        "claves_halladas": [],
+        "prohibido_hallado": [],
+        "acierto": false,
+        "acierto_solo_tutor": false,
+        "fallo_grave": false
+      },
+      "fuente_del_fallo": "diagnostico"
+    },
+    {
+      "archivo": "m5v-03.jpg",
+      "caso": "m5v-03",
+      "bloque": "localizacion",
+      "variante": "nitida",
+      "estado": "leido",
+      "lectura": {
+        "segundos": 14.07,
+        "px": [
+          1024,
+          309
+        ],
+        "ok": true,
+        "confirmable": true,
+        "pide_otra_foto": false,
+        "motivo_no_fiable": "",
+        "lecturas_coinciden": true,
+        "diferencias": [],
+        "discrepancias_mostradas": [],
+        "diferencias_inocuas": [
+          "redacción del enunciado"
+        ],
+        "enunciado_fiel": true,
+        "proposito": "revisar",
+        "enunciado": "Una camiseta cuesta 52000 pesos y tiene 25% de descuento. ¿Cuánto se paga?",
+        "transcripcion": "Enunciado: Una camiseta cuesta 52000 pesos y tiene 25% de descuento. ¿Cuánto se paga?\nPaso 1: El descuento es 52000 x 0.25 = 13000\nPaso 2: Resto el descuento 52000 - 13000 = 39000\nPaso 3: Respuesta Final: 38000 pesos",
+        "pasos": [
+          "El descuento es 52000 x 0.25 = 13000",
+          "Resto el descuento 52000 - 13000 = 39000",
+          "Respuesta Final: 38000 pesos"
+        ],
+        "n_pasos": 3,
+        "n_pasos_esperados": 3,
+        "numero_escrito_preservado": true,
+        "lectura_fiel": true,
+        "lectura": "caliente"
+      },
+      "esperado": "paso 3",
+      "solucion": {
+        "segundos": 11.6,
+        "ok": true,
+        "camino": "modelo",
+        "respuesta": "Paso 1: Descuentan 25%, así que el precio es 75% del original: 52000 × 0.75.\nPaso 2: 39000 × 14 = 546000.\nRespuesta final: 546000 pesos\n\nOjo: no estoy seguro de esta solución. La resolví de 3 maneras y no coinciden (resultados: 39000, 52000, 546000). Revisa el planteamiento con tu profesor.",
+        "pasos_solucion": [
+          "Paso 1: Descuentan 25%, así que el precio es 75% del original: 52000 × 0.75.",
+          "Paso 2: 39000 × 14 = 546000.",
+          "Respuesta final: 546000 pesos"
+        ],
+        "verificador_aritmetico": {
+          "paso": null,
+          "tipo": "ninguno",
+          "detalle": "todas las cuentas escritas cuadran"
+        },
+        "error": null,
+        "calificacion": {
+          "criterio": "resultado",
+          "esperado": "39000",
+          "obtenido": "546000",
+          "acierto": false
+        }
+      },
+      "diagnostico": {
+        "segundos": 0.81,
+        "ok": true,
+        "respuesta": "Diagnóstico: Paso 3\n\nPor qué: el paso 3 copia mal el resultado: era 39000 y está escrito 38000.\n\nOjo: el tutor, por su cuenta, había concluido otra cosa. La conclusión de arriba se apoya en la comprobación determinista; si no te convence, revísala con tu profesor.",
+        "verificador_aritmetico": {
+          "paso": 3,
+          "tipo": "traslado",
+          "detalle": "el paso 3 copia mal el resultado: era 39000 y está escrito 38000"
+        },
+        "pasos_llm": 1,
+        "herramientas": [],
+        "respuesta_modelo": "Diagnóstico: Paso 2",
+        "diagnostico_final": {
+          "conclusion": "paso 3",
+          "fuente": "verificador",
+          "modelo": "paso 2",
+          "verificador_paso": 3,
+          "planteamiento_paso": null,
+          "comprobados": [
+            1,
+            2
+          ],
+          "motivo": "el paso 3 copia mal el resultado: era 39000 y está escrito 38000",
+          "desacuerdo": true
+        },
+        "planteamiento": null,
+        "referencia": null,
+        "modo": "revisar",
+        "error": null
+      },
+      "calificacion": {
+        "criterio": "exacto",
+        "claves_halladas": [
+          "paso 3",
+          "el paso 3"
+        ],
+        "prohibido_hallado": [],
+        "acierto": true,
+        "acierto_solo_tutor": false,
+        "fallo_grave": false
+      },
+      "fuente_del_fallo": "—"
+    },
+    {
+      "archivo": "m5v-04.jpg",
+      "caso": "m5v-04",
+      "bloque": "localizacion",
+      "variante": "nitida",
+      "estado": "leido",
+      "lectura": {
+        "segundos": 10.59,
+        "px": [
+          1024,
+          302
+        ],
+        "ok": true,
+        "confirmable": true,
+        "pide_otra_foto": false,
+        "motivo_no_fiable": "",
+        "lecturas_coinciden": false,
+        "diferencias": [
+          "números del enunciado"
+        ],
+        "discrepancias_mostradas": [
+          "Enunciado: solo una de las dos lecturas lo encontró: «Se reporten 1764 semillas en partes iguales entre 7 materas. ¿Cuantas recibe cada una?»."
+        ],
+        "diferencias_inocuas": [],
+        "enunciado_fiel": true,
+        "proposito": "revisar",
+        "enunciado": "Se reporten 1764 semillas en partes iguales entre 7 materas. ¿Cuantas recibe cada una?",
+        "transcripcion": "Enunciado: Se reporten 1764 semillas en partes iguales entre 7 materas. ¿Cuantas recibe cada una?\nPaso 1: Divido el total entre las materas: 1764 ÷ 7\nPaso 2: 1764 ÷ 7 = 242\nPaso 3: Respuesta Final: 242 semillas",
+        "pasos": [
+          "Divido el total entre las materas: 1764 ÷ 7",
+          "1764 ÷ 7 = 242",
+          "Respuesta Final: 242 semillas"
+        ],
+        "n_pasos": 3,
+        "n_pasos_esperados": 3,
+        "numero_escrito_preservado": true,
+        "lectura_fiel": false,
+        "lectura": "caliente"
+      },
+      "esperado": "paso 2",
+      "solucion": {
+        "segundos": 13.81,
+        "ok": true,
+        "camino": "modelo",
+        "respuesta": "Paso 1: Dividimos: 1764 ÷ 7 = 252.\nRespuesta final: 252 semillas\n\nNota: las cuentas las recalculó el verificador, con aritmética exacta: 1764 ÷ 7 = 252 (el borrador decía 246).",
+        "pasos_solucion": [
+          "Paso 1: Dividimos: 1764 ÷ 7 = 252.",
+          "Respuesta final: 252 semillas"
+        ],
+        "verificador_aritmetico": {
+          "paso": null,
+          "tipo": "ninguno",
+          "detalle": "todas las cuentas escritas cuadran"
+        },
+        "error": null,
+        "calificacion": {
+          "criterio": "resultado",
+          "esperado": "252",
+          "obtenido": "252",
+          "acierto": true
+        }
+      },
+      "diagnostico": {
+        "segundos": 0.82,
+        "ok": true,
+        "respuesta": "Diagnóstico: Paso 2\n\nPor qué: el paso 2 no cuadra: 1764 ÷ 7 da 252, y está escrito 242.",
+        "verificador_aritmetico": {
+          "paso": 2,
+          "tipo": "calculo",
+          "detalle": "el paso 2 no cuadra: 1764 ÷ 7 da 252, y está escrito 242"
+        },
+        "pasos_llm": 1,
+        "herramientas": [],
+        "respuesta_modelo": "Diagnóstico: Paso 2",
+        "diagnostico_final": {
+          "conclusion": "paso 2",
+          "fuente": "ambos",
+          "modelo": "paso 2",
+          "verificador_paso": 2,
+          "planteamiento_paso": null,
+          "comprobados": [],
+          "motivo": "el paso 2 no cuadra: 1764 ÷ 7 da 252, y está escrito 242",
+          "desacuerdo": false
+        },
+        "planteamiento": null,
+        "referencia": null,
+        "modo": "revisar",
+        "error": null
+      },
+      "calificacion": {
+        "criterio": "exacto",
+        "claves_halladas": [
+          "paso 2",
+          "el paso 2"
+        ],
+        "prohibido_hallado": [],
+        "acierto": true,
+        "acierto_solo_tutor": true,
+        "fallo_grave": false
+      },
+      "fuente_del_fallo": "—"
+    },
+    {
+      "archivo": "m5v-05.jpg",
+      "caso": "m5v-05",
+      "bloque": "compensado",
+      "variante": "nitida",
+      "estado": "leido",
+      "lectura": {
+        "segundos": 16.32,
+        "px": [
+          1024,
+          351
+        ],
+        "ok": true,
+        "confirmable": true,
+        "pide_otra_foto": false,
+        "motivo_no_fiable": "",
+        "lecturas_coinciden": true,
+        "diferencias": [],
+        "discrepancias_mostradas": [],
+        "diferencias_inocuas": [
+          "redacción del enunciado",
+          "redacción del paso 2"
+        ],
+        "enunciado_fiel": true,
+        "proposito": "revisar",
+        "enunciado": "Compré 6 cuadernos de 3500 pesos y 2 lápices de 1500 ¿cuánto pago en total?",
+        "transcripcion": "Enunciado: Compré 6 cuadernos de 3500 pesos y 2 lápices de 1500 ¿cuánto pago en total?\nPaso 1: Los cuadernos cuestan 6 x 3500 = 20000\nPaso 2: Los lápices cuestan 2 x 1500 = 3000\nPaso 3: Sumo 20000 + 3000 = 24000",
+        "pasos": [
+          "Los cuadernos cuestan 6 x 3500 = 20000",
+          "Los lápices cuestan 2 x 1500 = 3000",
+          "Sumo 20000 + 3000 = 24000"
+        ],
+        "n_pasos": 3,
+        "n_pasos_esperados": 4,
+        "numero_escrito_preservado": true,
+        "lectura_fiel": true,
+        "lectura": "caliente"
+      },
+      "esperado": "paso 1",
+      "solucion": {
+        "segundos": 14.58,
+        "ok": true,
+        "camino": "modelo",
+        "respuesta": "Paso 1: Cuadernos: 6 × 3500 = 21000.\nPaso 2: Lápices: 2 × 1500 = 3000.\nPaso 3: Total: 21000 + 3000 = 24000.\nRespuesta final: 24000 pesos",
+        "pasos_solucion": [
+          "Paso 1: Cuadernos: 6 × 3500 = 21000.",
+          "Paso 2: Lápices: 2 × 1500 = 3000.",
+          "Paso 3: Total: 21000 + 3000 = 24000.",
+          "Respuesta final: 24000 pesos"
+        ],
+        "verificador_aritmetico": {
+          "paso": null,
+          "tipo": "ninguno",
+          "detalle": "todas las cuentas escritas cuadran"
+        },
+        "error": null,
+        "calificacion": {
+          "criterio": "resultado",
+          "esperado": "24000",
+          "obtenido": "24000",
+          "acierto": true
+        }
+      },
+      "diagnostico": {
+        "segundos": 0.83,
+        "ok": true,
+        "respuesta": "Diagnóstico: Paso 1\n\nPor qué: el paso 1 no cuadra: 6 x 3500 da 21000, y está escrito 20000.",
+        "verificador_aritmetico": {
+          "paso": 1,
+          "tipo": "calculo",
+          "detalle": "el paso 1 no cuadra: 6 x 3500 da 21000, y está escrito 20000"
+        },
+        "pasos_llm": 1,
+        "herramientas": [],
+        "respuesta_modelo": "Diagnóstico: Paso 1",
+        "diagnostico_final": {
+          "conclusion": "paso 1",
+          "fuente": "ambos",
+          "modelo": "paso 1",
+          "verificador_paso": 1,
+          "planteamiento_paso": null,
+          "comprobados": [],
+          "motivo": "el paso 1 no cuadra: 6 x 3500 da 21000, y está escrito 20000",
+          "desacuerdo": false
+        },
+        "planteamiento": null,
+        "referencia": null,
+        "modo": "revisar",
+        "error": null
+      },
+      "calificacion": {
+        "criterio": "exacto",
+        "claves_halladas": [
+          "paso 1",
+          "el paso 1"
+        ],
+        "prohibido_hallado": [],
+        "acierto": true,
+        "acierto_solo_tutor": true,
+        "fallo_grave": false
+      },
+      "fuente_del_fallo": "—"
+    },
+    {
+      "archivo": "m5v-06.jpg",
+      "caso": "m5v-06",
+      "bloque": "compensado",
+      "variante": "nitida",
+      "estado": "leido",
+      "lectura": {
+        "segundos": 13.81,
+        "px": [
+          1024,
+          357
+        ],
+        "ok": true,
+        "confirmable": true,
+        "pide_otra_foto": false,
+        "motivo_no_fiable": "",
+        "lecturas_coinciden": true,
+        "diferencias": [],
+        "discrepancias_mostradas": [],
+        "diferencias_inocuas": [],
+        "enunciado_fiel": true,
+        "proposito": "revisar",
+        "enunciado": "un recorrido tiene 3 tramos: 12 km, 18 km y 25 km ¿cuántos kilómetros son en total?",
+        "transcripcion": "Enunciado: un recorrido tiene 3 tramos: 12 km, 18 km y 25 km ¿cuántos kilómetros son en total?\nPaso 1: Sumo los 2 primeros tramos: 12 + 18 = 32\nPaso 2: Le sumo el tercero: 32 + 25 = 55\nPaso 3: Respuesta final: 55 km",
+        "pasos": [
+          "Sumo los 2 primeros tramos: 12 + 18 = 32",
+          "Le sumo el tercero: 32 + 25 = 55",
+          "Respuesta final: 55 km"
+        ],
+        "n_pasos": 3,
+        "n_pasos_esperados": 3,
+        "numero_escrito_preservado": true,
+        "lectura_fiel": true,
+        "lectura": "caliente"
+      },
+      "esperado": "paso 1",
+      "solucion": {
+        "segundos": 8.79,
+        "ok": true,
+        "camino": "modelo",
+        "respuesta": "Paso 1: Sumamos los dos primeros: 12 + 18 = 30.\nPaso 2: Sumamos el tercero: 30 + 25 = 55.\nRespuesta final: 55 km",
+        "pasos_solucion": [
+          "Paso 1: Sumamos los dos primeros: 12 + 18 = 30.",
+          "Paso 2: Sumamos el tercero: 30 + 25 = 55.",
+          "Respuesta final: 55 km"
+        ],
+        "verificador_aritmetico": {
+          "paso": null,
+          "tipo": "ninguno",
+          "detalle": "todas las cuentas escritas cuadran"
+        },
+        "error": null,
+        "calificacion": {
+          "criterio": "resultado",
+          "esperado": "55",
+          "obtenido": "55",
+          "acierto": true
+        }
+      },
+      "diagnostico": {
+        "segundos": 1.32,
+        "ok": true,
+        "respuesta": "Diagnóstico: Paso 1\n\nPor qué: el paso 1 no cuadra: 12 + 18 da 30, y está escrito 32.\n\nOjo: el tutor, por su cuenta, había concluido otra cosa. La conclusión de arriba se apoya en la comprobación determinista; si no te convence, revísala con tu profesor.",
+        "verificador_aritmetico": {
+          "paso": 1,
+          "tipo": "calculo",
+          "detalle": "el paso 1 no cuadra: 12 + 18 da 30, y está escrito 32"
+        },
+        "pasos_llm": 1,
+        "herramientas": [],
+        "respuesta_modelo": "Diagnóstico: Paso 2.\nRespuesta final: 55 km",
+        "diagnostico_final": {
+          "conclusion": "paso 1",
+          "fuente": "verificador",
+          "modelo": "paso 2",
+          "verificador_paso": 1,
+          "planteamiento_paso": null,
+          "comprobados": [],
+          "motivo": "el paso 1 no cuadra: 12 + 18 da 30, y está escrito 32",
+          "desacuerdo": true
+        },
+        "planteamiento": null,
+        "referencia": null,
+        "modo": "revisar",
+        "error": null
+      },
+      "calificacion": {
+        "criterio": "exacto",
+        "claves_halladas": [
+          "paso 1",
+          "el paso 1"
+        ],
+        "prohibido_hallado": [],
+        "acierto": true,
+        "acierto_solo_tutor": false,
+        "fallo_grave": false
+      },
+      "fuente_del_fallo": "—"
+    },
+    {
+      "archivo": "m5v-07.jpg",
+      "caso": "m5v-07",
+      "bloque": "sin_error",
+      "variante": "nitida",
+      "estado": "leido",
+      "lectura": {
+        "segundos": 12.93,
+        "px": [
+          1024,
+          423
+        ],
+        "ok": true,
+        "confirmable": true,
+        "pide_otra_foto": false,
+        "motivo_no_fiable": "",
+        "lecturas_coinciden": true,
+        "diferencias": [],
+        "discrepancias_mostradas": [],
+        "diferencias_inocuas": [],
+        "enunciado_fiel": true,
+        "proposito": "revisar",
+        "enunciado": "un paquete trae 18 galletas; cuantas galletas hay en 15 paquetes?",
+        "transcripcion": "Enunciado: un paquete trae 18 galletas; cuantas galletas hay en 15 paquetes?\nPaso 1: Multiplico los paquetes por las galletas de cada uno: 18 x 15\nPaso 2: 18 x 15 = 270\nPaso 3: Respuesta Final: 270 galletas",
+        "pasos": [
+          "Multiplico los paquetes por las galletas de cada uno: 18 x 15",
+          "18 x 15 = 270",
+          "Respuesta Final: 270 galletas"
+        ],
+        "n_pasos": 3,
+        "n_pasos_esperados": 3,
+        "numero_escrito_preservado": true,
+        "lectura_fiel": true,
+        "lectura": "caliente"
+      },
+      "esperado": "sin_error",
+      "solucion": {
+        "segundos": 9.61,
+        "ok": true,
+        "camino": "modelo",
+        "respuesta": "Paso 1: Multiplicamos el número de galletas por los paquetes: 18 × 15 = 270.\nRespuesta final: 270 galletas",
+        "pasos_solucion": [
+          "Paso 1: Multiplicamos el número de galletas por los paquetes: 18 × 15 = 270.",
+          "Respuesta final: 270 galletas"
+        ],
+        "verificador_aritmetico": {
+          "paso": null,
+          "tipo": "ninguno",
+          "detalle": "todas las cuentas escritas cuadran"
+        },
+        "error": null,
+        "calificacion": {
+          "criterio": "resultado",
+          "esperado": "270",
+          "obtenido": "270",
+          "acierto": true
+        }
+      },
+      "diagnostico": {
+        "segundos": 10.31,
+        "ok": true,
+        "respuesta": "Diagnóstico: Sin error\n\nPor qué: todas las cuentas que se pueden comprobar cuadran y tu resultado, 270, es el mismo que sale al resolver el enunciado por separado.\n\nOjo: el tutor, por su cuenta, había concluido otra cosa. La conclusión de arriba se apoya en la comprobación determinista; si no te convence, revísala con tu profesor.",
+        "verificador_aritmetico": {
+          "paso": null,
+          "tipo": "ninguno",
+          "detalle": "todas las cuentas escritas cuadran"
+        },
+        "pasos_llm": 1,
+        "herramientas": [],
+        "respuesta_modelo": "Diagnóstico: Paso 2",
+        "diagnostico_final": {
+          "conclusion": "sin error",
+          "fuente": "referencia",
+          "modelo": "paso 2",
+          "verificador_paso": null,
+          "planteamiento_paso": null,
+          "comprobados": [
+            2,
+            3
+          ],
+          "motivo": "todas las cuentas que se pueden comprobar cuadran y tu resultado, 270, es el mismo que sale al resolver el enunciado por separado",
+          "desacuerdo": true
+        },
+        "planteamiento": {
+          "paso": null,
+          "tipo": "coincide",
+          "detalle": "tu resultado, 270, es el mismo que sale al resolver el enunciado por separado"
+        },
+        "referencia": {
+          "final": "270",
+          "texto": "Paso 1: Multiplicamos el número de galletas por los paquetes: 18 × 15 = 270.\nRespuesta final: 270 galletas"
+        },
+        "modo": "revisar",
+        "error": null
+      },
+      "calificacion": {
+        "criterio": "valvula",
+        "claves_halladas": [
+          "sin error"
+        ],
+        "prohibido_hallado": [],
+        "acierto": true,
+        "acierto_solo_tutor": false,
+        "fallo_grave": false
+      },
+      "fuente_del_fallo": "—"
+    },
+    {
+      "archivo": "m5v-08.jpg",
+      "caso": "m5v-08",
+      "bloque": "sin_error",
+      "variante": "nitida",
+      "estado": "leido",
+      "lectura": {
+        "segundos": 16.05,
+        "px": [
+          1024,
+          565
+        ],
+        "ok": true,
+        "confirmable": true,
+        "pide_otra_foto": false,
+        "motivo_no_fiable": "",
+        "lecturas_coinciden": true,
+        "diferencias": [],
+        "discrepancias_mostradas": [],
+        "diferencias_inocuas": [],
+        "enunciado_fiel": true,
+        "proposito": "revisar",
+        "enunciado": "De un rollo de 7/8 de metro se usan 3/8 ¿cuánto queda?",
+        "transcripcion": "Enunciado: De un rollo de 7/8 de metro se usan 3/8 ¿cuánto queda?\nPaso 1: Resto las fracciones, que tienen el mismo denominador: 7/8 - 3/8\nPaso 2: 7/8 - 3/8 = 4/8\nPaso 3: Simplifique: 4/8 = 1/2\nPaso 4: Respuesta final: 1/2 de metro",
+        "pasos": [
+          "Resto las fracciones, que tienen el mismo denominador: 7/8 - 3/8",
+          "7/8 - 3/8 = 4/8",
+          "Simplifique: 4/8 = 1/2",
+          "Respuesta final: 1/2 de metro"
+        ],
+        "n_pasos": 4,
+        "n_pasos_esperados": 4,
+        "numero_escrito_preservado": true,
+        "lectura_fiel": true,
+        "lectura": "caliente"
+      },
+      "esperado": "sin_error",
+      "solucion": {
+        "segundos": 12.27,
+        "ok": true,
+        "camino": "modelo",
+        "respuesta": "Paso 1: Dividimos entre los dos: 7/8 ÷ 3/8 = 7/8 × 8/3 = 56/24.\nPaso 2: Simplificamos: 56/24 = 7/3.\nRespuesta final: 7/3 metros",
+        "pasos_solucion": [
+          "Paso 1: Dividimos entre los dos: 7/8 ÷ 3/8 = 7/8 × 8/3 = 56/24.",
+          "Paso 2: Simplificamos: 56/24 = 7/3.",
+          "Respuesta final: 7/3 metros"
+        ],
+        "verificador_aritmetico": {
+          "paso": null,
+          "tipo": "ninguno",
+          "detalle": "todas las cuentas escritas cuadran"
+        },
+        "error": null,
+        "calificacion": {
+          "criterio": "resultado",
+          "esperado": "1/2",
+          "obtenido": "7/3",
+          "acierto": false
+        }
+      },
+      "diagnostico": {
+        "segundos": 13.12,
+        "ok": true,
+        "respuesta": "Diagnóstico: Paso 1\n\nPor qué: en el paso 1 se plantea 7/8 - 3/8, que da 1/2, pero al resolver el enunciado por separado el resultado es 7/3: la cuenta puede estar bien hecha, pero no es la operación que pide el enunciado.\n\nAsí sale al resolver el enunciado por separado:\nPaso 1: Dividimos entre los dos: 7/8 ÷ 3/8 = 7/8 × 8/3 = 56/24.\nPaso 2: Simplificamos: 56/24 = 7/3.\nRespuesta final: 7/3 metros",
+        "verificador_aritmetico": {
+          "paso": null,
+          "tipo": "ninguno",
+          "detalle": "todas las cuentas escritas cuadran"
+        },
+        "pasos_llm": 1,
+        "herramientas": [],
+        "respuesta_modelo": "Diagnóstico: Paso 1",
+        "diagnostico_final": {
+          "conclusion": "paso 1",
+          "fuente": "ambos",
+          "modelo": "paso 1",
+          "verificador_paso": null,
+          "planteamiento_paso": 1,
+          "comprobados": [
+            2,
+            3,
+            4
+          ],
+          "motivo": "en el paso 1 se plantea 7/8 - 3/8, que da 1/2, pero al resolver el enunciado por separado el resultado es 7/3: la cuenta puede estar bien hecha, pero no es la operación que pide el enunciado",
+          "desacuerdo": false
+        },
+        "planteamiento": {
+          "paso": 1,
+          "tipo": "planteamiento",
+          "detalle": "en el paso 1 se plantea 7/8 - 3/8, que da 1/2, pero al resolver el enunciado por separado el resultado es 7/3: la cuenta puede estar bien hecha, pero no es la operación que pide el enunciado"
+        },
+        "referencia": {
+          "final": "7/3",
+          "texto": "Paso 1: Dividimos entre los dos: 7/8 ÷ 3/8 = 7/8 × 8/3 = 56/24.\nPaso 2: Simplificamos: 56/24 = 7/3.\nRespuesta final: 7/3 metros"
+        },
+        "modo": "revisar",
+        "error": null
+      },
+      "calificacion": {
+        "criterio": "valvula",
+        "claves_halladas": [],
+        "prohibido_hallado": [
+          "paso 1"
+        ],
+        "acierto": false,
+        "acierto_solo_tutor": false,
+        "fallo_grave": true
+      },
+      "fuente_del_fallo": "diagnostico"
+    },
+    {
+      "archivo": "m5v-09.jpg",
+      "caso": "m5v-09",
+      "bloque": "localizacion",
+      "variante": "nitida",
+      "estado": "leido",
+      "lectura": {
+        "segundos": 12.79,
+        "px": [
+          1024,
+          327
+        ],
+        "ok": true,
+        "confirmable": true,
+        "pide_otra_foto": false,
+        "motivo_no_fiable": "",
+        "lecturas_coinciden": true,
+        "diferencias": [],
+        "discrepancias_mostradas": [],
+        "diferencias_inocuas": [],
+        "enunciado_fiel": true,
+        "proposito": "revisar",
+        "enunciado": "En un grupo de 40 estudiantes, el 35% practica natación. ¿Cuántos son?",
+        "transcripcion": "Enunciado: En un grupo de 40 estudiantes, el 35% practica natación. ¿Cuántos son?\nPaso 1: Calcula el 35% de 40: 40 x 0.35\nPaso 2: 40 x 0.35 = 14\nPaso 3: Respuesta final: 14 estudiantes",
+        "pasos": [
+          "Calcula el 35% de 40: 40 x 0.35",
+          "40 x 0.35 = 14",
+          "Respuesta final: 14 estudiantes"
+        ],
+        "n_pasos": 3,
+        "n_pasos_esperados": 3,
+        "numero_escrito_preservado": false,
+        "lectura_fiel": false,
+        "lectura": "caliente"
+      },
+      "esperado": "paso 3",
+      "solucion": {
+        "segundos": 13.54,
+        "ok": true,
+        "camino": "modelo",
+        "respuesta": "Paso 1: Calculamos el número de estudiantes que practican natación: 40 × 0.35 = 14.\nPaso 2: Dividimos entre dos: 14 ÷ 2 = 7.\nRespuesta final: 7 estudiantes\n\nOjo: no estoy seguro de esta solución. La resolví de 3 maneras y no coinciden (resultados: 14, 40, 7). Revisa el planteamiento con tu profesor.",
+        "pasos_solucion": [
+          "Paso 1: Calculamos el número de estudiantes que practican natación: 40 × 0.35 = 14.",
+          "Paso 2: Dividimos entre dos: 14 ÷ 2 = 7.",
+          "Respuesta final: 7 estudiantes"
+        ],
+        "verificador_aritmetico": {
+          "paso": null,
+          "tipo": "ninguno",
+          "detalle": "todas las cuentas escritas cuadran"
+        },
+        "error": null,
+        "calificacion": {
+          "criterio": "resultado",
+          "esperado": "14",
+          "obtenido": "7",
+          "acierto": false
+        }
+      },
+      "diagnostico": {
+        "segundos": 14.09,
+        "ok": true,
+        "respuesta": "Diagnóstico: Sin error\n\nPor qué: todas las cuentas que se pueden comprobar cuadran; el planteamiento no se pudo comprobar por separado.\n\nOjo: el tutor, por su cuenta, había concluido otra cosa. La conclusión de arriba se apoya en la comprobación determinista; si no te convence, revísala con tu profesor.",
+        "verificador_aritmetico": {
+          "paso": null,
+          "tipo": "ninguno",
+          "detalle": "todas las cuentas escritas cuadran"
+        },
+        "pasos_llm": 1,
+        "herramientas": [],
+        "respuesta_modelo": "Diagnóstico: Paso 2",
+        "diagnostico_final": {
+          "conclusion": "sin error",
+          "fuente": "verificador",
+          "modelo": "paso 2",
+          "verificador_paso": null,
+          "planteamiento_paso": null,
+          "comprobados": [
+            2,
+            3
+          ],
+          "motivo": "todas las cuentas que se pueden comprobar cuadran; el planteamiento no se pudo comprobar por separado",
+          "desacuerdo": true
+        },
+        "planteamiento": null,
+        "referencia": null,
+        "modo": "revisar",
+        "error": null
+      },
+      "calificacion": {
+        "criterio": "exacto",
+        "claves_halladas": [],
+        "prohibido_hallado": [],
+        "acierto": false,
+        "acierto_solo_tutor": false,
+        "fallo_grave": false
+      },
+      "fuente_del_fallo": "lectura"
+    },
+    {
+      "archivo": "m5v-10.jpg",
+      "caso": "m5v-10",
+      "bloque": "adversarial",
+      "variante": "borrosa",
+      "estado": "excluido",
+      "excluido": "fuera de la ronda: su foto es legible y el caso mide fotos borrosas, que esta ronda no evalúa."
+    },
+    {
+      "archivo": "m5v-11.jpg",
+      "caso": "m5v-11",
+      "bloque": "adversarial",
+      "variante": "nitida",
+      "estado": "leido",
+      "lectura": {
+        "segundos": 3.82,
+        "px": [
+          1024,
+          335
+        ],
+        "ok": true,
+        "confirmable": true,
+        "pide_otra_foto": false,
+        "motivo_no_fiable": "",
+        "lecturas_coinciden": true,
+        "diferencias": [],
+        "discrepancias_mostradas": [],
+        "diferencias_inocuas": [],
+        "enunciado_fiel": null,
+        "proposito": "resolver",
+        "enunciado": "Pan Queso Dos litros de leche Jabón",
+        "transcripcion": "Lo único que se alcanza a leer en la hoja: Pan Queso Dos litros de leche Jabón\n(no hay ningún paso de un procedimiento matemático)",
+        "pasos": [],
+        "n_pasos": 0,
+        "n_pasos_esperados": 4,
+        "numero_escrito_preservado": null,
+        "lectura_fiel": null,
+        "lectura": "caliente"
+      },
+      "esperado": "adversarial",
+      "solucion": {
+        "segundos": 0.0,
+        "ok": true,
+        "camino": "fuera_de_dominio",
+        "respuesta": "Esto no es un ejercicio de matemáticas: no hay ninguna cantidad ni ninguna pregunta que calcular. Si es un ejercicio, escribe el enunciado completo con sus datos, o toma otra foto.",
+        "pasos_solucion": [],
+        "verificador_aritmetico": null,
+        "error": null,
+        "calificacion": {
+          "criterio": "valvula",
+          "claves_halladas": [
+            "no es un ejercicio"
+          ],
+          "prohibido_hallado": [],
+          "acierto": true
+        }
+      },
+      "diagnostico": {
+        "segundos": 0.0,
+        "ok": true,
+        "respuesta": "Esto no es un ejercicio de matemáticas: no hay ninguna cantidad ni ninguna pregunta que calcular. Si es un ejercicio, escribe el enunciado completo con sus datos, o toma otra foto.",
+        "verificador_aritmetico": null,
+        "pasos_llm": 0,
+        "herramientas": [],
+        "respuesta_modelo": null,
+        "diagnostico_final": null,
+        "planteamiento": null,
+        "referencia": null,
+        "modo": "resolver",
+        "error": null
+      },
+      "calificacion": {
+        "criterio": "valvula",
+        "claves_halladas": [
+          "no es un ejercicio"
+        ],
+        "prohibido_hallado": [],
+        "acierto": true,
+        "acierto_solo_tutor": true,
+        "fallo_grave": false
+      },
+      "fuente_del_fallo": "—"
+    },
+    {
+      "archivo": "m5v-12.jpg",
+      "caso": "m5v-12",
+      "bloque": "adversarial",
+      "variante": "nitida",
+      "estado": "leido",
+      "lectura": {
+        "segundos": 8.65,
+        "px": [
+          1024,
+          311
+        ],
+        "ok": true,
+        "confirmable": true,
+        "pide_otra_foto": false,
+        "motivo_no_fiable": "",
+        "lecturas_coinciden": true,
+        "diferencias": [],
+        "discrepancias_mostradas": [],
+        "diferencias_inocuas": [],
+        "enunciado_fiel": true,
+        "proposito": "revisar",
+        "enunciado": "¿Cuánto me costó el libro artístico?",
+        "transcripcion": "Enunciado: ¿Cuánto me costó el libro artístico?\nPaso 1: Sumo los dos primeros: 8500 + 12300 = 20800\nPaso 2: Respuesta final: 20800 pesos",
+        "pasos": [
+          "Sumo los dos primeros: 8500 + 12300 = 20800",
+          "Respuesta final: 20800 pesos"
+        ],
+        "n_pasos": 2,
+        "n_pasos_esperados": 2,
+        "numero_escrito_preservado": true,
+        "lectura_fiel": null,
+        "lectura": "caliente"
+      },
+      "esperado": "adversarial",
+      "solucion": {
+        "segundos": 0.0,
+        "ok": true,
+        "camino": "falta_dato",
+        "respuesta": "Falta un dato: la pregunta pide una cantidad, pero en lo que leí no aparece ningún dato numérico para calcularla; no está en la foto y no lo voy a inventar. Si tu ejercicio trae más datos, escríbelos en el enunciado y lo resuelvo.",
+        "pasos_solucion": [],
+        "verificador_aritmetico": null,
+        "error": null,
+        "calificacion": {
+          "criterio": "valvula",
+          "claves_halladas": [
+            "no aparece",
+            "no está en la foto"
+          ],
+          "prohibido_hallado": [],
+          "acierto": true
+        }
+      },
+      "diagnostico": {
+        "segundos": 0.85,
+        "ok": true,
+        "respuesta": "Diagnóstico: Falta un dato\n\nPor qué: el enunciado no trae ningún dato numérico, y los números que usas (8500, 12300) no aparecen en él: el dato que pide la pregunta no está en la foto. Sin ese dato no puedo decir si el procedimiento responde a la pregunta.\n\nOjo: el tutor, por su cuenta, había concluido otra cosa. La conclusión de arriba se apoya en la comprobación determinista; si no te convence, revísala con tu profesor.",
+        "verificador_aritmetico": {
+          "paso": null,
+          "tipo": "ninguno",
+          "detalle": "todas las cuentas escritas cuadran"
+        },
+        "pasos_llm": 1,
+        "herramientas": [],
+        "respuesta_modelo": "Diagnóstico: Paso 1",
+        "diagnostico_final": {
+          "conclusion": "dato no disponible",
+          "fuente": "verificador",
+          "modelo": "paso 1",
+          "verificador_paso": null,
+          "planteamiento_paso": null,
+          "comprobados": [
+            1,
+            2
+          ],
+          "motivo": "el enunciado no trae ningún dato numérico, y los números que usas (8500, 12300) no aparecen en él: el dato que pide la pregunta no está en la foto. Sin ese dato no puedo decir si el procedimiento responde a la pregunta",
+          "desacuerdo": true
+        },
+        "planteamiento": null,
+        "referencia": null,
+        "modo": "revisar",
+        "error": null
+      },
+      "calificacion": {
+        "criterio": "valvula",
+        "claves_halladas": [
+          "no puedo",
+          "no aparece",
+          "no está en la foto"
+        ],
+        "prohibido_hallado": [],
+        "acierto": true,
+        "acierto_solo_tutor": false,
+        "fallo_grave": false
+      },
+      "fuente_del_fallo": "—"
+    }
+  ],
+  "latencias": {
+    "carga_del_vlm_s": 13.02,
+    "lectura_fria_s": 13.27,
+    "lecturas_calientes_s": [
+      3.82,
+      8.65,
+      10.59,
+      12.79,
+      12.93,
+      13.0,
+      13.81,
+      14.07,
+      16.05,
+      16.32
+    ],
+    "resolver_s": [
+      22.53,
+      6.46,
+      11.6,
+      13.81,
+      14.58,
+      8.79,
+      9.61,
+      12.27,
+      13.54,
+      0.0,
+      0.0
+    ],
+    "revisar_s": [
+      0.8,
+      6.99,
+      0.81,
+      0.82,
+      0.83,
+      1.32,
+      10.31,
+      13.12,
+      14.09,
+      0.0,
+      0.85
+    ],
+    "nota": "menos de 20 observaciones por etapa: sin p50/p95, se dan los tiempos uno a uno. revisar incluye resolver el enunciado aparte cuando las cuentas cuadran (salvo caché)."
+  },
+  "metricas": {
+    "fotos_evaluadas": 11,
+    "excluidas_de_la_ronda": [
+      "m5v-10"
+    ],
+    "pidio_otra_foto": [],
+    "con_discrepancias_mostradas": [
+      "m5v-01",
+      "m5v-04"
+    ],
+    "lectura_fiel_pasos": 6,
+    "lectura_fiel_enunciado": 10,
+    "resolver": {
+      "puntuables": 11,
+      "aciertos": 8
+    },
+    "revisar": {
+      "puntuables": 11,
+      "aciertos": 8,
+      "aciertos_solo_tutor": 4,
+      "fallos_graves_error_inventado": 1,
+      "fallos_de_lectura": 1,
+      "fallos_de_diagnostico": 2
+    }
+  },
+  "conflictos": {
+    "m5v-10": "NO VÁLIDO para medir la salvaguarda de ilegibles: la foto es LEGIBLE y el caso exige una toma movida. Se lee y se registra, pero no cuenta ni como acierto ni como fallo de la válvula hasta que haya una foto borrosa de verdad."
+  },
+  "excluidos_de_la_ronda": {
+    "m5v-10": "fuera de la ronda: su foto es legible y el caso mide fotos borrosas, que esta ronda no evalúa."
+  },
+  "lado_mayor_px": 1024,
+  "limites_de_la_muestra": "11 fotos legibles. Un acierto mueve la tasa unos 9 puntos. Las hojas se reutilizaron para depurar el sistema: sirve para ver si el recorrido funciona, no para comparar configuraciones ni afirmar generalización."
+}
