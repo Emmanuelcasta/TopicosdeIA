@@ -1,5 +1,11 @@
 {
   "tipo": "evaluación de la vía visual de M5",
+  "commit": "b439be5",
+  "fecha": "2026-11-04T15:07:39+00:00",
+  "naturaleza": "evaluación de DESARROLLO: estas 12 hojas se han usado para depurar la lectura, el verificador y la regla de diagnóstico. No es evidencia de generalización.",
+  "excluidos_de_la_puntuacion": {
+    "m5v-10": "NO VÁLIDO para medir la salvaguarda de ilegibles: la foto es LEGIBLE y el caso exige una toma movida. Se lee y se registra, pero no cuenta ni como acierto ni como fallo de la válvula hasta que haya una foto borrosa de verdad."
+  },
   "parcial": false,
   "eval_set": "data/eval_set_m5_vision.jsonl",
   "inventario": {
@@ -14,7 +20,7 @@
   "carga_del_vlm": {
     "ok": true,
     "ya_estaba_cargado": false,
-    "segundos": 14.27,
+    "segundos": 14.55,
     "dispositivo": "cuda"
   },
   "variantes": [
@@ -25,7 +31,7 @@
       "variante": "nitida",
       "estado": "leido",
       "lectura": {
-        "segundos": 13.72,
+        "segundos": 14.63,
         "px": [
           1024,
           575
@@ -36,7 +42,9 @@
         "motivo_no_fiable": "dos lecturas de la misma foto no coinciden: la transcripción no es de fiar",
         "lecturas_coinciden": false,
         "diferencias": [
-          "números"
+          "números del enunciado",
+          "números de los pasos",
+          "respuesta final"
         ],
         "proposito": null,
         "enunciado": "Un bus recorre 68 km cada día. 2. Cuántos kilómetros recorre en 14 días?",
@@ -51,8 +59,7 @@
         "numero_escrito_preservado": true,
         "lectura_fiel": false,
         "lectura": "fria"
-      },
-      "bloqueado": "la hoja escribe «Respuesta final: 642 km»; el JSONL espera 942 (valor_final_escrito). El paso con error sigue siendo el 2, pero el número final ya no es el del eval set."
+      }
     },
     {
       "archivo": "m5v-02.jpg",
@@ -61,7 +68,7 @@
       "variante": "nitida",
       "estado": "leido",
       "lectura": {
-        "segundos": 13.68,
+        "segundos": 14.76,
         "px": [
           1024,
           355
@@ -87,9 +94,9 @@
         "lectura": "caliente"
       },
       "diagnostico": {
-        "segundos": 17.32,
+        "segundos": 17.46,
         "ok": true,
-        "respuesta": "Diagnóstico: Paso 2",
+        "respuesta": "Diagnóstico: Sin error\n\nComprobación de las cuentas: todas las igualdades que se pueden comprobar cuadran.\n\nOjo: las dos señales no coinciden. El tutor concluyó «paso 2» y la comprobación determinista lleva a «sin error». Muestro las dos: revisa ambos pasos antes de darlo por bueno.",
         "verificador_aritmetico": {
           "paso": null,
           "tipo": "ninguno",
@@ -97,16 +104,28 @@
         },
         "pasos_llm": 1,
         "herramientas": [],
+        "respuesta_modelo": "Diagnóstico: Paso 2",
+        "diagnostico_final": {
+          "conclusion": "sin error",
+          "fuente": "verificador",
+          "modelo": "paso 2",
+          "verificador_paso": null,
+          "comprobados": [
+            2,
+            3
+          ],
+          "desacuerdo": true
+        },
         "modo": "revisar",
         "error": null
       },
       "calificacion": {
         "criterio": "exacto",
         "claves_halladas": [],
-        "prohibido_hallado": [
-          "paso 2"
-        ],
-        "acierto": false
+        "prohibido_hallado": [],
+        "acierto": false,
+        "acierto_solo_tutor": false,
+        "fallo_grave": false
       },
       "fuente_del_fallo": "diagnostico"
     },
@@ -117,20 +136,22 @@
       "variante": "nitida",
       "estado": "leido",
       "lectura": {
-        "segundos": 14.81,
+        "segundos": 16.03,
         "px": [
           1024,
           309
         ],
         "ok": true,
-        "confirmable": true,
-        "pide_otra_foto": false,
-        "motivo_no_fiable": "",
-        "lecturas_coinciden": true,
-        "diferencias": [],
-        "proposito": "revisar",
+        "confirmable": false,
+        "pide_otra_foto": true,
+        "motivo_no_fiable": "dos lecturas de la misma foto no coinciden: la transcripción no es de fiar",
+        "lecturas_coinciden": false,
+        "diferencias": [
+          "palabras del enunciado"
+        ],
+        "proposito": null,
         "enunciado": "Una camiseta cuesta 52000 pesos y tiene 25% de descuento. ¿Cuánto se paga?",
-        "transcripcion": "Enunciado: Una camiseta cuesta 52000 pesos y tiene 25% de descuento. ¿Cuánto se paga?\nPaso 1: El descuento es 52000 x 0.25 = 13000\nPaso 2: Resto el descuento 52000 - 13000 = 39000\nPaso 3: Respuesta Final: 38000 pesos",
+        "transcripcion": "(la hoja NO se pudo leer: dos lecturas de la misma foto no coinciden: la transcripción no es de fiar. No hay un procedimiento legible que revisar.)",
         "pasos": [
           "El descuento es 52000 x 0.25 = 13000",
           "Resto el descuento 52000 - 13000 = 39000",
@@ -139,32 +160,9 @@
         "n_pasos": 3,
         "n_pasos_esperados": 3,
         "numero_escrito_preservado": true,
-        "lectura_fiel": true,
+        "lectura_fiel": false,
         "lectura": "caliente"
-      },
-      "diagnostico": {
-        "segundos": 0.89,
-        "ok": true,
-        "respuesta": "Diagnóstico: Paso 2",
-        "verificador_aritmetico": {
-          "paso": 3,
-          "tipo": "traslado",
-          "detalle": "el paso 3 copia mal el resultado: era 39000 y está escrito 38000"
-        },
-        "pasos_llm": 1,
-        "herramientas": [],
-        "modo": "revisar",
-        "error": null
-      },
-      "calificacion": {
-        "criterio": "exacto",
-        "claves_halladas": [],
-        "prohibido_hallado": [
-          "paso 2"
-        ],
-        "acierto": false
-      },
-      "fuente_del_fallo": "diagnostico"
+      }
     },
     {
       "archivo": "m5v-04.jpg",
@@ -173,7 +171,7 @@
       "variante": "nitida",
       "estado": "leido",
       "lectura": {
-        "segundos": 10.98,
+        "segundos": 12.63,
         "px": [
           1024,
           302
@@ -184,7 +182,8 @@
         "motivo_no_fiable": "dos lecturas de la misma foto no coinciden: la transcripción no es de fiar",
         "lecturas_coinciden": false,
         "diferencias": [
-          "números"
+          "palabras del enunciado",
+          "números del enunciado"
         ],
         "proposito": null,
         "enunciado": "Se reporten 1764 semillas en partes iguales entre 7 materas. ¿Cuantas recibe cada una?",
@@ -208,20 +207,23 @@
       "variante": "nitida",
       "estado": "leido",
       "lectura": {
-        "segundos": 17.17,
+        "segundos": 18.43,
         "px": [
           1024,
           351
         ],
         "ok": true,
-        "confirmable": true,
-        "pide_otra_foto": false,
-        "motivo_no_fiable": "",
-        "lecturas_coinciden": true,
-        "diferencias": [],
-        "proposito": "revisar",
+        "confirmable": false,
+        "pide_otra_foto": true,
+        "motivo_no_fiable": "dos lecturas de la misma foto no coinciden: la transcripción no es de fiar",
+        "lecturas_coinciden": false,
+        "diferencias": [
+          "palabras del enunciado",
+          "palabras de los pasos"
+        ],
+        "proposito": null,
         "enunciado": "Compré 6 cuadernos de 3500 pesos y 2 lápices de 1500 ¿cuánto pago en total?",
-        "transcripcion": "Enunciado: Compré 6 cuadernos de 3500 pesos y 2 lápices de 1500 ¿cuánto pago en total?\nPaso 1: Los cuadernos cuestan 6 x 3500 = 20000\nPaso 2: Los lápices cuestan 2 x 1500 = 3000\nPaso 3: Sumo 20000 + 3000 = 24000",
+        "transcripcion": "(la hoja NO se pudo leer: dos lecturas de la misma foto no coinciden: la transcripción no es de fiar. No hay un procedimiento legible que revisar.)",
         "pasos": [
           "Los cuadernos cuestan 6 x 3500 = 20000",
           "Los lápices cuestan 2 x 1500 = 3000",
@@ -230,24 +232,9 @@
         "n_pasos": 3,
         "n_pasos_esperados": 4,
         "numero_escrito_preservado": true,
-        "lectura_fiel": true,
+        "lectura_fiel": false,
         "lectura": "caliente"
-      },
-      "diagnostico": {
-        "segundos": 0.9,
-        "ok": true,
-        "respuesta": "Diagnóstico: Paso 1",
-        "verificador_aritmetico": {
-          "paso": 1,
-          "tipo": "calculo",
-          "detalle": "el paso 1 no cuadra: 6 x 3500 da 21000, y está escrito 20000"
-        },
-        "pasos_llm": 1,
-        "herramientas": [],
-        "modo": "revisar",
-        "error": null
-      },
-      "bloqueado": "la hoja escribe «2 × 15000 = 3000»; el JSONL dice «2 × 1500 = 3000» y el enunciado de la propia hoja dice «lapiceros de 1500». Con un cero de más el paso 2 también queda mal, y el caso es de tipo `compensado`: esperaba que el ÚNICO primer error fuera el paso 1 y prohíbe nombrar el paso 2. Además la hoja tiene 3 pasos y el JSONL 4."
+      }
     },
     {
       "archivo": "m5v-06.jpg",
@@ -256,7 +243,7 @@
       "variante": "nitida",
       "estado": "leido",
       "lectura": {
-        "segundos": 14.56,
+        "segundos": 15.96,
         "px": [
           1024,
           357
@@ -282,9 +269,9 @@
         "lectura": "caliente"
       },
       "diagnostico": {
-        "segundos": 0.88,
+        "segundos": 0.91,
         "ok": true,
-        "respuesta": "Diagnóstico: Paso 1",
+        "respuesta": "Diagnóstico: Paso 1\n\nComprobación de las cuentas: el paso 1 no cuadra: 12 + 18 da 30, y está escrito 32.",
         "verificador_aritmetico": {
           "paso": 1,
           "tipo": "calculo",
@@ -292,16 +279,28 @@
         },
         "pasos_llm": 1,
         "herramientas": [],
+        "respuesta_modelo": "Diagnóstico: Paso 1",
+        "diagnostico_final": {
+          "conclusion": "paso 1",
+          "fuente": "ambos",
+          "modelo": "paso 1",
+          "verificador_paso": 1,
+          "comprobados": [],
+          "desacuerdo": false
+        },
         "modo": "revisar",
         "error": null
       },
       "calificacion": {
         "criterio": "exacto",
         "claves_halladas": [
-          "paso 1"
+          "paso 1",
+          "el paso 1"
         ],
         "prohibido_hallado": [],
-        "acierto": true
+        "acierto": true,
+        "acierto_solo_tutor": true,
+        "fallo_grave": false
       },
       "fuente_del_fallo": "—"
     },
@@ -312,7 +311,7 @@
       "variante": "nitida",
       "estado": "leido",
       "lectura": {
-        "segundos": 13.34,
+        "segundos": 14.41,
         "px": [
           1024,
           423
@@ -338,9 +337,9 @@
         "lectura": "caliente"
       },
       "diagnostico": {
-        "segundos": 0.89,
+        "segundos": 0.99,
         "ok": true,
-        "respuesta": "Diagnóstico: Paso 2",
+        "respuesta": "Diagnóstico: Sin error\n\nComprobación de las cuentas: todas las igualdades que se pueden comprobar cuadran.\n\nOjo: las dos señales no coinciden. El tutor concluyó «paso 2» y la comprobación determinista lleva a «sin error». Muestro las dos: revisa ambos pasos antes de darlo por bueno.",
         "verificador_aritmetico": {
           "paso": null,
           "tipo": "ninguno",
@@ -348,18 +347,32 @@
         },
         "pasos_llm": 1,
         "herramientas": [],
+        "respuesta_modelo": "Diagnóstico: Paso 2",
+        "diagnostico_final": {
+          "conclusion": "sin error",
+          "fuente": "verificador",
+          "modelo": "paso 2",
+          "verificador_paso": null,
+          "comprobados": [
+            2,
+            3
+          ],
+          "desacuerdo": true
+        },
         "modo": "revisar",
         "error": null
       },
       "calificacion": {
         "criterio": "valvula",
-        "claves_halladas": [],
-        "prohibido_hallado": [
-          "paso 2"
+        "claves_halladas": [
+          "sin error"
         ],
-        "acierto": false
+        "prohibido_hallado": [],
+        "acierto": true,
+        "acierto_solo_tutor": false,
+        "fallo_grave": false
       },
-      "fuente_del_fallo": "diagnostico"
+      "fuente_del_fallo": "—"
     },
     {
       "archivo": "m5v-08.jpg",
@@ -368,7 +381,7 @@
       "variante": "nitida",
       "estado": "leido",
       "lectura": {
-        "segundos": 16.69,
+        "segundos": 17.93,
         "px": [
           1024,
           565
@@ -395,9 +408,9 @@
         "lectura": "caliente"
       },
       "diagnostico": {
-        "segundos": 0.9,
+        "segundos": 0.93,
         "ok": true,
-        "respuesta": "Diagnóstico: Paso 1",
+        "respuesta": "Diagnóstico: Paso 1\n\nEl tutor señala un error de planteamiento; en ese paso no hay una cuenta que el verificador pueda comprobar, así que esta conclusión no está verificada.",
         "verificador_aritmetico": {
           "paso": null,
           "tipo": "ninguno",
@@ -405,6 +418,19 @@
         },
         "pasos_llm": 1,
         "herramientas": [],
+        "respuesta_modelo": "Diagnóstico: Paso 1",
+        "diagnostico_final": {
+          "conclusion": "paso 1",
+          "fuente": "modelo",
+          "modelo": "paso 1",
+          "verificador_paso": null,
+          "comprobados": [
+            2,
+            3,
+            4
+          ],
+          "desacuerdo": false
+        },
         "modo": "revisar",
         "error": null
       },
@@ -414,18 +440,20 @@
         "prohibido_hallado": [
           "paso 1"
         ],
-        "acierto": false
+        "acierto": false,
+        "acierto_solo_tutor": false,
+        "fallo_grave": true
       },
       "fuente_del_fallo": "diagnostico"
     },
     {
       "archivo": "m5v-09.jpg",
       "caso": "m5v-09",
-      "bloque": "sin_error",
+      "bloque": "localizacion",
       "variante": "nitida",
       "estado": "leido",
       "lectura": {
-        "segundos": 13.3,
+        "segundos": 14.39,
         "px": [
           1024,
           327
@@ -446,14 +474,14 @@
         ],
         "n_pasos": 3,
         "n_pasos_esperados": 3,
-        "numero_escrito_preservado": true,
-        "lectura_fiel": true,
+        "numero_escrito_preservado": false,
+        "lectura_fiel": false,
         "lectura": "caliente"
       },
       "diagnostico": {
-        "segundos": 0.88,
+        "segundos": 0.94,
         "ok": true,
-        "respuesta": "Diagnóstico: Paso 2",
+        "respuesta": "Diagnóstico: Sin error\n\nComprobación de las cuentas: todas las igualdades que se pueden comprobar cuadran.\n\nOjo: las dos señales no coinciden. El tutor concluyó «paso 2» y la comprobación determinista lleva a «sin error». Muestro las dos: revisa ambos pasos antes de darlo por bueno.",
         "verificador_aritmetico": {
           "paso": null,
           "tipo": "ninguno",
@@ -461,10 +489,30 @@
         },
         "pasos_llm": 1,
         "herramientas": [],
+        "respuesta_modelo": "Diagnóstico: Paso 2",
+        "diagnostico_final": {
+          "conclusion": "sin error",
+          "fuente": "verificador",
+          "modelo": "paso 2",
+          "verificador_paso": null,
+          "comprobados": [
+            2,
+            3
+          ],
+          "desacuerdo": true
+        },
         "modo": "revisar",
         "error": null
       },
-      "bloqueado": "la hoja escribe «Respuesta final: 19 estudiantes»; su propio paso 2 dice «40 × 0.35 = 14» y el JSONL espera 14. El caso está declarado `sin_error`, y con un 19 al final sí hay un error en el paso 3."
+      "calificacion": {
+        "criterio": "exacto",
+        "claves_halladas": [],
+        "prohibido_hallado": [],
+        "acierto": false,
+        "acierto_solo_tutor": false,
+        "fallo_grave": false
+      },
+      "fuente_del_fallo": "lectura"
     },
     {
       "archivo": "m5v-10.jpg",
@@ -473,7 +521,7 @@
       "variante": "borrosa",
       "estado": "leido",
       "lectura": {
-        "segundos": 11.37,
+        "segundos": 12.38,
         "px": [
           1024,
           300
@@ -499,9 +547,9 @@
         "lectura": "caliente"
       },
       "diagnostico": {
-        "segundos": 0.89,
+        "segundos": 0.91,
         "ok": true,
-        "respuesta": "Diagnóstico: Paso 2",
+        "respuesta": "Diagnóstico: Sin error\n\nComprobación de las cuentas: todas las igualdades que se pueden comprobar cuadran.\n\nOjo: las dos señales no coinciden. El tutor concluyó «paso 2» y la comprobación determinista lleva a «sin error». Muestro las dos: revisa ambos pasos antes de darlo por bueno.",
         "verificador_aritmetico": {
           "paso": null,
           "tipo": "ninguno",
@@ -509,10 +557,22 @@
         },
         "pasos_llm": 1,
         "herramientas": [],
+        "respuesta_modelo": "Diagnóstico: Paso 2",
+        "diagnostico_final": {
+          "conclusion": "sin error",
+          "fuente": "verificador",
+          "modelo": "paso 2",
+          "verificador_paso": null,
+          "comprobados": [
+            2,
+            3
+          ],
+          "desacuerdo": true
+        },
         "modo": "revisar",
         "error": null
       },
-      "bloqueado": "la foto es LEGIBLE. El caso existe para medir la salvaguarda de ilegibles y el JSONL pide explícitamente que esta hoja se fotografíe movida. Con una foto nítida no se puede afirmar que la válvula quedó probada, en ningún sentido."
+      "bloqueado": "NO VÁLIDO para medir la salvaguarda de ilegibles: la foto es LEGIBLE y el caso exige una toma movida. Se lee y se registra, pero no cuenta ni como acierto ni como fallo de la válvula hasta que haya una foto borrosa de verdad."
     },
     {
       "archivo": "m5v-11.jpg",
@@ -521,7 +581,7 @@
       "variante": "nitida",
       "estado": "leido",
       "lectura": {
-        "segundos": 4.02,
+        "segundos": 4.33,
         "px": [
           1024,
           335
@@ -543,27 +603,24 @@
         "lectura": "caliente"
       },
       "diagnostico": {
-        "segundos": 3.65,
+        "segundos": 0.0,
         "ok": true,
-        "respuesta": "Paso 1: Dividimos entre dos: 68 ÷ 2 = 34.\nPaso 2: Multiplicamos por los jabones: 34 × 4 = 136.\nRespuesta final: 136 panes",
-        "verificador_aritmetico": {
-          "paso": null,
-          "tipo": "ninguno",
-          "detalle": "todas las cuentas escritas cuadran"
-        },
-        "pasos_llm": 1,
+        "respuesta": "No veo un ejercicio de matemáticas en lo que leí: no hay ningún número. Si es un ejercicio, escribe el enunciado completo con sus datos, o toma otra foto.",
+        "verificador_aritmetico": null,
+        "pasos_llm": 0,
         "herramientas": [],
+        "respuesta_modelo": null,
+        "diagnostico_final": null,
         "modo": "resolver",
         "error": null
       },
       "calificacion": {
         "criterio": "valvula",
         "claves_halladas": [],
-        "prohibido_hallado": [
-          "paso 1",
-          "paso 2"
-        ],
-        "acierto": false
+        "prohibido_hallado": [],
+        "acierto": false,
+        "acierto_solo_tutor": false,
+        "fallo_grave": false
       },
       "fuente_del_fallo": "diagnostico"
     },
@@ -574,7 +631,7 @@
       "variante": "nitida",
       "estado": "leido",
       "lectura": {
-        "segundos": 9.22,
+        "segundos": 9.78,
         "px": [
           1024,
           311
@@ -599,9 +656,9 @@
         "lectura": "caliente"
       },
       "diagnostico": {
-        "segundos": 0.88,
+        "segundos": 0.93,
         "ok": true,
-        "respuesta": "Diagnóstico: Paso 2",
+        "respuesta": "Diagnóstico: Sin error\n\nComprobación de las cuentas: todas las igualdades que se pueden comprobar cuadran.\n\nOjo: las dos señales no coinciden. El tutor concluyó «paso 2» y la comprobación determinista lleva a «sin error». Muestro las dos: revisa ambos pasos antes de darlo por bueno.",
         "verificador_aritmetico": {
           "paso": null,
           "tipo": "ninguno",
@@ -609,35 +666,47 @@
         },
         "pasos_llm": 1,
         "herramientas": [],
+        "respuesta_modelo": "Diagnóstico: Paso 2",
+        "diagnostico_final": {
+          "conclusion": "sin error",
+          "fuente": "verificador",
+          "modelo": "paso 2",
+          "verificador_paso": null,
+          "comprobados": [
+            1,
+            2
+          ],
+          "desacuerdo": true
+        },
         "modo": "revisar",
         "error": null
       },
       "calificacion": {
         "criterio": "valvula",
         "claves_halladas": [],
-        "prohibido_hallado": [
-          "paso 2"
-        ],
-        "acierto": false
+        "prohibido_hallado": [],
+        "acierto": false,
+        "acierto_solo_tutor": false,
+        "fallo_grave": false
       },
       "fuente_del_fallo": "diagnostico"
     }
   ],
   "latencias": {
-    "carga_del_vlm_s": 14.27,
-    "lectura_fria_s": 13.72,
+    "carga_del_vlm_s": 14.55,
+    "lectura_fria_s": 14.63,
     "lecturas_calientes_s": [
-      4.02,
-      9.22,
-      10.98,
-      11.37,
-      13.3,
-      13.34,
-      13.68,
-      14.56,
-      14.81,
-      16.69,
-      17.17
+      4.33,
+      9.78,
+      12.38,
+      12.63,
+      14.39,
+      14.41,
+      14.76,
+      15.96,
+      16.03,
+      17.93,
+      18.43
     ],
     "p50_s": null,
     "p95_s": null,
@@ -646,19 +715,24 @@
   "metricas": {
     "fotos_del_conjunto": 12,
     "fotos_leidas": 12,
-    "bloqueadas_por_conflicto": 4,
+    "bloqueadas_por_conflicto": 1,
     "puntuables": 7,
-    "pidio_otra_foto": 2,
-    "aciertos": 1,
-    "fallos_de_lectura": 0,
-    "fallos_de_diagnostico": 6
+    "pidio_otra_foto": 4,
+    "aciertos": 2,
+    "aciertos_solo_tutor": 1,
+    "fallos_graves_error_inventado": 1,
+    "legibles_rechazadas_por_doble_lectura": [
+      "m5v-01",
+      "m5v-03",
+      "m5v-04",
+      "m5v-05"
+    ],
+    "fallos_de_lectura": 1,
+    "fallos_de_diagnostico": 4
   },
   "conflictos": {
-    "m5v-01": "la hoja escribe «Respuesta final: 642 km»; el JSONL espera 942 (valor_final_escrito). El paso con error sigue siendo el 2, pero el número final ya no es el del eval set.",
-    "m5v-05": "la hoja escribe «2 × 15000 = 3000»; el JSONL dice «2 × 1500 = 3000» y el enunciado de la propia hoja dice «lapiceros de 1500». Con un cero de más el paso 2 también queda mal, y el caso es de tipo `compensado`: esperaba que el ÚNICO primer error fuera el paso 1 y prohíbe nombrar el paso 2. Además la hoja tiene 3 pasos y el JSONL 4.",
-    "m5v-09": "la hoja escribe «Respuesta final: 19 estudiantes»; su propio paso 2 dice «40 × 0.35 = 14» y el JSONL espera 14. El caso está declarado `sin_error`, y con un 19 al final sí hay un error en el paso 3.",
-    "m5v-10": "la foto es LEGIBLE. El caso existe para medir la salvaguarda de ilegibles y el JSONL pide explícitamente que esta hoja se fotografíe movida. Con una foto nítida no se puede afirmar que la válvula quedó probada, en ningún sentido."
+    "m5v-10": "NO VÁLIDO para medir la salvaguarda de ilegibles: la foto es LEGIBLE y el caso exige una toma movida. Se lee y se registra, pero no cuenta ni como acierto ni como fallo de la válvula hasta que haya una foto borrosa de verdad."
   },
-  "decision_pendiente": "Cuatro de las doce hojas no coinciden con lo que el JSONL declara (m5v-01, m5v-05, m5v-09) o no son la toma que el caso pide (m5v-10, fotografiada legible cuando el caso existe para medir la salvaguarda de ilegibles). Se leen y se guarda lo que contestó el tutor, pero no se puntúan: su respuesta esperada describe una hoja distinta. Resolverlo es una decisión de diseño —repetir la foto o corregir el JSONL— y no se toma aquí. Mientras siga abierta, cualquier tasa sobre este conjunto es sobre 8 casos, no sobre 12, y así se informa.",
-  "limites_de_la_muestra": "8 casos puntuables. Con ese tamaño un acierto más o menos mueve la tasa 12,5 puntos: no sirve para afirmar una mejora frente a ninguna otra configuración, solo para ver si el recorrido completo funciona."
+  "decision_pendiente": "m5v-10 necesita una foto movida de verdad. Hasta entonces la salvaguarda de ilegibles no tiene ninguna medición en este conjunto.",
+  "limites_de_la_muestra": "11 casos puntuables como máximo, menos los que pare la doble lectura. Un acierto mueve la tasa unos 9 puntos o más. Las hojas se reutilizaron para depurar el sistema: sirve para ver si el recorrido funciona, no para comparar configuraciones ni afirmar mejoras."
 }

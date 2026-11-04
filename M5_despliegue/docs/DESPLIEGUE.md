@@ -853,3 +853,65 @@ mismo recorte dan la misma lectura. HEIC de iPhone **no** se abre sin
 - El verificador lee mal igualdades encadenadas («a ÷ b = c × d = e» compara a ÷ b
   con c); da un falso «no cuadra». Pendiente.
 - Una hoja sin ninguna cifra ya no se resuelve (m5v-11 inventó «68 ÷ 2 = 34»).
+
+## 10 · Lectura estricta, verificador por igualdades y diagnóstico combinado · corrida del 2026-11-04 (tarde)
+
+Kaggle T4, commit `b439be5`, 2026-11-04T15:07:39Z, una sola corrida completa
+con el mismo commit que se reporta. Resultados en
+`M5_despliegue/resultados/vision_m5.{json,csv}` (sustituyen a los de §9; no se
+mezclan versiones). **Evaluación de desarrollo**: estas 12 hojas se usaron para
+depurar lectura, verificador y regla de diagnóstico. No es evidencia de
+generalización.
+
+**Qué cambió.**
+- *Doble lectura estricta.* Sustituye la decisión de §9: ahora compara, por
+  separado en enunciado y pasos, palabras, números, operaciones, cantidad de
+  pasos y respuesta final. Solo normaliza mayúsculas, espacios, puntuación y
+  tildes. Si algo material difiere, para y dice qué parte no coincidió, sin
+  mostrar la transcripción dudosa.
+- *Verificador.* Cada igualdad adyacente de una cadena se evalúa por separado
+  y con aritmética exacta (`7/8 ÷ 3/8 = 7/3` ya cuadra); informa qué igualdad
+  falló.
+- *Diagnóstico.* Manda el paso que señala el verificador, salvo que el tutor
+  apunte a un paso anterior que el verificador no pudo comprobar (planteamiento).
+  Si el tutor señala un paso que el verificador comprobó como correcto, la
+  conclusión es «sin error». Cuando las dos señales difieren, la pantalla
+  muestra las dos.
+
+**Scorecard.** 12 leídas · 8 confirmables · 4 paradas por la doble lectura ·
+1 excluida (m5v-10) · 7 puntuables · **2 aciertos** (m5v-06, m5v-07). El tutor
+solo habría acertado 1: en m5v-07 (sin error) se inventaba un error en el paso 2
+y la regla combinada lo evita. 1 fallo grave: m5v-08 (sin error), el tutor señala
+el paso 1, que el verificador no puede comprobar. Fuente de los fallos: 4 de
+diagnóstico (m5v-02, 08, 11, 12) y 1 de lectura (m5v-09, ambas lecturas dan 14
+donde la hoja dice 19; en la app el estudiante lo corregiría antes de confirmar).
+
+**Coste de la regla estricta.** Rechaza 4 de las 12 fotos legibles: m5v-01
+(números), m5v-04 (palabras y números) y m5v-03 y m5v-05, estas dos **solo por
+palabras**. Con la regla de §9 esas dos habrían pasado a confirmación.
+
+**m5v-10.** Registrado como NO VÁLIDO: la foto es legible y el caso exige una
+toma movida. Se lee pero no puntúa. La salvaguarda de ilegibles sigue sin
+medición hasta que haya una foto borrosa de verdad.
+
+**Latencias.** Carga del VLM 14,6 s. Lectura en frío 14,6 s; en caliente de
+4,3 a 18,4 s (11 observaciones; sin p50/p95 por debajo de 20). Diagnóstico tras
+la lectura ~1 s (17,5 s el primero, que carga el tutor).
+
+**Prueba en la app** (misma versión, sesión nueva de Kaggle). Resolver: recorte
+de m5v-07 con solo el enunciado, PNG, lectura 7,9 s, confirmación editable y
+luego «18 × 15 = 270», con el verificador conforme. Revisar: m5v-07.jpg completa,
+lectura 13,5 s con las dos lecturas coincidentes, confirmación y luego
+«Diagnóstico: Sin error», mostrando que el tutor solo decía «paso 2». El
+paso 4 no aparece hasta confirmar, y una foto nueva lo vuelve a ocultar.
+
+**Abierto.**
+- Foto movida para m5v-10.
+- Decidir si el coste de la regla estricta (2 hojas paradas solo por palabras)
+  es aceptable.
+- Errores de planteamiento que el tutor no ve (m5v-02) y errores inventados en
+  pasos no comprobables (m5v-08).
+- m5v-11 responde «No veo un ejercicio», que no casa con las claves del JSONL.
+- m5v-12: el dato que falta no se detecta.
+- `scripts/tests/test_m4_vision.py::test_dos_lecturas_iguales_son_consistentes`
+  falla, ya fallaba antes de estos cambios y contradice la regla de palabras.
