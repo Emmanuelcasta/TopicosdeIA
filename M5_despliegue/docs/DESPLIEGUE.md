@@ -998,3 +998,21 @@ pide cuántas quedan) y referencia 1240 − 365 = 875.
 
 **Pendiente.** m5v-09 (lectura 14/19). La redacción del modelo puede aludir a
 un paso que la limpieza quitó («Multiplicamos el resultado…»).
+
+## 13 · Fase 4, cierre de pendientes · 2026-11-04
+
+Commit de código `83e44f7`, probado en Kaggle T4.
+
+- La explicación ya no alude a un paso eliminado: «Multiplicamos el resultado
+  por…» pasa a «Multiplicamos 18 por…» cuando ningún paso anterior dejó un
+  resultado (`limpiar_solucion`).
+- La caja de la foto dice «Arrastra aquí la foto de tu hoja» (antes, «Drop
+  Image Here»).
+- Presentación versionada en `M5_despliegue/presentacion/`: HTML, guion y los
+  recursos que usa (capturas en modo claro y hojas del eval set de desarrollo),
+  sin rutas fuera de la carpeta. Sin etiqueta flotante de expositor.
+- Guía para probar la app en Kaggle: `M5_despliegue/docs/PROBAR_EN_KAGGLE.md`.
+
+**Fallo conocido, sin cambios:** m5v-09 se lee «14» donde la hoja dice «19» en
+las dos lecturas; no hay discrepancia que enseñar y la revisión sale «sin
+error». El scorecard vigente sigue siendo el de `a98d805` (§11).
