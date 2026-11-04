@@ -1441,3 +1441,31 @@ def test_las_instrucciones_de_m4_no_cambiaron():
     # Y las de M5 no le piden al VLM que decida qué es un paso.
     assert "pasos" not in vision.INSTRUCCION_COPIAR
     assert "pasos" not in vision.INSTRUCCION_COPIAR_INDEPENDIENTE
+
+
+def test_recupera_las_lineas_de_un_json_sin_cerrar():
+    """Caso real de la sonda: una copia correcta llegó sin el `]` final."""
+    from vision import lineas_de
+    crudo = '```json\n{\n  "lineas": ["7. un paquete trae 18 galletas; cuantas galletas hay en 15 paquetes?"\n}\n```'
+    assert lineas_de(crudo) == ["7. un paquete trae 18 galletas; cuantas galletas hay en 15 paquetes?"]
+    assert lineas_de('{"ilegible": true}') is None
+
+
+def test_las_lineas_de_relleno_no_cuentan():
+    from vision import estructurar_lineas, lecturas_consistentes
+    a = {"json": {"lineas": ["8. De un rollo de 7/8 de metro se usan 3/8 ¿cuánto queda?"]}}
+    b = {"json": {"lineas": ["8. De un rollo de 7/8 de metro se usan 3/8 cuánto queda?", "...", "..."]}}
+    assert lecturas_consistentes(a, b)
+    assert estructurar_lineas(b["json"]["lineas"])["pasos"] == []
+
+
+def test_partir_una_linea_en_dos_no_es_otra_lectura_pero_otro_numero_si():
+    """`vis-10`, foto borrosa: una copia leyó 306 y la otra 312. Eso tiene que
+    parar la hoja; que una copia parta una línea en dos, no."""
+    from vision import lecturas_consistentes
+    a = {"json": {"lineas": ["Paso 1: lo que queda se obtiene sumando 1500 + 847"]}}
+    b = {"json": {"lineas": ["Paso 1: lo que queda se obtiene", "sumando 1500 + 847"]}}
+    assert lecturas_consistentes(a, b)
+    c = {"json": {"lineas": ["24 x 13 = 306"]}}
+    d = {"json": {"lineas": ["24 x 13 = 312"]}}
+    assert not lecturas_consistentes(c, d)

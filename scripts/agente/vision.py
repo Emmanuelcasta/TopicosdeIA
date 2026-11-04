@@ -208,6 +208,20 @@ def huella_lectura(lectura) -> tuple:
         return ("json_no_objeto",)
     if js.get("ilegible"):
         return ("ilegible",)
+    if isinstance(js.get("lineas"), list):
+        # Lectura por líneas (M5). Se compara el TEXTO completo, normalizado,
+        # no la lista: que una copia parta una línea en dos no cambia lo que
+        # leyó. Una palabra, un número o una operación distinta sí.
+        texto = " ".join(_norm(str(x)).replace("×", "x")
+                         for x in js["lineas"] if any(c.isalnum() for c in str(x)))
+        # La puntuación no es lo que se mide: «¿cuánto» y «cuánto» son la misma
+        # lectura. Se conservan letras, cifras, operadores y el separador
+        # decimal ENTRE cifras, que sí cambia un número.
+        texto = _PAT_DECIMAL.sub(r"\1.\2", texto)
+        texto = _PAT_PUNTUACION.sub(" ", texto)
+        texto = " ".join(texto.split())
+        return ("lineas", bool(texto), texto, tuple(numeros_de(texto)),
+                operaciones_de(texto))
     pasos = js.get("pasos")
     if not isinstance(pasos, list):
         return ("estructura_invalida", tuple(sorted(map(str, js))))
@@ -255,6 +269,7 @@ def diferencias_de_lectura(a, b) -> list:
         "procedimiento": ("tipo", "estructura", "pasos", "respuesta final", "números"),
         "enunciado": ("tipo", "estructura", "respuesta final",
                       "números del enunciado", "operaciones del enunciado"),
+        "lineas": ("tipo", "hay texto", "texto", "números", "operaciones"),
     }.get(ha[0], tuple(f"campo {i}" for i in range(len(ha))))
     return [n for n, x, y in zip(nombres, ha, hb) if x != y]
 
@@ -672,22 +687,59 @@ INSTRUCCION_VER_INDEPENDIENTE = (
 # Las instrucciones de M4 no se tocan: `nb_m4.py` las usa para reproducir M4.
 # --------------------------------------------------------------------------
 
+# Por qué estas dos redacciones y no otras. Sonda del 2026-11-04 en Kaggle
+# (`sonda_prompts.py`), sobre 9 hojas que NO son el scorecard: 7 `vis-*` de M4
+# —ya gastadas— y dos franjas de enunciado recortadas de m5v-07 y m5v-08.
+#
+#   · Toda redacción que ofrecía la salida {"ilegible": true} la usó en falso,
+#     sobre hojas que se leen sin esfuerzo, con motivos como «la hoja está
+#     escrita en español y no se puede leer». Entre 2 y 9 de 9 según redacción.
+#   · Sin esa salida, la primera redacción copió 9 de 9 —una con el JSON sin
+#     cerrar, que `lineas_de` recupera— y no añadió ningún paso que no
+#     estuviera escrito.
+#   · En la foto borrosa `vis-10` una redacción leyó «24 x 13 = 306» —el mismo
+#     invento de M4— y la otra «24 x 13 = 312». No coinciden, y la doble
+#     lectura para la hoja. Por eso son dos redacciones DISTINTAS: con la misma,
+#     un invento estable pasaría dos veces igual.
+#
+# La ilegibilidad ya no la declara el VLM: la decide el código, cuando no queda
+# ninguna línea o las dos copias no coinciden.
 INSTRUCCION_COPIAR = (
-    "Copia EXACTAMENTE, línea por línea, todo lo que está escrito a mano en esta "
-    "hoja, de arriba abajo. No corrijas nada, no resuelvas nada y no añadas "
-    "ninguna línea que no esté escrita: si una cuenta está mal, cópiala mal.\n"
-    'Devuelve SOLO un JSON: {"lineas": ["...", "..."]}\n'
-    'Si la hoja no se puede leer, devuelve {"ilegible": true, "motivo": "..."}.'
+    "Transcribe línea por línea el texto manuscrito de esta hoja, en el mismo "
+    "orden y tal como está escrito. No resuelvas el ejercicio ni corrijas "
+    "ninguna cuenta; copia también los errores.\n"
+    'Devuelve SOLO un JSON: {"lineas": ["...", "..."]}'
 )
 
 INSTRUCCION_COPIAR_INDEPENDIENTE = (
-    "Haz una segunda copia independiente de esta hoja, como si fuera la primera "
-    "vez que la ves. Escribe cada línea manuscrita tal como está, en el mismo "
-    "orden; no arregles ninguna cuenta, no completes números poco claros y no "
-    "escribas nada que no aparezca en la hoja.\n"
-    'Devuelve SOLO un JSON: {"lineas": ["...", "..."]}\n'
-    'Si no puedes leerla con claridad, devuelve {"ilegible": true, "motivo": "..."}.'
+    "Lee la hoja de arriba abajo, como si fuera la primera vez que la ves, y "
+    "escribe cada línea manuscrita exactamente como aparece, sin añadir, "
+    "completar ni arreglar nada.\n"
+    'Devuelve SOLO un JSON: {"lineas": ["...", "..."]}'
 )
+
+_PAT_DECIMAL = re.compile(r"(\d)[.,](\d)")
+_PAT_PUNTUACION = re.compile(r"[^\w\s+\-*/÷=%.]|(?<!\d)\.|\.(?!\d)")
+_PAT_LINEAS = re.compile(r'"lineas"\s*:\s*\[(.*)', re.DOTALL)
+_PAT_CADENA = re.compile(r'"((?:[^"\\]|\\.)*)"')
+
+
+def lineas_de(crudo: str):
+    """Las líneas de una salida del VLM, aunque el JSON venga sin cerrar.
+
+    En la sonda, una copia correcta llegó como `{"lineas": ["7. un paquete …"`
+    sin `]`. Tirarla por un corchete sería rechazar una lectura buena por
+    formato. Se recuperan las cadenas que siguen a `"lineas": [`; si no
+    aparece esa clave, None.
+    """
+    js = json_de(crudo or "")
+    if isinstance(js, dict) and isinstance(js.get("lineas"), list):
+        return js["lineas"]
+    m = _PAT_LINEAS.search(crudo or "")
+    if not m:
+        return None
+    return [json.loads(f'"{s}"') for s in _PAT_CADENA.findall(m.group(1))]
+
 
 _LINEA_DE_PASO = re.compile(r"^\s*paso\s*\d|=|respuesta\s*final", re.IGNORECASE)
 _NUMERACION_DEL_EJERCICIO = re.compile(r"^\s*\d{1,2}\s*[.)]\s*")
@@ -705,7 +757,10 @@ def estructurar_lineas(lineas) -> dict:
     distintas— y lo corrige antes de confirmar. Un VLM decidiendo lo mismo no
     deja rastro de por qué.
     """
-    lineas = [str(l).strip() for l in (lineas or []) if str(l).strip()]
+    # Una línea sin ninguna letra ni cifra —«...», «—»— no es texto de la hoja:
+    # el VLM la usa de relleno. Se descarta antes de separar.
+    lineas = [str(l).strip() for l in (lineas or [])
+              if any(c.isalnum() for c in str(l))]
     corte = next((i for i, l in enumerate(lineas) if _LINEA_DE_PASO.search(l)),
                  len(lineas))
     enunciado = lineas[:corte]
