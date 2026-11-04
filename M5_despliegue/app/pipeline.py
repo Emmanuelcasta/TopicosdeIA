@@ -1290,6 +1290,23 @@ class Tutor:
                 "la lectura todavía no está confirmada. Revisa el enunciado y "
                 "confírmalo: no resuelvo un ejercicio que quizá no es el tuyo.", t0)
 
+        if not any(c.isdigit() for c in enunciado):
+            # Corrida del 2026-11-04, m5v-11: una lista de mercado («Pan, Queso,
+            # Dos litros de leche, Jabón») entró por aquí y el modelo resolvió
+            # «68 ÷ 2 = 34», un ejercicio que no estaba en la hoja. El prompt ya
+            # le pedía decir que no era matemáticas; no lo hizo. Sin una sola
+            # cifra no hay nada que calcular, y eso lo decide el código.
+            return {
+                "ok": True, "etapa": "solucion", "camino": "ninguno",
+                "enunciado": enunciado, "pasos_solucion": [],
+                "respuesta": ("No veo un ejercicio de matemáticas en lo que leí: no "
+                              "hay ningún número. Si es un ejercicio, escribe el "
+                              "enunciado completo con sus datos, o toma otra foto."),
+                "herramientas": [], "observaciones": [], "verificador_aritmetico": None,
+                "pasos_llm": 0, "contextos": 0, "verificador": None,
+                "latencia_s": round(time.perf_counter() - t0, 2),
+            }
+
         cuenta = cuenta_de(enunciado)
         explicada = explicar_cuenta(cuenta) if cuenta else None
         if explicada is not None:

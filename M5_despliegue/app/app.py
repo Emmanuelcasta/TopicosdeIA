@@ -175,6 +175,8 @@ def presentar_solucion(r: dict) -> str:
     una igualdad que no cuadra en lo que escribió el modelo, se dice en grande:
     la solución no se da por buena.
     """
+    if r.get("camino") == "ninguno":
+        return presentar(r.get("respuesta") or "")
     partes = [f"Ejercicio: {r.get('enunciado', '')}"]
     pasos = r.get("pasos_solucion") or []
     if pasos:

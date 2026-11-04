@@ -1507,3 +1507,11 @@ def test_una_palabra_distinta_no_para_la_hoja_un_numero_si():
     assert not lecturas_consistentes(L("Paso 1: 3 + 4 = 7"), L("Paso 1: 3 - 4 = 7"))
     assert not lecturas_consistentes(L("Paso 1: 3 + 4 = 7", "Paso 2: 7 x 2 = 14"),
                                      L("Paso 1: 3 + 4 = 7"))
+
+
+def test_sin_ningun_numero_no_se_resuelve_nada():
+    """m5v-11, lista de mercado: el modelo inventó «68 ÷ 2 = 34»."""
+    r = pipeline.Tutor("revision_foto").resolver_enunciado(
+        "Pan Queso Dos litros de leche Jabón", confirmado=True)
+    assert r["ok"] and r["camino"] == "ninguno" and r["pasos_llm"] == 0
+    assert "no es" in r["respuesta"].lower() or "no veo" in r["respuesta"].lower()
