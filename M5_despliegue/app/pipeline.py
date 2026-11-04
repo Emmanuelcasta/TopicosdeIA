@@ -1275,7 +1275,8 @@ class Tutor:
         if dato is None and (hallazgo or {}).get("tipo") not in ("calculo", "traslado"):
             referencia = self._referencia(enunciado)
             if referencia is not None:
-                h = revisar_planteamiento(pasos, referencia["final"], referencia["valores"])
+                h = revisar_planteamiento(pasos, referencia["final"], referencia["valores"],
+                                          operandos_referencia=referencia["operandos"])
                 if h is not None:
                     planteamiento = {"paso": h.paso, "tipo": h.tipo, "detalle": h.detalle}
         if r.get("ok"):
@@ -1303,6 +1304,19 @@ class Tutor:
         "«Respuesta final: …». Si el enunciado no es un ejercicio de matemáticas, "
         "o le falta un dato para resolverlo, dilo en una sola línea y no inventes "
         "el dato.")
+
+    PROMPTS_RESOLVER = (
+        PROMPT_RESOLVER,
+        ("Enunciado: {enunciado}\n\n"
+         "Antes de calcular, escribe en una línea qué pregunta el enunciado y qué "
+         "operación hay que hacer con qué datos, y por qué. Después resuélvelo en "
+         "pasos «Paso N: …», cada cuenta completa con su resultado, y termina con "
+         "«Respuesta final: …». Usa los números del enunciado tal como están."),
+        ("Un estudiante de colegio te pide ayuda con este problema: {enunciado}\n\n"
+         "Explícale cómo resolverlo paso a paso, con líneas «Paso N: …» y las "
+         "cuentas escritas completas, y cierra con «Respuesta final: …». Si "
+         "falta un dato, dilo y no lo inventes."),
+    )
 
     def resolver_enunciado(self, enunciado: str, confirmado: bool = False) -> dict:
         """Paso 2 de una foto que solo trae el enunciado: resolverlo.
@@ -1380,14 +1394,53 @@ class Tutor:
                 "latencia_s": round(time.perf_counter() - t0, 2),
             }
 
-        r = self.responder(self.PROMPT_RESOLVER.format(enunciado=enunciado))
-        if not r.get("ok"):
-            return r
-        lineas = [l.strip() for l in (r.get("respuesta") or "").splitlines()
-                  if l.strip() and not re.match(r"(?i)^\s*(pensamiento|thought)\s*:", l)]
+        # Hasta tres borradores con instrucciones distintas; el modelo plantea y
+        # el código rehace las cuentas de cada uno. La solución se da por
+        # CONFIABLE solo si dos borradores llegan al mismo resultado: en la
+        # corrida del 2026-11-05 un único borrador planteó «7/8 de metro, se
+        # usan 3/8, ¿cuánto queda?» como una división, y como referencia eso
+        # inventaba un error en una hoja correcta.
+        from verificador_aritmetico import corregir_cuentas, valor_final
+        borradores, r = [], None
+        for plantilla in self.PROMPTS_RESOLVER:
+            ri = self.responder(plantilla.format(enunciado=enunciado))
+            if not ri.get("ok"):
+                continue
+            r = r or ri
+            lineas = [l.strip() for l in (ri.get("respuesta") or "").splitlines()
+                      if l.strip() and not re.match(r"(?i)^\s*(pensamiento|thought)\s*:", l)]
+            lineas, cambios = corregir_cuentas(lineas)
+            borradores.append({"lineas": lineas, "cambios": cambios,
+                               "final": valor_final(lineas),
+                               "crudo": ri.get("respuesta")})
+            finales = [x["final"] for x in borradores if x["final"] is not None]
+            if any(finales.count(f) >= 2 for f in finales):
+                break
+        if r is None:
+            return self._fallo("el modelo no respondió", t0)
+        finales = [x["final"] for x in borradores if x["final"] is not None]
+        mayoria = next((f for f in finales if finales.count(f) >= 2), None)
+        elegido = next((x for x in borradores if mayoria is not None and x["final"] == mayoria),
+                       borradores[0])
+        lineas, cambios = elegido["lineas"], elegido["cambios"]
         hallazgo, _ = self._comprobar_aritmetica(lineas)
+        respuesta = "\n".join(lineas)
+        if cambios:
+            respuesta += ("\n\nNota: las cuentas las recalculó el verificador, con "
+                          "aritmética exacta: " + "; ".join(cambios) + ".")
+        confiable = mayoria is not None
+        if not confiable:
+            distintos = sorted({str(f) for f in finales}) or ["ninguno"]
+            respuesta += ("\n\nOjo: no estoy seguro de esta solución. La resolví de "
+                          f"{len(borradores)} maneras y no coinciden (resultados: "
+                          f"{', '.join(distintos)}). Revisa el planteamiento con tu profesor.")
         r.update({"etapa": "solucion", "camino": "modelo", "enunciado": enunciado,
-                  "pasos_solucion": lineas, "verificador_aritmetico": hallazgo,
+                  "respuesta_modelo": elegido["crudo"], "respuesta": respuesta,
+                  "pasos_solucion": lineas, "cuentas_corregidas": cambios,
+                  "confiable": confiable,
+                  "borradores": [{"final": None if x["final"] is None else str(x["final"]),
+                                  "pasos": x["lineas"]} for x in borradores],
+                  "verificador_aritmetico": hallazgo,
                   "latencia_s": round(time.perf_counter() - t0, 2)})
         return r
 
@@ -1408,7 +1461,7 @@ class Tutor:
         enunciado porque el modelo decodifica en greedy: misma entrada, misma
         salida, y así resolver y revisar la misma hoja no la resuelven dos veces.
         """
-        from verificador_aritmetico import valor_final, valores_de
+        from verificador_aritmetico import operandos_de, valor_final, valores_de
 
         enunciado = (enunciado or "").strip()
         if not enunciado or not any(c.isdigit() for c in enunciado):
@@ -1418,10 +1471,13 @@ class Tutor:
             r = self.resolver_enunciado(enunciado, confirmado=True)
             pasos = r.get("pasos_solucion") or []
             final = valor_final(pasos)
-            ok = (r.get("ok") and final is not None
+            # Solo una solución en la que dos borradores coinciden: una sola
+            # lectura del modelo no basta para acusar a la hoja de nada.
+            ok = (r.get("ok") and final is not None and r.get("confiable", True)
                   and (r.get("verificador_aritmetico") or {}).get("tipo") == "ninguno")
             cache[enunciado] = ({"final": final, "valores": valores_de(pasos),
-                                 "texto": r.get("respuesta") or ""} if ok else None)
+                                 "operandos": operandos_de(pasos),
+                                 "texto": "\n".join(pasos)} if ok else None)
         return cache[enunciado]
 
     @staticmethod

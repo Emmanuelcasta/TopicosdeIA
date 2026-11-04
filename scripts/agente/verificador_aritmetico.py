@@ -254,8 +254,21 @@ def valores_de(pasos) -> set:
     return salida
 
 
+def _operandos(expr: str) -> tuple:
+    """Los datos con que opera una cuenta, sin orden: «365 + 1240» y
+    «1240 − 365» operan con los mismos."""
+    valores = (_valor(n) for n in _NUMERO.findall(expr.replace("−", "-")))
+    return tuple(sorted(str(abs(v)) for v in valores if v is not None))
+
+
+def operandos_de(pasos) -> set:
+    """Los conjuntos de datos con que opera cada cuenta de una solución."""
+    return {_operandos(e) for p in (pasos or []) for e in expresiones_de(str(p))}
+
+
 def revisar_planteamiento(pasos, final_referencia, valores_referencia,
-                          hasta: int | None = None) -> Hallazgo | None:
+                          hasta: int | None = None,
+                          operandos_referencia: set | None = None) -> Hallazgo | None:
     """Compara la hoja con el enunciado resuelto aparte. None si no se puede.
 
       · «coincide»       la hoja llega al mismo resultado que la referencia.
@@ -280,12 +293,18 @@ def revisar_planteamiento(pasos, final_referencia, valores_referencia,
     if final == final_referencia:
         return None
     limpios = [_PREFIJO_PASO.sub("", str(p)) for p in (pasos or [])]
+    # Firmas de la referencia: con qué datos opera cada cuenta. Un paso solo se
+    # señala como mal planteado si la referencia opera con LOS MISMOS datos y
+    # obtiene otra cosa (1240 + 365 frente a 1240 − 365). Si la referencia
+    # siguió otro camino, no hay con qué comparar ese paso y no se elige.
     for i, paso in enumerate(limpios, 1):
         if hasta is not None and i >= hasta:
             break
         for e in expresiones_de(paso):
             v = _valor(e)
-            if v is not None and v not in referencia:
+            if (v is not None and v not in referencia
+                    and (operandos_referencia is None
+                         or _operandos(e) in operandos_referencia)):
                 return Hallazgo(
                     i, "planteamiento",
                     f"en el paso {i} se plantea {e}, que da {_fmt(v)}, pero al "
@@ -299,6 +318,71 @@ def revisar_planteamiento(pasos, final_referencia, valores_referencia,
                     f"resolver el enunciado por separado, {_fmt(final_referencia)}, "
                     "pero no encuentro un paso concreto que lo explique: revisa "
                     "el planteamiento con tu profesor")
+
+
+def _fmt_legible(v: Fraction) -> str:
+    """Entero, decimal exacto si lo hay (13,5 -> «13.5»), o fracción."""
+    if v.denominator == 1:
+        return str(v.numerator)
+    d = v.denominator
+    while d % 2 == 0:
+        d //= 2
+    while d % 5 == 0:
+        d //= 5
+    if d == 1:
+        return f"{float(v):.10f}".rstrip("0").rstrip(".")
+    return f"{v.numerator}/{v.denominator}"
+
+
+_TOKEN_NUMERO = r"(?<![\d.,/])({})(?![\d/]|[.,]\d)"
+
+
+def corregir_cuentas(pasos) -> tuple:
+    """-> (pasos con las cuentas rehechas, [qué se corrigió]).
+
+    Para resolver un enunciado el modelo PLANTEA y el código CALCULA: cada
+    igualdad «a op b = c» con c mal se reescribe con el valor exacto, y ese
+    valor sustituye al equivocado en los pasos siguientes y en la respuesta
+    final. El planteamiento —qué operación hacer con qué datos— sigue siendo
+    del modelo y no se toca. Corrida del 2026-11-05: el modelo planteaba bien
+    1764 ÷ 7 y escribía 246.
+    """
+    salida, cambios, sustituir = [], [], {}
+    ultimo = None
+    for paso in pasos or []:
+        texto = str(paso)
+        for malo, bueno in sustituir.items():
+            texto = re.sub(_TOKEN_NUMERO.format(re.escape(malo)), bueno, texto)
+        for _ in range(6):                      # cadenas: una igualdad por vuelta
+            arreglado = False
+            for izq, der in igualdades_de(texto):
+                a, b = _valor(izq), _valor(der)
+                if a is None or b is None:
+                    continue
+                ultimo = a
+                if a != b:
+                    i = texto.find(izq)
+                    j = texto.find("=", i + len(izq))
+                    k = texto.find(der, j)
+                    if min(i, j, k) < 0:
+                        continue
+                    bueno = _fmt_legible(a)
+                    texto = texto[:k] + bueno + texto[k + len(der):]
+                    sustituir[der.strip()] = bueno
+                    cambios.append(f"{izq} = {bueno} (el borrador decía {der})")
+                    arreglado = True
+                    break
+            if not arreglado:
+                break
+        if _MENCIONA_FINAL.search(texto) and not igualdades_de(texto) and ultimo is not None:
+            m = _NUMERO.search(_MENCIONA_FINAL.split(texto)[-1])
+            if m and _valor(m.group()) is not None and _valor(m.group()) != ultimo:
+                inicio = texto.rfind(m.group())
+                bueno = _fmt_legible(ultimo)
+                cambios.append(f"respuesta final {bueno} (el borrador decía {m.group()})")
+                texto = texto[:inicio] + bueno + texto[inicio + len(m.group()):]
+        salida.append(texto)
+    return salida, cambios
 
 
 # Cantidades escritas con palabras: si el enunciado las trae, sí tiene datos.

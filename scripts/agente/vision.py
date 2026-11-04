@@ -379,8 +379,13 @@ def comparar_lecturas(a, b) -> dict:
                 categorias.append(f"operaciones del {nombre}")
             if fa == fb:
                 categorias.append(f"sentido del {nombre}")
-            discrepancias.append(
-                f"{nombre[0].upper()}{nombre[1:]}: una lectura dice «{ta}» y la otra «{tb}».")
+            if ta and tb:
+                discrepancias.append(
+                    f"{nombre[0].upper()}{nombre[1:]}: una lectura dice «{ta}» y la otra «{tb}».")
+            else:
+                discrepancias.append(
+                    f"{nombre[0].upper()}{nombre[1:]}: solo una de las dos lecturas lo "
+                    f"encontró: «{ta or tb}».")
         elif palabras_de(ta) != palabras_de(tb):
             inocuas.append(f"redacción del {nombre}")
 
@@ -987,13 +992,25 @@ def lineas_de(crudo: str):
     # real, con claves repetidas que `json` colapsa—: se toman las cadenas que
     # NO son claves, en el orden en que aparecen.
     resto = m.group(1)
-    return [json.loads(f'"{c.group(1)}"') for c in _PAT_CADENA.finditer(resto)
-            if not re.match(r"\s*:", resto[c.end():])]
+    cadenas = [json.loads(f'"{c.group(1)}"') for c in _PAT_CADENA.finditer(resto)
+               if not re.match(r"\s*:", resto[c.end():])]
+    # Dentro de esos objetos el VLM numera las líneas como valores sueltos
+    # («"numero": "2"»). Un número de una o dos cifras solo no es una línea de
+    # la hoja (corrida del 2026-11-05 a 1536 px, m5v-03).
+    return [c for c in cadenas if not re.fullmatch(r"\s*\d{1,2}\s*[.)]?\s*", c)]
 
 
 _MARCA_DE_PASO = re.compile(r"^\s*paso\s*\d+\s*[:.\-]", re.IGNORECASE)
 _LINEA_DE_PASO = re.compile(r"^\s*paso\s*\d|=|respuesta\s*final", re.IGNORECASE)
 _NUMERACION_DEL_EJERCICIO = re.compile(r"^\s*\d{1,2}\s*[.)]\s*")
+# La numeración que el VLM pone a las líneas que copia («1. Un bus…», «2.
+# ¿Cuántos…») y el rótulo de la hoja («M5V-02», «MSV-02», «Ejercicio 3:»). No
+# son datos del ejercicio: un «2.» o un «02» dentro del enunciado acababan en
+# la cuenta (m5v-01 se resolvió como 68 × 14 ÷ 2, corrida del 2026-11-05).
+_NUMERACION_DE_LINEA = re.compile(r"^\s*\d{1,2}\s*[.)]\s+(?=\D)")
+_ROTULO_DE_HOJA = re.compile(
+    r"^\s*(?:(?:ejercicio|problema|ej\.)\s*\d+\s*[.:)\-]?|"
+    r"[a-z]{1,3}\d?[a-z]?\s*-\s*\d{1,3}\b[.:)]?)\s*", re.IGNORECASE)
 
 
 def estructurar_lineas(lineas) -> dict:
@@ -1025,6 +1042,8 @@ def estructurar_lineas(lineas) -> dict:
     if enunciado:
         # «7.» arriba de la hoja numera el ejercicio; no es parte de él.
         enunciado[0] = _NUMERACION_DEL_EJERCICIO.sub("", enunciado[0])
+        enunciado = [_ROTULO_DE_HOJA.sub("", _NUMERACION_DE_LINEA.sub("", x)).strip()
+                     for x in enunciado]
     pasos = lineas[corte:]
     if any(_MARCA_DE_PASO.match(x) for x in pasos):
         # Si la hoja rotula sus pasos («Paso 1: …»), una línea sin rótulo es la

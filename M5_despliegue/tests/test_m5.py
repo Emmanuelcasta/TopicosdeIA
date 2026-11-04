@@ -1660,11 +1660,12 @@ def test_sin_referencia_el_tutor_no_impone_un_paso_si_las_cuentas_cuadran():
 
 def _con_referencia(pasos, conclusion_modelo, referencia_pasos):
     pytest.importorskip("sympy")
-    from verificador_aritmetico import (pasos_comprobados, revisar_hoja,
+    from verificador_aritmetico import (operandos_de, pasos_comprobados, revisar_hoja,
                                         revisar_planteamiento, valor_final, valores_de)
     from vision import decidir_diagnostico
     h = revisar_hoja(pasos)
-    p = revisar_planteamiento(pasos, valor_final(referencia_pasos), valores_de(referencia_pasos))
+    p = revisar_planteamiento(pasos, valor_final(referencia_pasos), valores_de(referencia_pasos),
+                              operandos_referencia=operandos_de(referencia_pasos))
     return decidir_diagnostico(
         conclusion_modelo, {"paso": h.paso, "tipo": h.tipo, "detalle": h.detalle},
         pasos_comprobados(pasos),
@@ -1701,6 +1702,33 @@ def test_si_no_se_localiza_el_paso_no_se_elige_uno():
     d = _con_referencia(hoja, "paso 1", ["Paso 1: 20 + 5 = 25", "Paso 2: 25 x 2 = 50",
                                          "Respuesta final: 50"])
     assert d["conclusion"] == "sin conclusión"
+
+
+def test_una_referencia_por_otro_camino_no_senala_ningun_paso():
+    """Si la referencia no opera con los mismos datos que el paso, no hay con
+    qué compararlo: no se elige un paso (evita inventar errores)."""
+    hoja = ["Sumo: 20 + 5 = 25", "Respuesta final: 25"]
+    d = _con_referencia(hoja, "paso 1", ["Paso 1: 4 x 15 = 60", "Respuesta final: 60"])
+    assert d["conclusion"] == "sin conclusión"
+
+
+def test_la_solucion_la_plantea_el_modelo_y_las_cuentas_las_hace_el_codigo():
+    pytest.importorskip("sympy")
+    from verificador_aritmetico import corregir_cuentas
+    pasos, cambios = corregir_cuentas(["Paso 1: 12 + 18 = 32", "Paso 2: 32 + 25 = 57",
+                                       "Respuesta final: 57 km"])
+    assert pasos == ["Paso 1: 12 + 18 = 30", "Paso 2: 30 + 25 = 55", "Respuesta final: 55 km"]
+    assert len(cambios) == 2
+    assert corregir_cuentas(["Paso 1: 7/8 - 3/8 = 4/8 = 1/2", "Respuesta final: 1/2"])[1] == []
+
+
+def test_la_numeracion_de_lineas_y_el_rotulo_no_son_datos_del_enunciado():
+    from vision import estructurar_lineas
+    e = estructurar_lineas(["1. Un bus recorre 68 km cada día.",
+                            "2. ¿Cuántos kilómetros recorre en 14 días?", "Paso 1: 68 x 14"])
+    assert e["enunciado"] == "Un bus recorre 68 km cada día. ¿Cuántos kilómetros recorre en 14 días?"
+    e = estructurar_lineas(["MSV-02 Un salón tiene 1240 sillas", "Paso 1: 1240 - 365"])
+    assert e["enunciado"] == "Un salón tiene 1240 sillas"
 
 
 def test_falta_un_dato_gana_a_todo():
