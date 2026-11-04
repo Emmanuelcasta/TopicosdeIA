@@ -1423,8 +1423,8 @@ class Tutor:
         if not self._cargar_vlm():
             return None
 
-        from vision import (INSTRUCCION_VER, INSTRUCCION_VER_INDEPENDIENTE,
-                            json_de, lecturas_consistentes)
+        from vision import (INSTRUCCION_COPIAR, INSTRUCCION_COPIAR_INDEPENDIENTE,
+                            estructurar_lineas, json_de, lecturas_consistentes)
 
         # Aquí, y no en la interfaz: las dos lecturas y el evaluador tienen que
         # ver exactamente los mismos píxeles, venga la imagen de Gradio, del
@@ -1444,10 +1444,13 @@ class Tutor:
             crudo = proc.batch_decode(out[:, ent["input_ids"].shape[1]:],
                                       skip_special_tokens=True)[0].strip()
             js = json_de(crudo)
+            if isinstance(js, dict) and isinstance(js.get("lineas"), list):
+                # El VLM copió líneas; enunciado y pasos los separa el código.
+                js = estructurar_lineas(js["lineas"]) | {"lineas": js["lineas"]}
             return {"crudo": crudo, "json": js, "ok": isinstance(js, dict)}
 
-        primera = transcribir(INSTRUCCION_VER)
-        segunda = transcribir(INSTRUCCION_VER_INDEPENDIENTE)
+        primera = transcribir(INSTRUCCION_COPIAR)
+        segunda = transcribir(INSTRUCCION_COPIAR_INDEPENDIENTE)
         # No se asigna una consistencia por defecto: una segunda salida ausente o
         # no estructurada también impide diagnosticar desde la foto.
         primera["consistente"] = bool(

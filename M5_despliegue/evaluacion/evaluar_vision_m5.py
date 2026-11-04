@@ -204,6 +204,9 @@ def etapa_lectura(tutor, ruta: Path, caso: dict) -> dict:
         "pide_otra_foto": r.get("confirmable") is False,
         "motivo_no_fiable": r.get("motivo_no_fiable") or "",
         "lecturas_coinciden": r.get("lecturas_coinciden"),
+        "diferencias": r.get("diferencias") or [],
+        "proposito": r.get("proposito"),
+        "enunciado": r.get("enunciado"),
         "transcripcion": r.get("transcripcion"),
         "pasos": pasos,
         "n_pasos": len(pasos),
@@ -249,17 +252,30 @@ def calificar(caso: dict, respuesta: str) -> dict:
     }
 
 
-def etapa_diagnostico(tutor, caso: dict, pasos: list) -> dict:
-    """Pasos confirmados -> revisión del tutor. La lectura ya terminó."""
+def etapa_diagnostico(tutor, caso: dict, pasos: list, proposito: str = "revisar",
+                      enunciado_leido: str = "") -> dict:
+    """Lo confirmado -> respuesta del tutor. La lectura ya terminó.
+
+    Igual que en la interfaz: si la lectura no encontró pasos y sugirió
+    resolver, se resuelve el enunciado LEÍDO. Revisar una lista vacía de
+    pasos solo devolvería un error, y el caso quedaría sin respuesta que
+    calificar.
+    """
     t0 = time.perf_counter()
-    r = tutor.revisar_pasos(pasos, caso["pregunta"],
-                            enunciado=caso.get("enunciado"), confirmado=True)
+    if proposito == "resolver":
+        r = tutor.resolver_enunciado(enunciado_leido, confirmado=True)
+    else:
+        r = tutor.revisar_pasos(pasos, caso["pregunta"],
+                                enunciado=caso.get("enunciado"), confirmado=True)
     return {
         "segundos": round(time.perf_counter() - t0, 2),
         "ok": bool(r.get("ok")),
         "respuesta": r.get("respuesta"),
         "verificador_aritmetico": r.get("verificador_aritmetico"),
         "pasos_llm": r.get("pasos_llm"),
+        "herramientas": r.get("herramientas") or [],
+        "modo": proposito,
+        "error": None if r.get("ok") else r.get("respuesta"),
     }
 
 
@@ -270,7 +286,8 @@ def escribir_csv(filas: list) -> None:
     import csv
 
     columnas = ["caso", "archivo", "bloque", "variante", "estado", "bloqueado",
-                "segundos_lectura", "lectura", "px", "confirmable",
+                "segundos_lectura", "lectura", "px", "confirmable", "proposito",
+                "diferencias", "modo", "error",
                 "pide_otra_foto", "motivo_no_fiable", "lecturas_coinciden",
                 "n_pasos", "n_pasos_esperados", "numero_escrito_preservado",
                 "lectura_fiel", "segundos_diagnostico", "verificador",
@@ -292,6 +309,10 @@ def escribir_csv(filas: list) -> None:
                 "lectura": lec.get("lectura", ""),
                 "px": "x".join(str(n) for n in lec.get("px", [])),
                 "confirmable": lec.get("confirmable", ""),
+                "proposito": lec.get("proposito", ""),
+                "diferencias": "; ".join(lec.get("diferencias") or []),
+                "modo": dia.get("modo", ""),
+                "error": dia.get("error") or "",
                 "pide_otra_foto": lec.get("pide_otra_foto", ""),
                 "motivo_no_fiable": lec.get("motivo_no_fiable", ""),
                 "lecturas_coinciden": lec.get("lecturas_coinciden", ""),
@@ -302,9 +323,9 @@ def escribir_csv(filas: list) -> None:
                 "segundos_diagnostico": dia.get("segundos", ""),
                 "verificador": json.dumps(dia.get("verificador_aritmetico"),
                                           ensure_ascii=False),
-                # Cuántas herramientas se EJECUTARON de verdad. Si aquí sale 0,
-                # la respuesta no está verificada por herramienta, diga lo que diga.
-                "herramientas_reales": dia.get("pasos_llm", ""),
+                # Las herramientas que se EJECUTARON de verdad, según la traza.
+                # Vacío: la respuesta no está verificada por herramienta.
+                "herramientas_reales": ",".join(dia.get("herramientas") or []),
                 "acierto": cal.get("acierto", ""),
                 "fuente_del_fallo": f.get("fuente_del_fallo", ""),
                 "transcripcion": (lec.get("transcripcion") or "").replace("\n", " / "),
@@ -375,7 +396,8 @@ def main() -> int:
               f"  numero_escrito_preservado={lec['numero_escrito_preservado']}"
               f"  lectura_fiel={lec['lectura_fiel']}")
         if lec["pide_otra_foto"]:
-            print(f"      PIDE OTRA FOTO: {lec['motivo_no_fiable']}")
+            print(f"      PIDE OTRA FOTO: {lec['motivo_no_fiable']}"
+                  + (f" · difieren en {lec['diferencias']}" if lec.get("diferencias") else ""))
             if caso["id"] in CONFLICTOS:
                 fila["bloqueado"] = CONFLICTOS[caso["id"]]
             # Y aquí se para. Diagnosticar sobre una lectura que el propio
@@ -384,7 +406,8 @@ def main() -> int:
             filas.append(fila)
             continue
 
-        dia = etapa_diagnostico(tutor, caso, lec["pasos"])
+        dia = etapa_diagnostico(tutor, caso, lec["pasos"], lec.get("proposito") or "revisar",
+                                lec.get("enunciado") or "")
         fila["diagnostico"] = dia
         if caso["id"] in CONFLICTOS:
             # Se guarda lo que contestó, para poder leerlo; no se puntúa. La

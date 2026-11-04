@@ -1395,3 +1395,36 @@ def test_la_traza_dice_en_que_difieren_dos_lecturas_sin_ensenar_el_texto():
     d = diferencias_de_lectura(a, b)
     assert d == ["operaciones del enunciado"]
     assert diferencias_de_lectura(a, a) == []
+
+
+# --------------------------------------------------------------------------
+# Lectura por líneas: el VLM copia, el código separa enunciado y pasos
+# --------------------------------------------------------------------------
+
+def test_una_hoja_con_solo_enunciado_queda_sin_pasos():
+    from vision import estructurar_lineas
+    js = estructurar_lineas(["7. Un paquete trae 18 galletas.",
+                             "¿Cuántas galletas hay en 15 paquetes?"])
+    assert js["pasos"] == [] and js["respuesta_final"] is None
+    assert js["enunciado"] == ("Un paquete trae 18 galletas. "
+                               "¿Cuántas galletas hay en 15 paquetes?")
+
+
+def test_una_hoja_con_procedimiento_separa_enunciado_y_pasos():
+    from vision import estructurar_lineas
+    js = estructurar_lineas(["Una camiseta cuesta 52000 pesos",
+                             "Paso 1: El descuento es 52000 x 0.25 = 13000",
+                             "Paso 2: Resto 52000 - 13000 = 39000",
+                             "Paso 3: Respuesta Final: 38000 pesos"])
+    assert js["enunciado"] == "Una camiseta cuesta 52000 pesos"
+    assert len(js["pasos"]) == 3 and js["respuesta_final"] == "38000 pesos"
+
+
+def test_las_instrucciones_de_m4_no_cambiaron():
+    """`nb_m4.py` reproduce M4 con ellas: tocarlas cambia un resultado ya medido."""
+    import vision
+    assert '"pasos": []' not in vision.INSTRUCCION_VER
+    assert '"pasos": []' not in vision.INSTRUCCION_VER_INDEPENDIENTE
+    # Y las de M5 no le piden al VLM que decida qué es un paso.
+    assert "pasos" not in vision.INSTRUCCION_COPIAR
+    assert "pasos" not in vision.INSTRUCCION_COPIAR_INDEPENDIENTE

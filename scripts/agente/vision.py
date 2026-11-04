@@ -635,9 +635,7 @@ INSTRUCCION_VER = (
     "Devuelve SOLO un JSON con esta forma:\n"
     '{"enunciado": "...", "pasos": ["...", "..."], "respuesta_final": "..."}\n'
     "Un elemento de `pasos` por cada línea escrita.\n"
-    "Si la hoja solo tiene el enunciado de un ejercicio, sin pasos resueltos, "
-    'devuelve el enunciado y `"pasos": []`.\n'
-    "Si la hoja no se puede leer, o no contiene nada de matemáticas, "
+    "Si la hoja no se puede leer, o no contiene un procedimiento matemático, "
     'devuelve {"ilegible": true, "motivo": "..."}.'
 )
 
@@ -651,11 +649,75 @@ INSTRUCCION_VER_INDEPENDIENTE = (
     "cuenta ni completes números poco claros.\n"
     "Devuelve SOLO un JSON con esta forma:\n"
     '{"enunciado": "...", "pasos": ["...", "..."], "respuesta_final": "..."}\n'
-    "Un elemento de `pasos` por cada línea escrita. Si solo hay un enunciado, "
-    'sin pasos resueltos, devuelve el enunciado y `"pasos": []`. Si no puedes '
-    "leerla con claridad, o no hay nada de matemáticas, devuelve "
+    "Un elemento de `pasos` por cada línea escrita. Si no puedes leerla con "
+    "claridad, o no hay un procedimiento matemático, devuelve "
     '{"ilegible": true, "motivo": "..."}.'
 )
+
+# --------------------------------------------------------------------------
+# Lectura de M5: copiar líneas, no interpretar la hoja
+#
+# Las dos instrucciones de arriba piden un JSON con `enunciado` y `pasos`, y eso
+# obliga al VLM a decidir qué es un paso. En la sonda del 2026-11-04 esa
+# decisión falló en las dos direcciones:
+#
+#   · ante una hoja con SOLO el enunciado, el modelo resolvió el ejercicio y
+#     devolvió pasos que no estaban escritos («15 * 18 = 270»);
+#   · al pedirle `"pasos": []` para ese caso, en una hoja CON procedimiento
+#     devolvió la clave dos veces —los tres pasos y luego `[]`— y el JSON se
+#     quedó con la vacía.
+#
+# Aquí el VLM solo copia líneas, y `estructurar_lineas` decide, de forma
+# determinista y auditable, dónde acaba el enunciado y dónde empiezan los pasos.
+# Las instrucciones de M4 no se tocan: `nb_m4.py` las usa para reproducir M4.
+# --------------------------------------------------------------------------
+
+INSTRUCCION_COPIAR = (
+    "Copia EXACTAMENTE, línea por línea, todo lo que está escrito a mano en esta "
+    "hoja, de arriba abajo. No corrijas nada, no resuelvas nada y no añadas "
+    "ninguna línea que no esté escrita: si una cuenta está mal, cópiala mal.\n"
+    'Devuelve SOLO un JSON: {"lineas": ["...", "..."]}\n'
+    'Si la hoja no se puede leer, devuelve {"ilegible": true, "motivo": "..."}.'
+)
+
+INSTRUCCION_COPIAR_INDEPENDIENTE = (
+    "Haz una segunda copia independiente de esta hoja, como si fuera la primera "
+    "vez que la ves. Escribe cada línea manuscrita tal como está, en el mismo "
+    "orden; no arregles ninguna cuenta, no completes números poco claros y no "
+    "escribas nada que no aparezca en la hoja.\n"
+    'Devuelve SOLO un JSON: {"lineas": ["...", "..."]}\n'
+    'Si no puedes leerla con claridad, devuelve {"ilegible": true, "motivo": "..."}.'
+)
+
+_LINEA_DE_PASO = re.compile(r"^\s*paso\s*\d|=|respuesta\s*final", re.IGNORECASE)
+_NUMERACION_DEL_EJERCICIO = re.compile(r"^\s*\d{1,2}\s*[.)]\s*")
+
+
+def estructurar_lineas(lineas) -> dict:
+    """Las líneas copiadas -> {enunciado, pasos, respuesta_final}.
+
+    El enunciado son las líneas ANTES de la primera que parece un paso: empieza
+    por «Paso N», tiene un «=» o dice «Respuesta final». Desde ahí, todo son
+    pasos. Sin ninguna línea así, la hoja es solo un enunciado.
+
+    Es una regla simple a propósito: se puede leer, se puede probar, y si se
+    equivoca el estudiante lo ve —el enunciado y los pasos salen en cajas
+    distintas— y lo corrige antes de confirmar. Un VLM decidiendo lo mismo no
+    deja rastro de por qué.
+    """
+    lineas = [str(l).strip() for l in (lineas or []) if str(l).strip()]
+    corte = next((i for i, l in enumerate(lineas) if _LINEA_DE_PASO.search(l)),
+                 len(lineas))
+    enunciado = lineas[:corte]
+    if enunciado:
+        # «7.» arriba de la hoja numera el ejercicio; no es parte de él.
+        enunciado[0] = _NUMERACION_DEL_EJERCICIO.sub("", enunciado[0])
+    pasos = lineas[corte:]
+    final = next((re.split(r"respuesta\s*final\s*[:.]?", p, flags=re.IGNORECASE)[-1].strip()
+                  for p in reversed(pasos) if _MENCIONA_FINAL.search(p)), None)
+    return {"enunciado": " ".join(x for x in enunciado if x), "pasos": pasos,
+            "respuesta_final": final}
+
 
 # El formato de salida, y la evidencia que lo decidió.
 #

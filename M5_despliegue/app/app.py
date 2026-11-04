@@ -317,7 +317,9 @@ def leer_foto(imagen):
         aviso = ("### 🟠 No pude leer bien esta hoja\n\n"
                  f"{r['respuesta']}\n\n"
                  f"**Lo que observé:** {r['motivo_no_fiable']}.\n\n"
-                 f"{tiempo}\n\n"
+                 + (f"**Qué no coincidió entre las dos lecturas:** "
+                    f"{', '.join(r['diferencias'])}.\n\n" if r.get("diferencias") else "")
+                 + f"{tiempo}\n\n"
                  "No voy a adivinar qué escribiste. Toma otra foto, o escribe "
                  "tus pasos a mano abajo y los reviso igual.")
         # El panel de edición se abre VACÍO: se ofrece escribir los pasos a
