@@ -969,3 +969,32 @@ el motivo y la solución de referencia.
   procedimiento» (texto de interfaz; fase 4).
 - Las pistas de operación son vocabulario escolar general, pero se
   escribieron mirando estas hojas: hace falta un conjunto nuevo para medirlas.
+
+## 12 · Fase 4: interfaz de la demo · 2026-11-04
+
+Commit `eb2ea45`, probado en Kaggle T4. Sin cambios en el eval set ni en la
+lógica de diagnóstico; no se volvió a correr el scorecard (sigue siendo el de
+`a98d805`, §11).
+
+- **Dos entradas claras:** «✍️ Pregunta escrita» y «📷 Foto de un ejercicio».
+  En la foto, lo que se quiere (resolver o revisar) se elige al subirla; si la
+  hoja no trae pasos, la app cambia a resolver y lo dice.
+- **Confirmación editable intacta:** enunciado (y pasos al revisar) en cajas
+  editables; sin confirmar no aparece el resultado.
+- **Resultados legibles:** pasos numerados, resultado destacado y una marca por
+  cuenta (✅ recalculada y cuadra, ❌ no cuadra, sin marca: no había cuenta). Al
+  revisar: el primer error señalado en la hoja, el motivo y de dónde sale.
+- **Explicación de resolver limpia** (`limpiar_solucion`): fuera rótulos del
+  borrador, «Respuesta final» intermedias e igualdades triviales.
+- **Modo resolver:** ya no aparece la caja «Revisa mi procedimiento…»; la
+  pregunta de la revisión es fija.
+- Detalles técnicos, configuración y límites, en desplegables. El modo
+  degradado sigue a la vista.
+
+**Pruebas rápidas en Kaggle (`eb2ea45`).** Resolver m5v-07 (recorte del
+enunciado) → «18 × 15 = 270 ✅», resultado 270 galletas, sin el texto de
+revisar. Revisar m5v-02 → «Primer error: paso 1», motivo (1240 + 365 donde se
+pide cuántas quedan) y referencia 1240 − 365 = 875.
+
+**Pendiente.** m5v-09 (lectura 14/19). La redacción del modelo puede aludir a
+un paso que la limpieza quitó («Multiplicamos el resultado…»).
