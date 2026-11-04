@@ -1494,14 +1494,16 @@ def test_recupera_lineas_envueltas_en_objetos_mal_formados():
 
 
 
-def test_una_palabra_distinta_para_la_hoja_igual_que_un_numero():
-    """Antes (1bab37e) las palabras no se comparaban. Ahora sí, por decisión del
-    responsable del proyecto: una lectura en la que cambia una palabra no es la
-    misma lectura. Números, operaciones y cantidad de pasos, igual que antes."""
+def test_la_redaccion_no_cuenta_pero_numeros_operaciones_y_sentido_si():
+    """Ronda del 2026-11-05: una palabra distinta que no cambia el sentido
+    («¿Cuánto» / «Cuantos») es redacción y no separa las lecturas; un número,
+    una operación, un paso de más o una palabra que cambia la operación, sí."""
     from vision import lecturas_consistentes
     L = lambda *x: {"json": {"lineas": list(x)}}
-    assert not lecturas_consistentes(L("¿Cuánto se paga?", "Paso 1: 52000 x 0.25 = 13000"),
-                                     L("Cuantos se paga?", "Paso 1: 52000 x 0.25 = 13000"))
+    assert lecturas_consistentes(L("¿Cuánto se paga?", "Paso 1: 52000 x 0.25 = 13000"),
+                                 L("Cuantos se paga?", "Paso 1: 52000 x 0.25 = 13000"))
+    assert not lecturas_consistentes(L("¿Cuántas quedan?", "Paso 1: sumo 1240 y 365"),
+                                     L("¿Cuántas quedan?", "Paso 1: resto 1240 y 365"))
     assert lecturas_consistentes(L("¿Cuánto se paga?", "Paso 1: 52000 x 0.25 = 13000"),
                                  L("cuanto se paga", "Paso 1: 52000 × 0,25 = 13000."))
     assert not lecturas_consistentes(L("Paso 1: 52000 x 0.25 = 13000"),
@@ -1515,8 +1517,16 @@ def test_sin_ningun_numero_no_se_resuelve_nada():
     """m5v-11, lista de mercado: el modelo inventó «68 ÷ 2 = 34»."""
     r = pipeline.Tutor("revision_foto").resolver_enunciado(
         "Pan Queso Dos litros de leche Jabón", confirmado=True)
-    assert r["ok"] and r["camino"] == "ninguno" and r["pasos_llm"] == 0
-    assert "no es" in r["respuesta"].lower() or "no veo" in r["respuesta"].lower()
+    assert r["ok"] and r["camino"] == "fuera_de_dominio" and r["pasos_llm"] == 0
+    assert "no es un ejercicio de matemáticas" in r["respuesta"].lower()
+
+
+def test_una_pregunta_sin_datos_es_un_dato_que_falta_no_otro_dominio():
+    """m5v-12 en modo resolver: hay pregunta por una cantidad y ningún dato."""
+    r = pipeline.Tutor("revision_foto").resolver_enunciado(
+        "¿Cuánto me costó el tercer artículo?", confirmado=True)
+    assert r["ok"] and r["camino"] == "falta_dato" and r["pasos_llm"] == 0
+    assert "no aparece" in r["respuesta"] and "no está en la foto" in r["respuesta"]
 
 
 # --------------------------------------------------------------------------
@@ -1551,18 +1561,35 @@ def test_doble_lectura_puntuacion_acentos_y_saltos_no_cuentan():
                                   _lectura_lineas(" ".join(_HOJA))) == []
 
 
-def test_doble_lectura_una_palabra_distinta_para_la_hoja():
-    from vision import diferencias_de_lectura
+def test_doble_lectura_una_palabra_inocua_no_se_muestra():
+    from vision import comparar_lecturas
     otra = (_HOJA[0].replace("¿Cuánto", "Cuantos"),) + _HOJA[1:]
-    assert diferencias_de_lectura(_lectura_lineas(*_HOJA),
-                                  _lectura_lineas(*otra)) == ["palabras del enunciado"]
+    c = comparar_lecturas(_lectura_lineas(*_HOJA), _lectura_lineas(*otra))
+    assert c["coinciden"] and c["discrepancias"] == []
+    assert c["inocuas"] == ["redacción del enunciado"]
 
 
-def test_doble_lectura_un_numero_distinto_para_la_hoja():
-    from vision import diferencias_de_lectura
+def test_doble_lectura_un_numero_distinto_se_muestra_con_las_dos_versiones():
+    from vision import comparar_lecturas
     otra = (_HOJA[0], _HOJA[1].replace("0.25", "0.35")) + _HOJA[2:]
-    assert diferencias_de_lectura(_lectura_lineas(*_HOJA),
-                                  _lectura_lineas(*otra)) == ["números de los pasos"]
+    c = comparar_lecturas(_lectura_lineas(*_HOJA), _lectura_lineas(*otra))
+    assert not c["coinciden"] and not c["bloqueante"]
+    assert c["categorias"] == ["números del paso 1"]
+    assert len(c["discrepancias"]) == 1
+    assert "0.25" in c["discrepancias"][0] and "0.35" in c["discrepancias"][0]
+
+
+def test_doble_lectura_un_signo_distinto_se_muestra():
+    from vision import comparar_lecturas
+    otra = (_HOJA[0], _HOJA[1], _HOJA[2].replace("52000 - 13000", "52000 + 13000"), _HOJA[3])
+    c = comparar_lecturas(_lectura_lineas(*_HOJA), _lectura_lineas(*otra))
+    assert c["categorias"] == ["operaciones del paso 2"]
+
+
+def test_doble_lectura_vacia_es_lo_unico_que_bloquea():
+    from vision import comparar_lecturas
+    c = comparar_lecturas(_lectura_lineas(*_HOJA), {"json": {"lineas": []}})
+    assert c["bloqueante"] and not c["coinciden"]
 
 
 # --------------------------------------------------------------------------
@@ -1620,10 +1647,75 @@ def test_el_verificador_manda_sobre_la_aritmetica():
     assert d["conclusion"] == "paso 3" and d["desacuerdo"] and d["fuente"] == "verificador"
 
 
-def test_un_planteamiento_anterior_sin_cuentas_lo_decide_el_tutor():
-    d = _decidir(["Para saber lo que queda, sumo: 1240 + 365", "1240 + 365 = 1605",
-                  "Respuesta final: 1605 sillas"], "paso 1")
-    assert d["conclusion"] == "paso 1" and d["fuente"] == "modelo"
+_SILLAS = ["Para saber lo que queda, sumo: 1240 + 365", "1240 + 365 = 1605",
+           "Respuesta final: 1605 sillas"]
+
+
+def test_sin_referencia_el_tutor_no_impone_un_paso_si_las_cuentas_cuadran():
+    """Antes el «paso 1» del tutor ganaba aquí; en m5v-08 eso fue un error
+    inventado. Sin evidencia de planteamiento no se señala ningún paso."""
+    d = _decidir(_SILLAS, "paso 1")
+    assert d["conclusion"] == "sin error" and "planteamiento" in d["motivo"]
+
+
+def _con_referencia(pasos, conclusion_modelo, referencia_pasos):
+    pytest.importorskip("sympy")
+    from verificador_aritmetico import (pasos_comprobados, revisar_hoja,
+                                        revisar_planteamiento, valor_final, valores_de)
+    from vision import decidir_diagnostico
+    h = revisar_hoja(pasos)
+    p = revisar_planteamiento(pasos, valor_final(referencia_pasos), valores_de(referencia_pasos))
+    return decidir_diagnostico(
+        conclusion_modelo, {"paso": h.paso, "tipo": h.tipo, "detalle": h.detalle},
+        pasos_comprobados(pasos),
+        None if p is None else {"paso": p.paso, "tipo": p.tipo, "detalle": p.detalle})
+
+
+def test_planteamiento_suma_donde_habia_que_restar():
+    """m5v-02: la cuenta está bien hecha, la operación no."""
+    d = _con_referencia(_SILLAS, "paso 2",
+                        ["Paso 1: 1240 - 365 = 875", "Respuesta final: 875 sillas"])
+    assert d["conclusion"] == "paso 1" and d["fuente"] == "referencia"
+    assert "1240 + 365" in d["motivo"] and "875" in d["motivo"]
+
+
+def test_hoja_correcta_con_la_misma_respuesta_es_sin_error_aunque_el_tutor_invente():
+    """m5v-08: el tutor señalaba el paso 1 de una hoja sin errores."""
+    hoja = ["Resto las fracciones: 7/8 - 3/8", "7/8 - 3/8 = 4/8", "Simplifico: 4/8 = 1/2",
+            "Respuesta final: 1/2 de metro"]
+    d = _con_referencia(hoja, "paso 1", ["Paso 1: 7/8 - 3/8 = 4/8 = 1/2",
+                                         "Respuesta final: 0.5 metros"])
+    assert d["conclusion"] == "sin error" and not d["conclusion"].startswith("paso")
+
+
+def test_un_camino_distinto_que_llega_al_mismo_resultado_no_es_error():
+    hoja = ["El descuento es 52000 x 0.25 = 13000", "52000 - 13000 = 39000",
+            "Respuesta final: 39000"]
+    d = _con_referencia(hoja, "paso 1", ["Paso 1: 52000 x 0.75 = 39000",
+                                         "Respuesta final: 39000 pesos"])
+    assert d["conclusion"] == "sin error"
+
+
+def test_si_no_se_localiza_el_paso_no_se_elige_uno():
+    hoja = ["20 + 5 = 25", "Respuesta final: 25"]
+    d = _con_referencia(hoja, "paso 1", ["Paso 1: 20 + 5 = 25", "Paso 2: 25 x 2 = 50",
+                                         "Respuesta final: 50"])
+    assert d["conclusion"] == "sin conclusión"
+
+
+def test_falta_un_dato_gana_a_todo():
+    """m5v-12: la pregunta pide el tercer artículo y no hay ningún dato."""
+    pytest.importorskip("sympy")
+    from verificador_aritmetico import falta_un_dato
+    pasos = ["Sumo los dos primeros: 8500 + 12300 = 20800", "Respuesta final: 20800 pesos"]
+    h = falta_un_dato("¿Cuánto me costó el tercer artículo?", pasos)
+    assert h is not None and "no está en la foto" in h.detalle and "8500" in h.detalle
+    assert falta_un_dato("Compro 3 cuadernos de 3500", pasos) is None
+    assert falta_un_dato("Compro tres cuadernos", pasos) is None
+    from vision import decidir_diagnostico
+    d = decidir_diagnostico("paso 2", {"paso": None, "tipo": "ninguno", "detalle": ""},
+                            {1, 2}, None, {"tipo": h.tipo, "detalle": h.detalle})
+    assert d["conclusion"] == "dato no disponible" and "paso" not in d["motivo"]
 
 
 def test_no_se_inventa_un_error_en_un_paso_comprobado():

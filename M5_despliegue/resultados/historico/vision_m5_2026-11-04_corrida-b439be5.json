@@ -1,0 +1,738 @@
+{
+  "tipo": "evaluación de la vía visual de M5",
+  "commit": "b439be5",
+  "fecha": "2026-11-04T15:07:39+00:00",
+  "naturaleza": "evaluación de DESARROLLO: estas 12 hojas se han usado para depurar la lectura, el verificador y la regla de diagnóstico. No es evidencia de generalización.",
+  "excluidos_de_la_puntuacion": {
+    "m5v-10": "NO VÁLIDO para medir la salvaguarda de ilegibles: la foto es LEGIBLE y el caso exige una toma movida. Se lee y se registra, pero no cuenta ni como acierto ni como fallo de la válvula hasta que haya una foto borrosa de verdad."
+  },
+  "parcial": false,
+  "eval_set": "data/eval_set_m5_vision.jsonl",
+  "inventario": {
+    "directorio": "/kaggle/working/ProyectoIA/m4/eval_set/imagenes_m5",
+    "existe_el_directorio": true,
+    "pedidas": 12,
+    "presentes": 12,
+    "faltan": [],
+    "nombres_inesperados": [],
+    "completo": true
+  },
+  "carga_del_vlm": {
+    "ok": true,
+    "ya_estaba_cargado": false,
+    "segundos": 14.55,
+    "dispositivo": "cuda"
+  },
+  "variantes": [
+    {
+      "archivo": "m5v-01.jpg",
+      "caso": "m5v-01",
+      "bloque": "localizacion",
+      "variante": "nitida",
+      "estado": "leido",
+      "lectura": {
+        "segundos": 14.63,
+        "px": [
+          1024,
+          575
+        ],
+        "ok": true,
+        "confirmable": false,
+        "pide_otra_foto": true,
+        "motivo_no_fiable": "dos lecturas de la misma foto no coinciden: la transcripción no es de fiar",
+        "lecturas_coinciden": false,
+        "diferencias": [
+          "números del enunciado",
+          "números de los pasos",
+          "respuesta final"
+        ],
+        "proposito": null,
+        "enunciado": "Un bus recorre 68 km cada día. 2. Cuántos kilómetros recorre en 14 días?",
+        "transcripcion": "(la hoja NO se pudo leer: dos lecturas de la misma foto no coinciden: la transcripción no es de fiar. No hay un procedimiento legible que revisar.)",
+        "pasos": [
+          "Multiplicar los días por la distancia de cada día: 68 x 14",
+          "68 x 14 = 942",
+          "Respuesta Final: 642 km"
+        ],
+        "n_pasos": 3,
+        "n_pasos_esperados": 3,
+        "numero_escrito_preservado": true,
+        "lectura_fiel": false,
+        "lectura": "fria"
+      }
+    },
+    {
+      "archivo": "m5v-02.jpg",
+      "caso": "m5v-02",
+      "bloque": "localizacion",
+      "variante": "nitida",
+      "estado": "leido",
+      "lectura": {
+        "segundos": 14.76,
+        "px": [
+          1024,
+          355
+        ],
+        "ok": true,
+        "confirmable": true,
+        "pide_otra_foto": false,
+        "motivo_no_fiable": "",
+        "lecturas_coinciden": true,
+        "diferencias": [],
+        "proposito": "revisar",
+        "enunciado": "MSV-02 Un salon tiene 1240 sillas y se retiran 365 ¿Cuántas sillas quedan?",
+        "transcripcion": "Enunciado: MSV-02 Un salon tiene 1240 sillas y se retiran 365 ¿Cuántas sillas quedan?\nPaso 1: Para saber lo que queda, sumo: 1240 + 365\nPaso 2: 1240 + 365 = 1605\nPaso 3: Respuesta final: 1605 sillas",
+        "pasos": [
+          "Para saber lo que queda, sumo: 1240 + 365",
+          "1240 + 365 = 1605",
+          "Respuesta final: 1605 sillas"
+        ],
+        "n_pasos": 3,
+        "n_pasos_esperados": 3,
+        "numero_escrito_preservado": true,
+        "lectura_fiel": true,
+        "lectura": "caliente"
+      },
+      "diagnostico": {
+        "segundos": 17.46,
+        "ok": true,
+        "respuesta": "Diagnóstico: Sin error\n\nComprobación de las cuentas: todas las igualdades que se pueden comprobar cuadran.\n\nOjo: las dos señales no coinciden. El tutor concluyó «paso 2» y la comprobación determinista lleva a «sin error». Muestro las dos: revisa ambos pasos antes de darlo por bueno.",
+        "verificador_aritmetico": {
+          "paso": null,
+          "tipo": "ninguno",
+          "detalle": "todas las cuentas escritas cuadran"
+        },
+        "pasos_llm": 1,
+        "herramientas": [],
+        "respuesta_modelo": "Diagnóstico: Paso 2",
+        "diagnostico_final": {
+          "conclusion": "sin error",
+          "fuente": "verificador",
+          "modelo": "paso 2",
+          "verificador_paso": null,
+          "comprobados": [
+            2,
+            3
+          ],
+          "desacuerdo": true
+        },
+        "modo": "revisar",
+        "error": null
+      },
+      "calificacion": {
+        "criterio": "exacto",
+        "claves_halladas": [],
+        "prohibido_hallado": [],
+        "acierto": false,
+        "acierto_solo_tutor": false,
+        "fallo_grave": false
+      },
+      "fuente_del_fallo": "diagnostico"
+    },
+    {
+      "archivo": "m5v-03.jpg",
+      "caso": "m5v-03",
+      "bloque": "localizacion",
+      "variante": "nitida",
+      "estado": "leido",
+      "lectura": {
+        "segundos": 16.03,
+        "px": [
+          1024,
+          309
+        ],
+        "ok": true,
+        "confirmable": false,
+        "pide_otra_foto": true,
+        "motivo_no_fiable": "dos lecturas de la misma foto no coinciden: la transcripción no es de fiar",
+        "lecturas_coinciden": false,
+        "diferencias": [
+          "palabras del enunciado"
+        ],
+        "proposito": null,
+        "enunciado": "Una camiseta cuesta 52000 pesos y tiene 25% de descuento. ¿Cuánto se paga?",
+        "transcripcion": "(la hoja NO se pudo leer: dos lecturas de la misma foto no coinciden: la transcripción no es de fiar. No hay un procedimiento legible que revisar.)",
+        "pasos": [
+          "El descuento es 52000 x 0.25 = 13000",
+          "Resto el descuento 52000 - 13000 = 39000",
+          "Respuesta Final: 38000 pesos"
+        ],
+        "n_pasos": 3,
+        "n_pasos_esperados": 3,
+        "numero_escrito_preservado": true,
+        "lectura_fiel": false,
+        "lectura": "caliente"
+      }
+    },
+    {
+      "archivo": "m5v-04.jpg",
+      "caso": "m5v-04",
+      "bloque": "localizacion",
+      "variante": "nitida",
+      "estado": "leido",
+      "lectura": {
+        "segundos": 12.63,
+        "px": [
+          1024,
+          302
+        ],
+        "ok": true,
+        "confirmable": false,
+        "pide_otra_foto": true,
+        "motivo_no_fiable": "dos lecturas de la misma foto no coinciden: la transcripción no es de fiar",
+        "lecturas_coinciden": false,
+        "diferencias": [
+          "palabras del enunciado",
+          "números del enunciado"
+        ],
+        "proposito": null,
+        "enunciado": "Se reporten 1764 semillas en partes iguales entre 7 materas. ¿Cuantas recibe cada una?",
+        "transcripcion": "(la hoja NO se pudo leer: dos lecturas de la misma foto no coinciden: la transcripción no es de fiar. No hay un procedimiento legible que revisar.)",
+        "pasos": [
+          "Divido el total entre las materas: 1764 ÷ 7",
+          "1764 ÷ 7 = 242",
+          "Respuesta Final: 242 semillas"
+        ],
+        "n_pasos": 3,
+        "n_pasos_esperados": 3,
+        "numero_escrito_preservado": true,
+        "lectura_fiel": false,
+        "lectura": "caliente"
+      }
+    },
+    {
+      "archivo": "m5v-05.jpg",
+      "caso": "m5v-05",
+      "bloque": "compensado",
+      "variante": "nitida",
+      "estado": "leido",
+      "lectura": {
+        "segundos": 18.43,
+        "px": [
+          1024,
+          351
+        ],
+        "ok": true,
+        "confirmable": false,
+        "pide_otra_foto": true,
+        "motivo_no_fiable": "dos lecturas de la misma foto no coinciden: la transcripción no es de fiar",
+        "lecturas_coinciden": false,
+        "diferencias": [
+          "palabras del enunciado",
+          "palabras de los pasos"
+        ],
+        "proposito": null,
+        "enunciado": "Compré 6 cuadernos de 3500 pesos y 2 lápices de 1500 ¿cuánto pago en total?",
+        "transcripcion": "(la hoja NO se pudo leer: dos lecturas de la misma foto no coinciden: la transcripción no es de fiar. No hay un procedimiento legible que revisar.)",
+        "pasos": [
+          "Los cuadernos cuestan 6 x 3500 = 20000",
+          "Los lápices cuestan 2 x 1500 = 3000",
+          "Sumo 20000 + 3000 = 24000"
+        ],
+        "n_pasos": 3,
+        "n_pasos_esperados": 4,
+        "numero_escrito_preservado": true,
+        "lectura_fiel": false,
+        "lectura": "caliente"
+      }
+    },
+    {
+      "archivo": "m5v-06.jpg",
+      "caso": "m5v-06",
+      "bloque": "compensado",
+      "variante": "nitida",
+      "estado": "leido",
+      "lectura": {
+        "segundos": 15.96,
+        "px": [
+          1024,
+          357
+        ],
+        "ok": true,
+        "confirmable": true,
+        "pide_otra_foto": false,
+        "motivo_no_fiable": "",
+        "lecturas_coinciden": true,
+        "diferencias": [],
+        "proposito": "revisar",
+        "enunciado": "un recorrido tiene 3 tramos: 12 km, 18 km y 25 km ¿cuántos kilómetros son en total?",
+        "transcripcion": "Enunciado: un recorrido tiene 3 tramos: 12 km, 18 km y 25 km ¿cuántos kilómetros son en total?\nPaso 1: Sumo los 2 primeros tramos: 12 + 18 = 32\nPaso 2: Le sumo el tercero: 32 + 25 = 55\nPaso 3: Respuesta final: 55 km",
+        "pasos": [
+          "Sumo los 2 primeros tramos: 12 + 18 = 32",
+          "Le sumo el tercero: 32 + 25 = 55",
+          "Respuesta final: 55 km"
+        ],
+        "n_pasos": 3,
+        "n_pasos_esperados": 3,
+        "numero_escrito_preservado": true,
+        "lectura_fiel": true,
+        "lectura": "caliente"
+      },
+      "diagnostico": {
+        "segundos": 0.91,
+        "ok": true,
+        "respuesta": "Diagnóstico: Paso 1\n\nComprobación de las cuentas: el paso 1 no cuadra: 12 + 18 da 30, y está escrito 32.",
+        "verificador_aritmetico": {
+          "paso": 1,
+          "tipo": "calculo",
+          "detalle": "el paso 1 no cuadra: 12 + 18 da 30, y está escrito 32"
+        },
+        "pasos_llm": 1,
+        "herramientas": [],
+        "respuesta_modelo": "Diagnóstico: Paso 1",
+        "diagnostico_final": {
+          "conclusion": "paso 1",
+          "fuente": "ambos",
+          "modelo": "paso 1",
+          "verificador_paso": 1,
+          "comprobados": [],
+          "desacuerdo": false
+        },
+        "modo": "revisar",
+        "error": null
+      },
+      "calificacion": {
+        "criterio": "exacto",
+        "claves_halladas": [
+          "paso 1",
+          "el paso 1"
+        ],
+        "prohibido_hallado": [],
+        "acierto": true,
+        "acierto_solo_tutor": true,
+        "fallo_grave": false
+      },
+      "fuente_del_fallo": "—"
+    },
+    {
+      "archivo": "m5v-07.jpg",
+      "caso": "m5v-07",
+      "bloque": "sin_error",
+      "variante": "nitida",
+      "estado": "leido",
+      "lectura": {
+        "segundos": 14.41,
+        "px": [
+          1024,
+          423
+        ],
+        "ok": true,
+        "confirmable": true,
+        "pide_otra_foto": false,
+        "motivo_no_fiable": "",
+        "lecturas_coinciden": true,
+        "diferencias": [],
+        "proposito": "revisar",
+        "enunciado": "un paquete trae 18 galletas; cuantas galletas hay en 15 paquetes?",
+        "transcripcion": "Enunciado: un paquete trae 18 galletas; cuantas galletas hay en 15 paquetes?\nPaso 1: Multiplico los paquetes por las galletas de cada uno: 18 x 15\nPaso 2: 18 x 15 = 270\nPaso 3: Respuesta Final: 270 galletas",
+        "pasos": [
+          "Multiplico los paquetes por las galletas de cada uno: 18 x 15",
+          "18 x 15 = 270",
+          "Respuesta Final: 270 galletas"
+        ],
+        "n_pasos": 3,
+        "n_pasos_esperados": 3,
+        "numero_escrito_preservado": true,
+        "lectura_fiel": true,
+        "lectura": "caliente"
+      },
+      "diagnostico": {
+        "segundos": 0.99,
+        "ok": true,
+        "respuesta": "Diagnóstico: Sin error\n\nComprobación de las cuentas: todas las igualdades que se pueden comprobar cuadran.\n\nOjo: las dos señales no coinciden. El tutor concluyó «paso 2» y la comprobación determinista lleva a «sin error». Muestro las dos: revisa ambos pasos antes de darlo por bueno.",
+        "verificador_aritmetico": {
+          "paso": null,
+          "tipo": "ninguno",
+          "detalle": "todas las cuentas escritas cuadran"
+        },
+        "pasos_llm": 1,
+        "herramientas": [],
+        "respuesta_modelo": "Diagnóstico: Paso 2",
+        "diagnostico_final": {
+          "conclusion": "sin error",
+          "fuente": "verificador",
+          "modelo": "paso 2",
+          "verificador_paso": null,
+          "comprobados": [
+            2,
+            3
+          ],
+          "desacuerdo": true
+        },
+        "modo": "revisar",
+        "error": null
+      },
+      "calificacion": {
+        "criterio": "valvula",
+        "claves_halladas": [
+          "sin error"
+        ],
+        "prohibido_hallado": [],
+        "acierto": true,
+        "acierto_solo_tutor": false,
+        "fallo_grave": false
+      },
+      "fuente_del_fallo": "—"
+    },
+    {
+      "archivo": "m5v-08.jpg",
+      "caso": "m5v-08",
+      "bloque": "sin_error",
+      "variante": "nitida",
+      "estado": "leido",
+      "lectura": {
+        "segundos": 17.93,
+        "px": [
+          1024,
+          565
+        ],
+        "ok": true,
+        "confirmable": true,
+        "pide_otra_foto": false,
+        "motivo_no_fiable": "",
+        "lecturas_coinciden": true,
+        "diferencias": [],
+        "proposito": "revisar",
+        "enunciado": "De un rollo de 7/8 de metro se usan 3/8 ¿cuánto queda?",
+        "transcripcion": "Enunciado: De un rollo de 7/8 de metro se usan 3/8 ¿cuánto queda?\nPaso 1: Resto las fracciones, que tienen el mismo denominador: 7/8 - 3/8\nPaso 2: 7/8 - 3/8 = 4/8\nPaso 3: Simplifique: 4/8 = 1/2\nPaso 4: Respuesta final: 1/2 de metro",
+        "pasos": [
+          "Resto las fracciones, que tienen el mismo denominador: 7/8 - 3/8",
+          "7/8 - 3/8 = 4/8",
+          "Simplifique: 4/8 = 1/2",
+          "Respuesta final: 1/2 de metro"
+        ],
+        "n_pasos": 4,
+        "n_pasos_esperados": 4,
+        "numero_escrito_preservado": true,
+        "lectura_fiel": true,
+        "lectura": "caliente"
+      },
+      "diagnostico": {
+        "segundos": 0.93,
+        "ok": true,
+        "respuesta": "Diagnóstico: Paso 1\n\nEl tutor señala un error de planteamiento; en ese paso no hay una cuenta que el verificador pueda comprobar, así que esta conclusión no está verificada.",
+        "verificador_aritmetico": {
+          "paso": null,
+          "tipo": "ninguno",
+          "detalle": "todas las cuentas escritas cuadran"
+        },
+        "pasos_llm": 1,
+        "herramientas": [],
+        "respuesta_modelo": "Diagnóstico: Paso 1",
+        "diagnostico_final": {
+          "conclusion": "paso 1",
+          "fuente": "modelo",
+          "modelo": "paso 1",
+          "verificador_paso": null,
+          "comprobados": [
+            2,
+            3,
+            4
+          ],
+          "desacuerdo": false
+        },
+        "modo": "revisar",
+        "error": null
+      },
+      "calificacion": {
+        "criterio": "valvula",
+        "claves_halladas": [],
+        "prohibido_hallado": [
+          "paso 1"
+        ],
+        "acierto": false,
+        "acierto_solo_tutor": false,
+        "fallo_grave": true
+      },
+      "fuente_del_fallo": "diagnostico"
+    },
+    {
+      "archivo": "m5v-09.jpg",
+      "caso": "m5v-09",
+      "bloque": "localizacion",
+      "variante": "nitida",
+      "estado": "leido",
+      "lectura": {
+        "segundos": 14.39,
+        "px": [
+          1024,
+          327
+        ],
+        "ok": true,
+        "confirmable": true,
+        "pide_otra_foto": false,
+        "motivo_no_fiable": "",
+        "lecturas_coinciden": true,
+        "diferencias": [],
+        "proposito": "revisar",
+        "enunciado": "En un grupo de 40 estudiantes, el 35% practica natación. ¿Cuántos son?",
+        "transcripcion": "Enunciado: En un grupo de 40 estudiantes, el 35% practica natación. ¿Cuántos son?\nPaso 1: Calcula el 35% de 40: 40 x 0.35\nPaso 2: 40 x 0.35 = 14\nPaso 3: Respuesta final: 14 estudiantes",
+        "pasos": [
+          "Calcula el 35% de 40: 40 x 0.35",
+          "40 x 0.35 = 14",
+          "Respuesta final: 14 estudiantes"
+        ],
+        "n_pasos": 3,
+        "n_pasos_esperados": 3,
+        "numero_escrito_preservado": false,
+        "lectura_fiel": false,
+        "lectura": "caliente"
+      },
+      "diagnostico": {
+        "segundos": 0.94,
+        "ok": true,
+        "respuesta": "Diagnóstico: Sin error\n\nComprobación de las cuentas: todas las igualdades que se pueden comprobar cuadran.\n\nOjo: las dos señales no coinciden. El tutor concluyó «paso 2» y la comprobación determinista lleva a «sin error». Muestro las dos: revisa ambos pasos antes de darlo por bueno.",
+        "verificador_aritmetico": {
+          "paso": null,
+          "tipo": "ninguno",
+          "detalle": "todas las cuentas escritas cuadran"
+        },
+        "pasos_llm": 1,
+        "herramientas": [],
+        "respuesta_modelo": "Diagnóstico: Paso 2",
+        "diagnostico_final": {
+          "conclusion": "sin error",
+          "fuente": "verificador",
+          "modelo": "paso 2",
+          "verificador_paso": null,
+          "comprobados": [
+            2,
+            3
+          ],
+          "desacuerdo": true
+        },
+        "modo": "revisar",
+        "error": null
+      },
+      "calificacion": {
+        "criterio": "exacto",
+        "claves_halladas": [],
+        "prohibido_hallado": [],
+        "acierto": false,
+        "acierto_solo_tutor": false,
+        "fallo_grave": false
+      },
+      "fuente_del_fallo": "lectura"
+    },
+    {
+      "archivo": "m5v-10.jpg",
+      "caso": "m5v-10",
+      "bloque": "adversarial",
+      "variante": "borrosa",
+      "estado": "leido",
+      "lectura": {
+        "segundos": 12.38,
+        "px": [
+          1024,
+          300
+        ],
+        "ok": true,
+        "confirmable": true,
+        "pide_otra_foto": false,
+        "motivo_no_fiable": "",
+        "lecturas_coinciden": true,
+        "diferencias": [],
+        "proposito": "revisar",
+        "enunciado": "Un pedido tiene 37 cajas con 46 unidades cada una. ¿Cuántas unidades tiene?",
+        "transcripcion": "Enunciado: Un pedido tiene 37 cajas con 46 unidades cada una. ¿Cuántas unidades tiene?\nPaso 1: Multiplico 37 x 46\nPaso 2: 37x46 = 1702\nPaso 3: Respuesta final: 1702",
+        "pasos": [
+          "Multiplico 37 x 46",
+          "37x46 = 1702",
+          "Respuesta final: 1702"
+        ],
+        "n_pasos": 3,
+        "n_pasos_esperados": 3,
+        "numero_escrito_preservado": true,
+        "lectura_fiel": null,
+        "lectura": "caliente"
+      },
+      "diagnostico": {
+        "segundos": 0.91,
+        "ok": true,
+        "respuesta": "Diagnóstico: Sin error\n\nComprobación de las cuentas: todas las igualdades que se pueden comprobar cuadran.\n\nOjo: las dos señales no coinciden. El tutor concluyó «paso 2» y la comprobación determinista lleva a «sin error». Muestro las dos: revisa ambos pasos antes de darlo por bueno.",
+        "verificador_aritmetico": {
+          "paso": null,
+          "tipo": "ninguno",
+          "detalle": "todas las cuentas escritas cuadran"
+        },
+        "pasos_llm": 1,
+        "herramientas": [],
+        "respuesta_modelo": "Diagnóstico: Paso 2",
+        "diagnostico_final": {
+          "conclusion": "sin error",
+          "fuente": "verificador",
+          "modelo": "paso 2",
+          "verificador_paso": null,
+          "comprobados": [
+            2,
+            3
+          ],
+          "desacuerdo": true
+        },
+        "modo": "revisar",
+        "error": null
+      },
+      "bloqueado": "NO VÁLIDO para medir la salvaguarda de ilegibles: la foto es LEGIBLE y el caso exige una toma movida. Se lee y se registra, pero no cuenta ni como acierto ni como fallo de la válvula hasta que haya una foto borrosa de verdad."
+    },
+    {
+      "archivo": "m5v-11.jpg",
+      "caso": "m5v-11",
+      "bloque": "adversarial",
+      "variante": "nitida",
+      "estado": "leido",
+      "lectura": {
+        "segundos": 4.33,
+        "px": [
+          1024,
+          335
+        ],
+        "ok": true,
+        "confirmable": true,
+        "pide_otra_foto": false,
+        "motivo_no_fiable": "",
+        "lecturas_coinciden": true,
+        "diferencias": [],
+        "proposito": "resolver",
+        "enunciado": "Pan Queso Dos litros de leche Jabón",
+        "transcripcion": "Lo único que se alcanza a leer en la hoja: Pan Queso Dos litros de leche Jabón\n(no hay ningún paso de un procedimiento matemático)",
+        "pasos": [],
+        "n_pasos": 0,
+        "n_pasos_esperados": 4,
+        "numero_escrito_preservado": null,
+        "lectura_fiel": null,
+        "lectura": "caliente"
+      },
+      "diagnostico": {
+        "segundos": 0.0,
+        "ok": true,
+        "respuesta": "No veo un ejercicio de matemáticas en lo que leí: no hay ningún número. Si es un ejercicio, escribe el enunciado completo con sus datos, o toma otra foto.",
+        "verificador_aritmetico": null,
+        "pasos_llm": 0,
+        "herramientas": [],
+        "respuesta_modelo": null,
+        "diagnostico_final": null,
+        "modo": "resolver",
+        "error": null
+      },
+      "calificacion": {
+        "criterio": "valvula",
+        "claves_halladas": [],
+        "prohibido_hallado": [],
+        "acierto": false,
+        "acierto_solo_tutor": false,
+        "fallo_grave": false
+      },
+      "fuente_del_fallo": "diagnostico"
+    },
+    {
+      "archivo": "m5v-12.jpg",
+      "caso": "m5v-12",
+      "bloque": "adversarial",
+      "variante": "nitida",
+      "estado": "leido",
+      "lectura": {
+        "segundos": 9.78,
+        "px": [
+          1024,
+          311
+        ],
+        "ok": true,
+        "confirmable": true,
+        "pide_otra_foto": false,
+        "motivo_no_fiable": "",
+        "lecturas_coinciden": true,
+        "diferencias": [],
+        "proposito": "revisar",
+        "enunciado": "¿Cuánto me costó el libro artístico?",
+        "transcripcion": "Enunciado: ¿Cuánto me costó el libro artístico?\nPaso 1: Sumo los dos primeros: 8500 + 12300 = 20800\nPaso 2: Respuesta final: 20800 pesos",
+        "pasos": [
+          "Sumo los dos primeros: 8500 + 12300 = 20800",
+          "Respuesta final: 20800 pesos"
+        ],
+        "n_pasos": 2,
+        "n_pasos_esperados": 2,
+        "numero_escrito_preservado": true,
+        "lectura_fiel": null,
+        "lectura": "caliente"
+      },
+      "diagnostico": {
+        "segundos": 0.93,
+        "ok": true,
+        "respuesta": "Diagnóstico: Sin error\n\nComprobación de las cuentas: todas las igualdades que se pueden comprobar cuadran.\n\nOjo: las dos señales no coinciden. El tutor concluyó «paso 2» y la comprobación determinista lleva a «sin error». Muestro las dos: revisa ambos pasos antes de darlo por bueno.",
+        "verificador_aritmetico": {
+          "paso": null,
+          "tipo": "ninguno",
+          "detalle": "todas las cuentas escritas cuadran"
+        },
+        "pasos_llm": 1,
+        "herramientas": [],
+        "respuesta_modelo": "Diagnóstico: Paso 2",
+        "diagnostico_final": {
+          "conclusion": "sin error",
+          "fuente": "verificador",
+          "modelo": "paso 2",
+          "verificador_paso": null,
+          "comprobados": [
+            1,
+            2
+          ],
+          "desacuerdo": true
+        },
+        "modo": "revisar",
+        "error": null
+      },
+      "calificacion": {
+        "criterio": "valvula",
+        "claves_halladas": [],
+        "prohibido_hallado": [],
+        "acierto": false,
+        "acierto_solo_tutor": false,
+        "fallo_grave": false
+      },
+      "fuente_del_fallo": "diagnostico"
+    }
+  ],
+  "latencias": {
+    "carga_del_vlm_s": 14.55,
+    "lectura_fria_s": 14.63,
+    "lecturas_calientes_s": [
+      4.33,
+      9.78,
+      12.38,
+      12.63,
+      14.39,
+      14.41,
+      14.76,
+      15.96,
+      16.03,
+      17.93,
+      18.43
+    ],
+    "p50_s": null,
+    "p95_s": null,
+    "nota": "p50 y p95 solo se calculan con 20 o más lecturas en caliente; por debajo de eso el p95 es el máximo con otro nombre. Se dan los tiempos uno a uno."
+  },
+  "metricas": {
+    "fotos_del_conjunto": 12,
+    "fotos_leidas": 12,
+    "bloqueadas_por_conflicto": 1,
+    "puntuables": 7,
+    "pidio_otra_foto": 4,
+    "aciertos": 2,
+    "aciertos_solo_tutor": 1,
+    "fallos_graves_error_inventado": 1,
+    "legibles_rechazadas_por_doble_lectura": [
+      "m5v-01",
+      "m5v-03",
+      "m5v-04",
+      "m5v-05"
+    ],
+    "fallos_de_lectura": 1,
+    "fallos_de_diagnostico": 4
+  },
+  "conflictos": {
+    "m5v-10": "NO VÁLIDO para medir la salvaguarda de ilegibles: la foto es LEGIBLE y el caso exige una toma movida. Se lee y se registra, pero no cuenta ni como acierto ni como fallo de la válvula hasta que haya una foto borrosa de verdad."
+  },
+  "decision_pendiente": "m5v-10 necesita una foto movida de verdad. Hasta entonces la salvaguarda de ilegibles no tiene ninguna medición en este conjunto.",
+  "limites_de_la_muestra": "11 casos puntuables como máximo, menos los que pare la doble lectura. Un acierto mueve la tasa unos 9 puntos o más. Las hojas se reutilizaron para depurar el sistema: sirve para ver si el recorrido funciona, no para comparar configuraciones ni afirmar mejoras."
+}

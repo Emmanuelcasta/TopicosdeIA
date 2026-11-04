@@ -115,6 +115,17 @@ _OPERACION_FRACCION = {"+": "suma", "-": "resta", "*": "multiplicacion",
                        "X": "multiplicacion", "÷": "division"}
 
 
+_PREGUNTA_POR_CANTIDAD = re.compile(
+    r"\bcuant[oa]s?\b|\bque (precio|valor|cantidad)\b|\bcalcula|\bhalla\b|\bcuanto vale",
+    re.IGNORECASE)
+
+
+def _sin_tildes(texto: str) -> str:
+    import unicodedata
+    t = unicodedata.normalize("NFKD", (texto or "").lower())
+    return "".join(c for c in t if not unicodedata.combining(c))
+
+
 def cuenta_de(pregunta: str) -> str | None:
     """La cuenta que pide la pregunta, o None si la pregunta es otra cosa.
 
@@ -1164,8 +1175,13 @@ class Tutor:
             "transcripcion": pasos_como_texto(lectura),
             "enunciado": js.get("enunciado"),
             "pasos": pasos_numerados(lectura),
-            "lecturas_coinciden": lectura.get("consistente"),
+            "lecturas_coinciden": lectura.get("coinciden"),
             "diferencias": lectura.get("diferencias") or [],
+            # Lo que el estudiante TIENE que mirar antes de confirmar: cada
+            # número, signo u operación en que las dos lecturas no coinciden,
+            # con lo que dice cada una. La redacción distinta no entra.
+            "discrepancias": lectura.get("discrepancias") or [],
+            "diferencias_inocuas": lectura.get("inocuas") or [],
             "normalizacion": lectura.get("normalizacion") or {},
             "latencia_s": round(time.perf_counter() - t0, 2),
             "herramientas": [], "pasos_llm": 0, "contextos": 0,
@@ -1183,6 +1199,11 @@ class Tutor:
                 "pregunta": ("¿Quieres tomar otra foto, o prefieres escribir los "
                              "pasos tú?"),
             }
+        if base["discrepancias"]:
+            base["aviso_discrepancias"] = (
+                "Leí la hoja dos veces y las dos lecturas no coinciden en esto. "
+                "Mira la foto y deja escrito lo que TÚ pusiste antes de confirmar:\n"
+                + "\n".join(f"- {d}" for d in base["discrepancias"]))
         if not base["pasos"]:
             if (base["enunciado"] or "").strip():
                 # Solo el enunciado. No es un error de lectura: es la otra cosa
@@ -1240,13 +1261,31 @@ class Tutor:
                 "la lectura todavía no está confirmada. Revisa la transcripción y "
                 "confírmala: no reviso un procedimiento que quizá no es el tuyo.", t0)
 
+        from verificador_aritmetico import falta_un_dato, revisar_planteamiento
         from vision import prompt_revision_confirmada
 
         hallazgo, evidencia = self._comprobar_aritmetica(pasos)
+        dato = falta_un_dato(enunciado, pasos)
         r = self.responder(prompt_revision_confirmada(
             pregunta or self.PREGUNTA_REVISION, enunciado, pasos, evidencia))
+        # El enunciado CONFIRMADO, resuelto aparte. Solo hace falta si las
+        # cuentas cuadran: un error de cálculo ya es el primer error que se
+        # puede demostrar, y no se le antepone una inferencia.
+        planteamiento, referencia = None, None
+        if dato is None and (hallazgo or {}).get("tipo") not in ("calculo", "traslado"):
+            referencia = self._referencia(enunciado)
+            if referencia is not None:
+                h = revisar_planteamiento(pasos, referencia["final"], referencia["valores"])
+                if h is not None:
+                    planteamiento = {"paso": h.paso, "tipo": h.tipo, "detalle": h.detalle}
         if r.get("ok"):
-            r.update(self._combinar_diagnostico(r.get("respuesta") or "", pasos, hallazgo))
+            r.update(self._combinar_diagnostico(
+                r.get("respuesta") or "", pasos, hallazgo, planteamiento,
+                None if dato is None else {"tipo": dato.tipo, "detalle": dato.detalle},
+                referencia))
+        r["planteamiento"] = planteamiento
+        r["referencia"] = (None if referencia is None else
+                           {"final": str(referencia["final"]), "texto": referencia["texto"]})
         r["etapa"] = "diagnostico"
         r["pasos_confirmados"] = list(pasos)
         r["transcripcion"] = "\n".join(f"Paso {i}: {p}"
@@ -1298,12 +1337,26 @@ class Tutor:
             # «68 ÷ 2 = 34», un ejercicio que no estaba en la hoja. El prompt ya
             # le pedía decir que no era matemáticas; no lo hizo. Sin una sola
             # cifra no hay nada que calcular, y eso lo decide el código.
+            #
+            # Dos casos distintos, y el estudiante necesita saber cuál: una
+            # PREGUNTA por una cantidad sin datos («¿Cuánto me costó el tercer
+            # artículo?», m5v-12) es un ejercicio al que le falta un dato; un
+            # texto sin pregunta ni cantidades no es un ejercicio.
+            if _PREGUNTA_POR_CANTIDAD.search(_sin_tildes(enunciado)):
+                camino, texto = "falta_dato", (
+                    "Falta un dato: la pregunta pide una cantidad, pero en lo que "
+                    "leí no aparece ningún dato numérico para calcularla; no está "
+                    "en la foto y no lo voy a inventar. Si tu ejercicio trae más "
+                    "datos, escríbelos en el enunciado y lo resuelvo.")
+            else:
+                camino, texto = "fuera_de_dominio", (
+                    "Esto no es un ejercicio de matemáticas: no hay ninguna "
+                    "cantidad ni ninguna pregunta que calcular. Si es un ejercicio, "
+                    "escribe el enunciado completo con sus datos, o toma otra foto.")
             return {
-                "ok": True, "etapa": "solucion", "camino": "ninguno",
+                "ok": True, "etapa": "solucion", "camino": camino,
                 "enunciado": enunciado, "pasos_solucion": [],
-                "respuesta": ("No veo un ejercicio de matemáticas en lo que leí: no "
-                              "hay ningún número. Si es un ejercicio, escribe el "
-                              "enunciado completo con sus datos, o toma otra foto."),
+                "respuesta": texto,
                 "herramientas": [], "observaciones": [], "verificador_aritmetico": None,
                 "pasos_llm": 0, "contextos": 0, "verificador": None,
                 "latencia_s": round(time.perf_counter() - t0, 2),
@@ -1346,13 +1399,42 @@ class Tutor:
                     "teniendo en cuenta que esa configuración NO está medida.")
         return ""
 
+    def _referencia(self, enunciado) -> dict | None:
+        """El enunciado confirmado, resuelto aparte. None si no es de fiar.
+
+        Solo se usa como referencia si la solución tiene un resultado final y
+        `revisar_hoja` no encuentra ni una cuenta mal en ella: una referencia
+        con errores convertiría cualquier hoja en «mal planteada». Se guarda por
+        enunciado porque el modelo decodifica en greedy: misma entrada, misma
+        salida, y así resolver y revisar la misma hoja no la resuelven dos veces.
+        """
+        from verificador_aritmetico import valor_final, valores_de
+
+        enunciado = (enunciado or "").strip()
+        if not enunciado or not any(c.isdigit() for c in enunciado):
+            return None
+        cache = self.__dict__.setdefault("_cache_referencia", {})
+        if enunciado not in cache:
+            r = self.resolver_enunciado(enunciado, confirmado=True)
+            pasos = r.get("pasos_solucion") or []
+            final = valor_final(pasos)
+            ok = (r.get("ok") and final is not None
+                  and (r.get("verificador_aritmetico") or {}).get("tipo") == "ninguno")
+            cache[enunciado] = ({"final": final, "valores": valores_de(pasos),
+                                 "texto": r.get("respuesta") or ""} if ok else None)
+        return cache[enunciado]
+
     @staticmethod
-    def _combinar_diagnostico(respuesta_modelo: str, pasos, hallazgo) -> dict:
-        """Junta tutor y verificador con `vision.decidir_diagnostico`.
+    def _combinar_diagnostico(respuesta_modelo: str, pasos, hallazgo,
+                              planteamiento=None, dato=None, referencia=None) -> dict:
+        """Junta las señales con `vision.decidir_diagnostico` y explica el motivo.
 
         -> {respuesta, respuesta_modelo, diagnostico_final}. `respuesta` es lo
-        que ve el estudiante y empieza por la conclusión final; la del tutor se
-        conserva aparte, para poder medir cada señal por separado.
+        que ve el estudiante: la conclusión, el motivo (la cuenta que no cuadra,
+        la operación que no corresponde o el dato que falta) y, si el tutor
+        llegó a lo mismo, su explicación. Si el tutor concluyó otra cosa, su
+        explicación argumenta un paso que se descartó y NO se añade: se dice que
+        discrepó, sin repetir su razonamiento.
         """
         try:
             from verificador_aritmetico import pasos_comprobados
@@ -1361,27 +1443,25 @@ class Tutor:
         except Exception:  # noqa: BLE001
             return {}
         d = decidir_diagnostico(extraer_diagnostico(respuesta_modelo), hallazgo,
-                                pasos_comprobados(list(pasos)))
+                                pasos_comprobados(list(pasos)), planteamiento, dato)
         final = d["conclusion"] or "sin conclusión"
-        lineas = [f"Diagnóstico: {final[0].upper() + final[1:]}"]
-        if d["fuente"] in ("verificador", "ambos") and (hallazgo or {}).get("tipo") in (
-                "calculo", "traslado"):
-            lineas.append(f"Comprobación de las cuentas: {hallazgo['detalle']}.")
-        elif final == "sin error" and (hallazgo or {}).get("tipo") == "ninguno":
-            lineas.append("Comprobación de las cuentas: todas las igualdades que se "
-                          "pueden comprobar cuadran.")
-        elif d["fuente"] == "modelo" and final.startswith("paso"):
-            lineas.append("El tutor señala un error de planteamiento; en ese paso no "
-                          "hay una cuenta que el verificador pueda comprobar, así que "
-                          "esta conclusión no está verificada.")
-        if d["desacuerdo"]:
-            lineas.append(
-                f"Ojo: las dos señales no coinciden. El tutor concluyó «{d['modelo'] or 'nada'}»"
-                f" y la comprobación determinista lleva a «{final}». Muestro las dos: "
-                "revisa ambos pasos antes de darlo por bueno.")
+        titulo = {"dato no disponible": "Falta un dato",
+                  "sin conclusión": "No puedo localizar el error"}.get(
+                      final, final[0].upper() + final[1:])
+        lineas = [f"Diagnóstico: {titulo}"]
+        if d["motivo"]:
+            lineas.append(f"Por qué: {d['motivo']}.")
+        if referencia and d["fuente"] in ("referencia", "ambos") and (
+                final.startswith("paso") or final == "sin conclusión"):
+            lineas.append("Así sale al resolver el enunciado por separado:\n"
+                          + referencia["texto"].strip())
         explicacion = _sin_la_linea_de_diagnostico(respuesta_modelo).strip()
-        if explicacion:
+        if not d["desacuerdo"] and explicacion:
             lineas.append("Lo que explica el tutor:\n" + explicacion)
+        elif d["desacuerdo"] and d["modelo"]:
+            lineas.append("Ojo: el tutor, por su cuenta, había concluido otra cosa. "
+                          "La conclusión de arriba se apoya en la comprobación "
+                          "determinista; si no te convence, revísala con tu profesor.")
         return {"respuesta": "\n\n".join(lineas), "respuesta_modelo": respuesta_modelo,
                 "diagnostico_final": d}
 
@@ -1442,7 +1522,8 @@ class Tutor:
             if self.estado.dispositivo == "desconocido":
                 self.estado.dispositivo = "cuda" if cuda else "cpu"
 
-            proc = AutoProcessor.from_pretrained(VLM_ID, max_pixels=1024 * 1024)
+            proc = AutoProcessor.from_pretrained(
+                VLM_ID, max_pixels=max(1024, LADO_MAYOR_FOTO) ** 2)
             # `device_map` es obligatorio, no una optimización. Sin él el VLM
             # se queda en CPU con pesos fp16 y `generate` muere con
             # «"addmm_impl_cpu_" not implemented for 'Half'», que es el mismo
@@ -1482,8 +1563,7 @@ class Tutor:
             return None
 
         from vision import (INSTRUCCION_COPIAR, INSTRUCCION_COPIAR_INDEPENDIENTE,
-                            estructurar_lineas, json_de, lecturas_consistentes,
-                            lineas_de)
+                            estructurar_lineas, json_de, lineas_de)
 
         # Aquí, y no en la interfaz: las dos lecturas y el evaluador tienen que
         # ver exactamente los mismos píxeles, venga la imagen de Gradio, del
@@ -1515,24 +1595,24 @@ class Tutor:
 
         primera = transcribir(INSTRUCCION_COPIAR)
         segunda = transcribir(INSTRUCCION_COPIAR_INDEPENDIENTE)
-        # No se asigna una consistencia por defecto: una segunda salida ausente o
-        # no estructurada también impide diagnosticar desde la foto.
-        primera["consistente"] = bool(
-            primera["ok"] and segunda["ok"] and lecturas_consistentes(primera, segunda))
         primera["normalizacion"] = normalizacion
-        # La segunda lectura no se enseña nunca al estudiante, pero quien depura
-        # un rechazo necesita verla. Va aparte, con el JSON ya interpretado.
         primera["segunda"] = {"crudo": segunda.get("crudo"), "json": segunda.get("json"),
                               "ok": segunda.get("ok")}
-        if not primera["consistente"]:
-            from vision import diferencias_de_lectura
-            primera["diferencias"] = (diferencias_de_lectura(primera, segunda)
-                                      if primera["ok"] and segunda["ok"]
-                                      else ["alguna lectura no salió en JSON"])
-            # Al log del servidor, no a la pantalla: es para depurar el
-            # rechazo, y enseñarle al estudiante una lectura dudosa invita a
-            # confirmarla.
-            print(f"[lectura] no coinciden · {primera['diferencias']}\n"
+        if not (primera["ok"] and segunda["ok"]):
+            # Una salida ausente o no estructurada no deja nada que confirmar.
+            primera.update(consistente=False, coinciden=False, discrepancias=[],
+                           diferencias=["alguna lectura no salió estructurada"])
+            return primera
+        from vision import comparar_lecturas
+        c = comparar_lecturas(primera, segunda)
+        # `consistente` es la puerta: solo se cierra si no hay texto que
+        # confirmar. Una diferencia de números u operaciones NO la cierra: se le
+        # enseña al estudiante, que es quien sabe qué escribió.
+        primera.update(consistente=not c["bloqueante"], coinciden=c["coinciden"],
+                       discrepancias=c["discrepancias"], diferencias=c["categorias"],
+                       inocuas=c["inocuas"])
+        if not c["coinciden"]:
+            print(f"[lectura] discrepancias · {c['categorias']}\n"
                   f"  1ª: {primera.get('crudo', '')[:400]!r}\n"
                   f"  2ª: {segunda.get('crudo', '')[:400]!r}", flush=True)
         return primera

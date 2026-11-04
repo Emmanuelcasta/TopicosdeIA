@@ -345,6 +345,13 @@ def leer_foto(imagen):
                  "**Revísalo antes de que lo corrija.** Si transcribí mal un número, "
                  "el error que te señale sería mío, no tuyo.\n\n"
                  f"{tiempo}")
+    if r.get("aviso_discrepancias"):
+        # Antes del botón de confirmar, no en la traza: es lo que el estudiante
+        # tiene que comprobar mirando su hoja.
+        aviso += "\n\n**⚠️ Revisa esto antes de confirmar.** " + r["aviso_discrepancias"]
+    if r.get("diferencias_inocuas"):
+        traza.append("diferencias de redacción, ignoradas: "
+                     + ", ".join(r["diferencias_inocuas"]))
     traza.append(f"propósito sugerido: {sugerido.lower()} (lo confirma el estudiante)")
     return (aviso, visible, oculto, "\n".join(r["pasos"]),
             r.get("enunciado") or "", False, "\n".join(traza), oculto,

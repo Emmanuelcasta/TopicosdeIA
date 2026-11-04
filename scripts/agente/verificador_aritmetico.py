@@ -198,6 +198,142 @@ def pasos_comprobados(pasos) -> set:
     return ok
 
 
+# --------------------------------------------------------------------------
+# Planteamiento y datos (ronda del 2026-11-05)
+#
+# Lo de arriba comprueba que cada cuenta esté bien HECHA. Lo de abajo compara
+# la hoja con el enunciado resuelto por separado, para dos fallos que las
+# cuentas no ven: la operación equivocada bien calculada (m5v-02, suma donde
+# hay que restar) y un error inventado en una hoja correcta (m5v-08). La
+# referencia la produce quien llame —en la app, el tutor resolviendo el
+# enunciado CONFIRMADO, comprobado a su vez por `revisar_hoja`—; aquí solo se
+# compara, con aritmética exacta.
+# --------------------------------------------------------------------------
+
+# Una expresión con al menos una operación: «1240 + 365», «7/8 − 3/8», «40 x 0.35».
+_EXPRESION = re.compile(
+    r"(?<![\w/.,])(-?\d+(?:[.,]\d+)?(?:\s*/\s*\d+)?"
+    r"(?:\s*[+\-−×xX*÷]\s*-?\d+(?:[.,]\d+)?(?:\s*/\s*\d+)?)+)(?![\w/])")
+
+
+def expresiones_de(paso: str) -> list:
+    """Las cuentas planteadas en un paso, con o sin «=» detrás."""
+    return [m.group(1).strip() for m in _EXPRESION.finditer(_PREFIJO_PASO.sub("", paso or ""))]
+
+
+def valor_final(pasos) -> Fraction | None:
+    """El resultado al que llega una hoja: el número de «Respuesta final», o si
+    no la hay, lo último escrito a la derecha de una igualdad."""
+    pasos = [_PREFIJO_PASO.sub("", str(p)) for p in (pasos or [])]
+    for p in reversed(pasos):
+        if _MENCIONA_FINAL.search(p):
+            return _primer_numero(_MENCIONA_FINAL.split(p)[-1])
+    for p in reversed(pasos):
+        pares = igualdades_de(p)
+        if pares:
+            return _valor(pares[-1][1])
+    return None
+
+
+def valores_de(pasos) -> set:
+    """Todos los valores que aparecen calculados en una solución: cada cuenta
+    planteada y cada lado de cada igualdad."""
+    salida = set()
+    for p in pasos or []:
+        for e in expresiones_de(str(p)):
+            v = _valor(e)
+            if v is not None:
+                salida.add(v)
+        for a, b in igualdades_de(str(p)):
+            for x in (_valor(a), _valor(b)):
+                if x is not None:
+                    salida.add(x)
+    final = valor_final(pasos)
+    if final is not None:
+        salida.add(final)
+    return salida
+
+
+def revisar_planteamiento(pasos, final_referencia, valores_referencia,
+                          hasta: int | None = None) -> Hallazgo | None:
+    """Compara la hoja con el enunciado resuelto aparte. None si no se puede.
+
+      · «coincide»       la hoja llega al mismo resultado que la referencia.
+      · «planteamiento»  no llega, y el paso p es el primero que plantea una
+                         cuenta cuyo valor no aparece en la referencia.
+      · «discrepa»       no llega, pero no hay un paso que lo explique: no se
+                         elige uno a ciegas.
+
+    `hasta`: solo se buscan pasos ANTERIORES a ese (el primer error de cálculo):
+    un planteamiento posterior no es el primer error.
+    """
+    if final_referencia is None:
+        return None
+    final = valor_final(pasos)
+    if final is None:
+        return None
+    referencia = set(valores_referencia or ()) | {final_referencia}
+    if final == final_referencia and hasta is None:
+        return Hallazgo(None, "coincide",
+                        f"tu resultado, {_fmt(final)}, es el mismo que sale al "
+                        "resolver el enunciado por separado")
+    if final == final_referencia:
+        return None
+    limpios = [_PREFIJO_PASO.sub("", str(p)) for p in (pasos or [])]
+    for i, paso in enumerate(limpios, 1):
+        if hasta is not None and i >= hasta:
+            break
+        for e in expresiones_de(paso):
+            v = _valor(e)
+            if v is not None and v not in referencia:
+                return Hallazgo(
+                    i, "planteamiento",
+                    f"en el paso {i} se plantea {e}, que da {_fmt(v)}, pero al "
+                    f"resolver el enunciado por separado el resultado es "
+                    f"{_fmt(final_referencia)}: la cuenta puede estar bien hecha, "
+                    "pero no es la operación que pide el enunciado")
+    if hasta is not None:
+        return None
+    return Hallazgo(None, "discrepa",
+                    f"tu resultado, {_fmt(final)}, no coincide con el que sale al "
+                    f"resolver el enunciado por separado, {_fmt(final_referencia)}, "
+                    "pero no encuentro un paso concreto que lo explique: revisa "
+                    "el planteamiento con tu profesor")
+
+
+# Cantidades escritas con palabras: si el enunciado las trae, sí tiene datos.
+_NUMEROS_EN_PALABRAS = re.compile(
+    r"\b(uno|una|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|once|doce|"
+    r"veinte|treinta|cuarenta|cincuenta|cien|ciento|mil|media|medio|mitad|"
+    r"doble|triple|tercio|cuarto|docena)\b", re.IGNORECASE)
+
+
+def falta_un_dato(enunciado, pasos) -> Hallazgo | None:
+    """El enunciado no trae ningún dato, pero los pasos operan con números.
+
+    Es lo que pasa cuando la pregunta pide algo que no está en la hoja
+    (m5v-12: «¿Cuánto me costó el tercer artículo?» y los pasos suman los dos
+    primeros). Sin datos en el enunciado no hay forma de saber si las cuentas
+    responden a la pregunta, y señalar un paso sería inventar.
+    """
+    texto = str(enunciado or "")
+    if not texto.strip() or any(c.isdigit() for c in texto) or _NUMEROS_EN_PALABRAS.search(texto):
+        return None
+    usados = [e for p in (pasos or []) for e in expresiones_de(str(p))]
+    if not usados:
+        return None
+    numeros = []
+    for e in usados:
+        for n in _NUMERO.findall(e):
+            if n not in numeros:
+                numeros.append(n)
+    return Hallazgo(None, "dato_ausente",
+                    "el enunciado no trae ningún dato numérico, y los números que "
+                    f"usas ({', '.join(numeros[:4])}) no aparecen en él: el dato que "
+                    "pide la pregunta no está en la foto. Sin ese dato no puedo "
+                    "decir si el procedimiento responde a la pregunta")
+
+
 def _primer_numero(texto: str) -> Fraction | None:
     m = _NUMERO.search(texto or "")
     return _valor(m.group()) if m else None

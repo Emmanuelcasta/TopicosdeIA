@@ -48,10 +48,20 @@ sys.path[:0] = [str(RAIZ / "M5_despliegue" / "app"), str(RAIZ / "scripts"),
 
 JSONL = RAIZ / "data" / "eval_set_m5_vision.jsonl"
 IMAGENES = Path(os.environ.get("M5_IMAGENES", RAIZ / "m4" / "eval_set" / "imagenes_m5"))
-SALIDA = RAIZ / "M5_despliegue" / "resultados" / "vision_m5.json"
-SALIDA_CSV = RAIZ / "M5_despliegue" / "resultados" / "vision_m5.csv"
-LADO_MAYOR = 1024          # el mismo tope de M4: la latencia por caso no debe
-                           # depender de cómo salió la foto
+# El mismo tope que la app (`TUTOR_LADO_MAYOR`): evaluador e interfaz tienen
+# que ver los mismos píxeles.
+LADO_MAYOR = int(os.environ.get("TUTOR_LADO_MAYOR", "1024"))
+_NOMBRE = os.environ.get("M5_SALIDA", "vision_m5")
+SALIDA = RAIZ / "M5_despliegue" / "resultados" / f"{_NOMBRE}.json"
+SALIDA_CSV = RAIZ / "M5_despliegue" / "resultados" / f"{_NOMBRE}.csv"
+SALIDA_TABLA = RAIZ / "M5_despliegue" / "resultados" / f"{_NOMBRE}_tabla.md"
+
+# Fuera de ESTA ronda, por decisión del responsable (2026-11-05): no se evalúan
+# fotos borrosas. Ni se lee ni se puntúa; consta en el informe.
+EXCLUIDOS_DE_LA_RONDA = {
+    "m5v-10": "fuera de la ronda: su foto es legible y el caso mide fotos "
+              "borrosas, que esta ronda no evalúa.",
+}
 
 # Conflictos verificados a mano entre la hoja fotografiada y el JSONL, el
 # 2026-11-03. Un caso en conflicto SE LEE —la evidencia de lectura sigue
@@ -198,6 +208,9 @@ def etapa_lectura(tutor, ruta: Path, caso: dict) -> dict:
         "motivo_no_fiable": r.get("motivo_no_fiable") or "",
         "lecturas_coinciden": r.get("lecturas_coinciden"),
         "diferencias": r.get("diferencias") or [],
+        "discrepancias_mostradas": r.get("discrepancias") or [],
+        "diferencias_inocuas": r.get("diferencias_inocuas") or [],
+        "enunciado_fiel": enunciado_fiel(caso, r.get("enunciado") or ""),
         "proposito": r.get("proposito"),
         "enunciado": r.get("enunciado"),
         "transcripcion": r.get("transcripcion"),
@@ -209,6 +222,16 @@ def etapa_lectura(tutor, ruta: Path, caso: dict) -> dict:
             else escrito.replace(" ", "") in " ".join(pasos).replace(" ", "")),
         "lectura_fiel": fiel,
     }
+
+
+def enunciado_fiel(caso: dict, leido: str) -> bool | None:
+    """¿El enunciado leído trae los mismos datos que la hoja? Compara los
+    números, que es lo que cambia el ejercicio; la redacción no."""
+    from vision import _firma_matematica
+    if not caso.get("check"):
+        return None
+    return sorted(_firma_matematica(leido)[0]) == sorted(
+        _firma_matematica(caso.get("enunciado") or "")[0])
 
 
 # --------------------------------------------------------------------------
@@ -254,10 +277,44 @@ def texto_a_calificar(dia: dict) -> str:
     abstenciones (fuera de dominio, dato no disponible) se puntúa el texto del
     tutor, porque esas categorías no las decide el verificador.
     """
-    final = (dia.get("diagnostico_final") or {}).get("conclusion")
+    d = dia.get("diagnostico_final") or {}
+    final = d.get("conclusion")
     if final and (final.startswith("paso") or final == "sin error"):
         return f"Diagnóstico: el {final}" if final.startswith("paso") else "Diagnóstico: sin error"
+    if d.get("fuente") in ("verificador", "referencia"):
+        # Abstención decidida por el código (falta un dato): se puntúa la
+        # conclusión y su motivo, que es lo que ve el estudiante.
+        return f"Diagnóstico: {final}. {d.get('motivo') or ''}"
     return dia.get("respuesta_modelo") or dia.get("respuesta") or ""
+
+
+def calificar_solucion(caso: dict, sol: dict) -> dict:
+    """Flujo 1 · ¿la solución del enunciado llega al resultado correcto?
+
+    El resultado correcto sale de `check`, la cuenta que el eval set ya
+    declaraba, no de `valor_correcto` escrito a mano. Para los adversariales
+    (no es un ejercicio, falta un dato) rige su contrato de `claves`.
+    """
+    from verificador_aritmetico import _valor, valor_final
+    if caso["bloque"] == "adversarial":
+        return calificar(caso, sol.get("respuesta") or "")
+    esperado = _valor(caso["check"])
+    obtenido = valor_final(sol.get("pasos_solucion") or
+                           (sol.get("respuesta") or "").splitlines())
+    return {"criterio": "resultado", "esperado": None if esperado is None else str(esperado),
+            "obtenido": None if obtenido is None else str(obtenido),
+            "acierto": esperado is not None and obtenido == esperado}
+
+
+def etapa_solucion(tutor, enunciado_leido: str) -> dict:
+    """Flujo 1 · el enunciado leído y confirmado tal cual -> solución."""
+    t0 = time.perf_counter()
+    r = tutor.resolver_enunciado(enunciado_leido, confirmado=True)
+    return {"segundos": round(time.perf_counter() - t0, 2), "ok": bool(r.get("ok")),
+            "camino": r.get("camino"), "respuesta": r.get("respuesta"),
+            "pasos_solucion": r.get("pasos_solucion") or [],
+            "verificador_aritmetico": r.get("verificador_aritmetico"),
+            "error": None if r.get("ok") else r.get("respuesta")}
 
 
 def etapa_diagnostico(tutor, caso: dict, pasos: list, proposito: str = "revisar",
@@ -273,8 +330,11 @@ def etapa_diagnostico(tutor, caso: dict, pasos: list, proposito: str = "revisar"
     if proposito == "resolver":
         r = tutor.resolver_enunciado(enunciado_leido, confirmado=True)
     else:
+        # El enunciado LEÍDO, no el del eval set: en la app el diagnóstico
+        # solo ve lo que el estudiante confirmó. Hasta b439be5 se pasaba el de
+        # referencia, que el tutor nunca tendría.
         r = tutor.revisar_pasos(pasos, caso["pregunta"],
-                                enunciado=caso.get("enunciado"), confirmado=True)
+                                enunciado=enunciado_leido, confirmado=True)
     return {
         "segundos": round(time.perf_counter() - t0, 2),
         "ok": bool(r.get("ok")),
@@ -284,6 +344,8 @@ def etapa_diagnostico(tutor, caso: dict, pasos: list, proposito: str = "revisar"
         "herramientas": r.get("herramientas") or [],
         "respuesta_modelo": r.get("respuesta_modelo"),
         "diagnostico_final": r.get("diagnostico_final"),
+        "planteamiento": r.get("planteamiento"),
+        "referencia": r.get("referencia"),
         "modo": proposito,
         "error": None if r.get("ok") else r.get("respuesta"),
     }
@@ -291,56 +353,81 @@ def etapa_diagnostico(tutor, caso: dict, pasos: list, proposito: str = "revisar"
 
 # --------------------------------------------------------------------------
 
+def _resumen_caso(f: dict) -> dict:
+    """Una fila de la tabla por caso: lectura, solución, diagnóstico,
+    explicación, latencias y fallo observado."""
+    lec = f.get("lectura") or {}
+    sol = f.get("solucion") or {}
+    dia = f.get("diagnostico") or {}
+    cal = f.get("calificacion") or {}
+    csol = sol.get("calificacion") or {}
+    df = dia.get("diagnostico_final") or {}
+    fallos = []
+    if f["estado"] == "excluido":
+        fallos.append("excluido de la ronda")
+    if lec.get("pide_otra_foto"):
+        fallos.append(f"lectura rechazada: {lec.get('motivo_no_fiable')}")
+    if lec.get("lectura_fiel") is False:
+        fallos.append("lectura de los pasos no fiel a la hoja")
+    if lec.get("enunciado_fiel") is False:
+        fallos.append("datos del enunciado mal leídos")
+    if sol and not csol.get("acierto"):
+        fallos.append("solución incorrecta")
+    if cal and not cal.get("acierto"):
+        fallos.append(f"diagnóstico incorrecto ({f.get('fuente_del_fallo')})")
+    if cal.get("fallo_grave"):
+        fallos.append("ERROR INVENTADO en hoja sin error")
+    explicacion = (df.get("motivo") or "") if df else (dia.get("respuesta") or "")
+    return {
+        "caso": f["caso"], "bloque": f.get("bloque", ""), "estado": f["estado"],
+        "lectura": ("; ".join(lec.get("pasos") or []) or lec.get("enunciado") or ""),
+        "enunciado_leido": lec.get("enunciado") or "",
+        "discrepancias_mostradas": " | ".join(lec.get("discrepancias_mostradas") or []),
+        "lectura_s": lec.get("segundos", ""),
+        "solucion": (f"{csol.get('obtenido')} (esperado {csol.get('esperado')})"
+                     if csol.get("criterio") == "resultado"
+                     else (sol.get("respuesta") or "")[:120]),
+        "solucion_acierto": csol.get("acierto", ""),
+        "resolver_s": sol.get("segundos", ""),
+        "diagnostico": df.get("conclusion") or (dia.get("respuesta") or "")[:80],
+        "esperado": f.get("esperado", ""),
+        "diagnostico_acierto": cal.get("acierto", ""),
+        "fuente": df.get("fuente", ""),
+        "explicacion": explicacion.replace("\n", " "),
+        "revisar_s": dia.get("segundos", ""),
+        "fallo_observado": "; ".join(fallos) or "ninguno",
+    }
+
+
 def escribir_csv(filas: list) -> None:
-    """Una fila por foto. El scorecard que se lee sin abrir el JSON."""
+    """Una fila por caso. El scorecard que se lee sin abrir el JSON."""
     import csv
 
-    columnas = ["caso", "archivo", "bloque", "variante", "estado", "bloqueado",
-                "segundos_lectura", "lectura", "px", "confirmable", "proposito",
-                "diferencias", "modo", "error",
-                "pide_otra_foto", "motivo_no_fiable", "lecturas_coinciden",
-                "n_pasos", "n_pasos_esperados", "numero_escrito_preservado",
-                "lectura_fiel", "segundos_diagnostico", "verificador",
-                "herramientas_reales", "acierto", "fuente_del_fallo",
-                "transcripcion", "respuesta"]
+    resumen = [_resumen_caso(f) for f in filas]
     SALIDA_CSV.parent.mkdir(parents=True, exist_ok=True)
     with SALIDA_CSV.open("w", newline="", encoding="utf-8") as fh:
-        w = csv.DictWriter(fh, fieldnames=columnas)
+        w = csv.DictWriter(fh, fieldnames=list(resumen[0]))
         w.writeheader()
-        for f in filas:
-            lec = f.get("lectura") or {}
-            dia = f.get("diagnostico") or {}
-            cal = f.get("calificacion") or {}
-            w.writerow({
-                "caso": f["caso"], "archivo": f["archivo"],
-                "bloque": f.get("bloque", ""), "variante": f.get("variante", ""),
-                "estado": f["estado"], "bloqueado": f.get("bloqueado", ""),
-                "segundos_lectura": lec.get("segundos", ""),
-                "lectura": lec.get("lectura", ""),
-                "px": "x".join(str(n) for n in lec.get("px", [])),
-                "confirmable": lec.get("confirmable", ""),
-                "proposito": lec.get("proposito", ""),
-                "diferencias": "; ".join(lec.get("diferencias") or []),
-                "modo": dia.get("modo", ""),
-                "error": dia.get("error") or "",
-                "pide_otra_foto": lec.get("pide_otra_foto", ""),
-                "motivo_no_fiable": lec.get("motivo_no_fiable", ""),
-                "lecturas_coinciden": lec.get("lecturas_coinciden", ""),
-                "n_pasos": lec.get("n_pasos", ""),
-                "n_pasos_esperados": lec.get("n_pasos_esperados", ""),
-                "numero_escrito_preservado": lec.get("numero_escrito_preservado", ""),
-                "lectura_fiel": lec.get("lectura_fiel", ""),
-                "segundos_diagnostico": dia.get("segundos", ""),
-                "verificador": json.dumps(dia.get("verificador_aritmetico"),
-                                          ensure_ascii=False),
-                # Las herramientas que se EJECUTARON de verdad, según la traza.
-                # Vacío: la respuesta no está verificada por herramienta.
-                "herramientas_reales": ",".join(dia.get("herramientas") or []),
-                "acierto": cal.get("acierto", ""),
-                "fuente_del_fallo": f.get("fuente_del_fallo", ""),
-                "transcripcion": (lec.get("transcripcion") or "").replace("\n", " / "),
-                "respuesta": (dia.get("respuesta") or "").replace("\n", " / "),
-            })
+        w.writerows(resumen)
+
+
+def escribir_tabla(filas: list, informe: dict) -> None:
+    """La misma tabla en Markdown, con la cabecera de la corrida."""
+    cols = [("caso", "Caso"), ("lectura_s", "Lectura s"), ("discrepancias_mostradas",
+            "Discrepancias mostradas"), ("solucion", "Resolver"), ("solucion_acierto", "✓"),
+            ("resolver_s", "s"), ("diagnostico", "Revisar"), ("esperado", "Esperado"),
+            ("diagnostico_acierto", "✓"),
+            ("revisar_s", "s"), ("explicacion", "Motivo"), ("fallo_observado", "Fallo observado")]
+    lineas = [f"# Scorecard visual M5 · commit {informe.get('commit')} · "
+              f"{informe.get('fecha')} · lado mayor {informe.get('lado_mayor_px')} px", "",
+              informe.get("naturaleza", ""), "",
+              "| " + " | ".join(t for _, t in cols) + " |",
+              "|" + "---|" * len(cols)]
+    for f in filas:
+        r = _resumen_caso(f)
+        lineas.append("| " + " | ".join(str(r.get(k, "")).replace("|", "/")[:160]
+                                        for k, _ in cols) + " |")
+    SALIDA_TABLA.write_text("\n".join(lineas) + "\n", encoding="utf-8")
 
 
 def main() -> int:
@@ -383,6 +470,12 @@ def main() -> int:
     for archivo, caso, etiqueta in variantes(cs):
         if solo and caso["id"] not in solo:
             continue
+        if caso["id"] in EXCLUIDOS_DE_LA_RONDA:
+            filas.append({"archivo": archivo, "caso": caso["id"], "bloque": caso["bloque"],
+                          "variante": etiqueta, "estado": "excluido",
+                          "excluido": EXCLUIDOS_DE_LA_RONDA[caso["id"]]})
+            print(f"--- {archivo}  EXCLUIDO de esta ronda")
+            continue
         ruta = IMAGENES / archivo
         if not ruta.is_file():
             filas.append({"archivo": archivo, "caso": caso["id"],
@@ -391,60 +484,56 @@ def main() -> int:
             continue
 
         lec = etapa_lectura(tutor, ruta, caso)
-        # La carga ya se pagó arriba, así que esta es la lectura en frío de
-        # verdad: la primera inferencia con el modelo ya en memoria.
         lec["lectura"] = "fria" if primera else "caliente"
         primera = False
-
         fila = {"archivo": archivo, "caso": caso["id"], "bloque": caso["bloque"],
-                "variante": etiqueta, "estado": "leido", "lectura": lec}
-
-        print(f"--- {archivo}  ({caso['id']} · {caso['bloque']} · {etiqueta})"
-              f"  {lec['segundos']}s  [{lec['lectura']}]")
-        print(f"      confirmable={lec['confirmable']}  coinciden={lec['lecturas_coinciden']}"
-              f"  pasos={lec['n_pasos']}/{lec['n_pasos_esperados']}"
-              f"  numero_escrito_preservado={lec['numero_escrito_preservado']}"
-              f"  lectura_fiel={lec['lectura_fiel']}")
+                "variante": etiqueta, "estado": "leido", "lectura": lec,
+                "esperado": (f"paso {caso['paso_error']}" if caso.get("paso_error")
+                             else caso["bloque"])}
+        print(f"--- {archivo}  ({caso['id']} · {caso['bloque']})  lectura {lec['segundos']}s"
+              f" [{lec['lectura']}] · confirmable={lec['confirmable']}"
+              f" · coinciden={lec['lecturas_coinciden']} · pasos={lec['n_pasos']}/"
+              f"{lec['n_pasos_esperados']} · fiel={lec['lectura_fiel']}"
+              f" · enunciado_fiel={lec['enunciado_fiel']}")
+        for d in lec["discrepancias_mostradas"]:
+            print(f"      discrepancia mostrada: {d}")
         if lec["pide_otra_foto"]:
-            print(f"      PIDE OTRA FOTO: {lec['motivo_no_fiable']}"
-                  + (f" · difieren en {lec['diferencias']}" if lec.get("diferencias") else ""))
-            if caso["id"] in CONFLICTOS:
-                fila["bloqueado"] = CONFLICTOS[caso["id"]]
-            # Y aquí se para. Diagnosticar sobre una lectura que el propio
-            # sistema declaró no fiable es exactamente lo que vis-10 demostró
-            # que no se puede hacer.
+            print(f"      PIDE OTRA FOTO: {lec['motivo_no_fiable']}")
             filas.append(fila)
             continue
 
-        dia = etapa_diagnostico(tutor, caso, lec["pasos"], lec.get("proposito") or "revisar",
-                                lec.get("enunciado") or "")
+        # Se simula a un estudiante que confirma la lectura SIN corregir nada:
+        # el peor caso. Si hubo discrepancias mostradas, consta en la fila.
+        # Flujo 1 · resolver el enunciado leído.
+        if (lec.get("enunciado") or "").strip():
+            sol = etapa_solucion(tutor, lec["enunciado"])
+            sol["calificacion"] = calificar_solucion(caso, sol)
+            fila["solucion"] = sol
+            print(f"      RESOLVER {sol['segundos']}s · camino={sol['camino']} · "
+                  f"acierto={sol['calificacion']['acierto']} "
+                  f"({sol['calificacion'].get('obtenido')} vs {sol['calificacion'].get('esperado')})")
+        # Flujo 2 · revisar el procedimiento. Sin pasos, la app propone resolver
+        # y eso es lo que se puntúa (m5v-11).
+        if lec["pasos"]:
+            dia = etapa_diagnostico(tutor, caso, lec["pasos"], "revisar",
+                                    lec.get("enunciado") or "")
+        else:
+            dia = etapa_diagnostico(tutor, caso, [], "resolver", lec.get("enunciado") or "")
         fila["diagnostico"] = dia
-        if caso["id"] in CONFLICTOS:
-            # Se guarda lo que contestó, para poder leerlo; no se puntúa. La
-            # respuesta esperada describe una hoja que no es la que hay.
-            fila["bloqueado"] = CONFLICTOS[caso["id"]]
-            print(f"      diagnóstico {dia['segundos']}s · BLOQUEADO, sin puntuar")
-            print(f"      {CONFLICTOS[caso['id']]}")
-            filas.append(fila)
-            continue
         cal = calificar(caso, texto_a_calificar(dia))
-        cal_modelo = calificar(caso, dia.get("respuesta_modelo") or dia["respuesta"] or "")
-        cal["acierto_solo_tutor"] = cal_modelo["acierto"]
+        cal["acierto_solo_tutor"] = calificar(
+            caso, dia.get("respuesta_modelo") or dia["respuesta"] or "")["acierto"]
         conclusion = (dia.get("diagnostico_final") or {}).get("conclusion") or ""
-        # Inventar un error en una hoja sin errores es el fallo más dañino.
         cal["fallo_grave"] = caso["bloque"] == "sin_error" and conclusion.startswith("paso")
         from vision import fuente_del_fallo
         fila["calificacion"] = cal
         fila["fuente_del_fallo"] = fuente_del_fallo(cal["acierto"], lec["lectura_fiel"])
-        print(f"      final={(dia.get('diagnostico_final') or {}).get('conclusion')} "
-              f"(fuente {(dia.get('diagnostico_final') or {}).get('fuente')}) · "
-              f"tutor={(dia.get('diagnostico_final') or {}).get('modelo')} · "
-              f"verificador={(dia.get('verificador_aritmetico') or {}).get('tipo')}/"
-              f"{(dia.get('verificador_aritmetico') or {}).get('paso')} · "
-              f"esperado={caso.get('paso_error') or caso['bloque']}")
-        print(f"      diagnóstico {dia['segundos']}s · acierto={cal['acierto']}"
-              f" · solo_tutor={cal['acierto_solo_tutor']} · grave={cal['fallo_grave']}"
-              f" · fuente_del_fallo={fila['fuente_del_fallo']}")
+        df = dia.get("diagnostico_final") or {}
+        print(f"      REVISAR {dia['segundos']}s · final={df.get('conclusion')} "
+              f"(fuente {df.get('fuente')}) · tutor={df.get('modelo')} · "
+              f"esperado={caso.get('paso_error') or caso['bloque']} · "
+              f"acierto={cal['acierto']} · grave={cal['fallo_grave']} · "
+              f"fuente_del_fallo={fila['fuente_del_fallo']}")
         filas.append(fila)
 
     parcial = bool(solo) or not inv["completo"]
@@ -462,7 +551,7 @@ def main() -> int:
         "naturaleza": ("evaluación de DESARROLLO: estas 12 hojas se han usado para "
                        "depurar la lectura, el verificador y la regla de diagnóstico. "
                        "No es evidencia de generalización."),
-        "excluidos_de_la_puntuacion": CONFLICTOS,
+        "excluidos_de_la_puntuacion": EXCLUIDOS_DE_LA_RONDA,
         "parcial": parcial,
         "eval_set": str(JSONL.relative_to(RAIZ)),
         "inventario": inv,
@@ -476,60 +565,61 @@ def main() -> int:
             "del eval set y acabaría citada como si lo fuera")
     else:
         juzgadas = [f for f in filas if "calificacion" in f]
+        resueltas = [f for f in filas if "solucion" in f]
         calientes = sorted(f["lectura"]["segundos"] for f in filas
                            if f.get("lectura", {}).get("lectura") == "caliente")
         informe["latencias"] = {
             "carga_del_vlm_s": carga["segundos"],
             "lectura_fria_s": next((f["lectura"]["segundos"] for f in filas
-                                    if f.get("lectura", {}).get("lectura") == "fria"),
-                                   None),
+                                    if f.get("lectura", {}).get("lectura") == "fria"), None),
             "lecturas_calientes_s": calientes,
-            # p50/p95 solo con muestra. Con menos de 20 observaciones un p95 es
-            # el máximo con otro nombre.
-            "p50_s": (calientes[len(calientes) // 2] if len(calientes) >= 20 else None),
-            "p95_s": (calientes[int(len(calientes) * 0.95)] if len(calientes) >= 20 else None),
-            "nota": ("p50 y p95 solo se calculan con 20 o más lecturas en "
-                     "caliente; por debajo de eso el p95 es el máximo con otro "
-                     "nombre. Se dan los tiempos uno a uno."),
+            "resolver_s": [f["solucion"]["segundos"] for f in resueltas],
+            "revisar_s": [f["diagnostico"]["segundos"] for f in juzgadas],
+            "nota": ("menos de 20 observaciones por etapa: sin p50/p95, se dan "
+                     "los tiempos uno a uno. revisar incluye resolver el "
+                     "enunciado aparte cuando las cuentas cuadran (salvo caché)."),
         }
         informe["metricas"] = {
-            "fotos_del_conjunto": len(filas),
-            "fotos_leidas": sum(1 for f in filas if f["estado"] == "leido"),
-            "bloqueadas_por_conflicto": sum(1 for f in filas if f.get("bloqueado")),
-            "puntuables": len(juzgadas),
-            "pidio_otra_foto": sum(1 for f in filas
-                                   if f.get("lectura", {}).get("pide_otra_foto")),
-            "aciertos": sum(1 for f in juzgadas if f["calificacion"]["acierto"]),
-            "aciertos_solo_tutor": sum(1 for f in juzgadas
-                                       if f["calificacion"].get("acierto_solo_tutor")),
-            "fallos_graves_error_inventado": sum(1 for f in juzgadas
-                                                 if f["calificacion"].get("fallo_grave")),
-            # Coste de seguridad de la doble lectura estricta: TODAS las fotos
-            # del conjunto son legibles (m5v-10 incluida, ver CONFLICTOS), así
-            # que cada rechazo aquí es una hoja legible que no pasó.
-            "legibles_rechazadas_por_doble_lectura": sorted(
-                f["caso"] for f in filas
-                if f.get("lectura", {}).get("pide_otra_foto")),
-            "fallos_de_lectura": sum(1 for f in juzgadas
-                                     if f["fuente_del_fallo"] == "lectura"),
-            "fallos_de_diagnostico": sum(1 for f in juzgadas
-                                         if f["fuente_del_fallo"] == "diagnostico"),
+            "fotos_evaluadas": sum(1 for f in filas if f["estado"] == "leido"),
+            "excluidas_de_la_ronda": sorted(EXCLUIDOS_DE_LA_RONDA),
+            "pidio_otra_foto": sorted(f["caso"] for f in filas
+                                      if f.get("lectura", {}).get("pide_otra_foto")),
+            "con_discrepancias_mostradas": sorted(
+                f["caso"] for f in filas if f.get("lectura", {}).get("discrepancias_mostradas")),
+            "lectura_fiel_pasos": sum(1 for f in filas
+                                      if f.get("lectura", {}).get("lectura_fiel") is True),
+            "lectura_fiel_enunciado": sum(1 for f in filas
+                                          if f.get("lectura", {}).get("enunciado_fiel") is True),
+            "resolver": {"puntuables": len(resueltas),
+                         "aciertos": sum(1 for f in resueltas
+                                         if f["solucion"]["calificacion"]["acierto"])},
+            "revisar": {
+                "puntuables": len(juzgadas),
+                "aciertos": sum(1 for f in juzgadas if f["calificacion"]["acierto"]),
+                "aciertos_solo_tutor": sum(1 for f in juzgadas
+                                           if f["calificacion"].get("acierto_solo_tutor")),
+                "fallos_graves_error_inventado": sum(
+                    1 for f in juzgadas if f["calificacion"].get("fallo_grave")),
+                "fallos_de_lectura": sum(1 for f in juzgadas
+                                         if f["fuente_del_fallo"] == "lectura"),
+                "fallos_de_diagnostico": sum(1 for f in juzgadas
+                                             if f["fuente_del_fallo"] == "diagnostico"),
+            },
         }
 
     informe["conflictos"] = CONFLICTOS
-    informe["decision_pendiente"] = (
-        "m5v-10 necesita una foto movida de verdad. Hasta entonces la "
-        "salvaguarda de ilegibles no tiene ninguna medición en este conjunto.")
+    informe["excluidos_de_la_ronda"] = EXCLUIDOS_DE_LA_RONDA
+    informe["lado_mayor_px"] = LADO_MAYOR
     informe["limites_de_la_muestra"] = (
-        "11 casos puntuables como máximo, menos los que pare la doble lectura. "
-        "Un acierto mueve la tasa unos 9 puntos o más. Las hojas se reutilizaron "
-        "para depurar el sistema: sirve para ver si el recorrido funciona, no "
-        "para comparar configuraciones ni afirmar mejoras.")
+        "11 fotos legibles. Un acierto mueve la tasa unos 9 puntos. Las hojas se "
+        "reutilizaron para depurar el sistema: sirve para ver si el recorrido "
+        "funciona, no para comparar configuraciones ni afirmar generalización.")
 
     SALIDA.parent.mkdir(parents=True, exist_ok=True)
     SALIDA.write_text(json.dumps(informe, ensure_ascii=False, indent=2) + "\n",
                       encoding="utf-8")
     escribir_csv(filas)
+    escribir_tabla(filas, informe)
     print(f"\nescrito: {SALIDA.relative_to(RAIZ)}")
     print(f"escrito: {SALIDA_CSV.relative_to(RAIZ)}")
     if parcial:

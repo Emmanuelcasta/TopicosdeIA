@@ -270,30 +270,139 @@ def huella_lectura(lectura) -> tuple:
 
 
 def diferencias_de_lectura(a, b) -> list:
-    """Qué parte de la huella separa dos lecturas. [] si coinciden.
+    """Qué separa dos lecturas, por categoría. [] si coinciden en lo material.
 
-    Solo nombres de componentes, nunca el texto: es para la traza, y enseñar
-    una transcripción que no es de fiar invita a confirmarla.
+    Solo nombres («números del enunciado», «paso 2»…), para la traza. El texto
+    de cada discrepancia, para enseñárselo al estudiante, lo da
+    `comparar_lecturas`.
     """
-    ha, hb = huella_lectura(a), huella_lectura(b)
-    if ha == hb:
-        return []
-    if ha[0] != hb[0]:
-        return [f"tipo de hoja: {ha[0]} / {hb[0]}"]
-    nombres = {
-        "procedimiento": ("tipo", "estructura", "pasos", "respuesta final", "números"),
-        "enunciado": ("tipo", "estructura", "respuesta final",
-                      "números del enunciado", "operaciones del enunciado"),
-        "lineas": ("tipo", "hay texto", "palabras del enunciado",
-                   "palabras de los pasos", "números del enunciado",
-                   "números de los pasos", "operaciones", "cantidad de pasos",
-                   "respuesta final"),
-    }.get(ha[0], tuple(f"campo {i}" for i in range(len(ha))))
-    return [n for n, x, y in zip(nombres, ha, hb) if x != y]
+    return comparar_lecturas(a, b)["categorias"]
+
+
+# Palabras que cambian el SENTIDO de un enunciado o de un paso: la operación
+# («sumo» / «resto»), la relación («quedan» / «faltan») o una negación. Se
+# agrupan por raíz para que «sumo» y «suma» cuenten igual. Una diferencia en
+# cualquier otra palabra —«lápices» / «lapiceros», «reparten» / «reporten»— es
+# de redacción y no se le enseña al estudiante.
+_RAICES_EXACTAS = {"mas": "mas", "menos": "menos", "por": "por", "entre": "entre",
+                   "cada": "cada", "total": "total", "no": "no", "ni": "no",
+                   "sin": "sin", "doble": "dobl", "triple": "tripl"}
+_RAICES = ("sum", "rest", "multipl", "divid", "repart", "retir", "qued", "sobr",
+           "falt", "agreg", "anad", "quit", "mitad", "terci", "cuart", "descuent",
+           "aument", "porcent", "cient", "gan", "perd", "pierd", "pag", "cost",
+           "vend", "compr", "veces")
+_NEGACIONES = {"no", "sin"}
+
+
+def _raices_de_sentido(texto: str) -> set:
+    salida = set()
+    for w in palabras_de(texto):
+        r = _RAICES_EXACTAS.get(w) or next((p for p in _RAICES if w.startswith(p)), None)
+        if r:
+            salida.add(r)
+    return salida
+
+
+def _sentido_distinto(ta: str, tb: str) -> bool:
+    """¿Las dos versiones dicen cosas distintas, y no solo con otras palabras?
+
+    Cuenta como cambio de sentido que cada versión tenga una palabra de sentido
+    que la otra no tiene («sumo» frente a «resto»), o que una sola tenga una
+    negación. Que una versión simplemente omita «Multiplico» delante de
+    «24 x 13» no lo es: la operación sigue escrita en los números.
+    """
+    ra, rb = _raices_de_sentido(ta), _raices_de_sentido(tb)
+    solo_a, solo_b = ra - rb, rb - ra
+    return bool((solo_a and solo_b) or ((solo_a | solo_b) & _NEGACIONES))
+
+
+def _firma_matematica(texto: str) -> tuple:
+    """Números y operaciones de un texto, en orden. «×» y «x», coma y punto
+    decimal y las marcas «Paso N» no cuentan."""
+    t = _PAT_MARCA_PASO.sub(" ", _decimal(texto))
+    return tuple(numeros_de(t)), operaciones_de(t)
+
+
+def _partes_de_lectura(lectura):
+    """-> (enunciado, [pasos]) de una lectura, o None si no hay nada legible.
+
+    Sirve para los dos formatos: el de líneas de M5 y el JSON con `pasos` de
+    M4. La respuesta final cuenta como un paso, igual que en el eval set.
+    """
+    js = (lectura or {}).get("json") or {}
+    if not isinstance(js, dict) or js.get("ilegible"):
+        return None
+    if isinstance(js.get("lineas"), list) and "enunciado" not in js and "pasos" not in js:
+        js = estructurar_lineas(js["lineas"])
+    if not isinstance(js.get("pasos"), list):
+        return None
+    pasos = [_PREFIJO_PASO.sub("", str(p)).strip() for p in js["pasos"]]
+    final = js.get("respuesta_final")
+    if pasos and final is not None and not any(_MENCIONA_FINAL.search(p) for p in pasos):
+        pasos.append(f"Respuesta final: {final}")
+    return str(js.get("enunciado") or "").strip(), [p for p in pasos if p]
+
+
+def comparar_lecturas(a, b) -> dict:
+    """Compara dos lecturas de la misma foto, parte por parte.
+
+    -> {coinciden, bloqueante, discrepancias, categorias, inocuas}
+
+    La regla (fase 3, ronda del 2026-11-05):
+
+      · **material** — un número, un signo, una operación o una palabra que
+        cambia el sentido es distinta entre las dos lecturas. No se elige una
+        en silencio ni se para la hoja: la discrepancia se ENSEÑA, con lo que
+        dice cada lectura, para que el estudiante confirme qué escribió.
+      · **inocua** — cambia la redacción, la ortografía, mayúsculas, tildes o
+        puntuación. Se registra en la traza y no se enseña.
+      · **bloqueante** — alguna de las dos lecturas no trae texto. Ahí no hay
+        nada que confirmar y se pide otra foto.
+
+    Antes (b439be5) cualquier palabra distinta paraba la hoja: 2 de 12 fotos
+    legibles se rechazaban solo por la redacción.
+    """
+    pa, pb = _partes_de_lectura(a), _partes_de_lectura(b)
+    vacia = (lambda p: p is None or (not p[0] and not p[1]))
+    if vacia(pa) or vacia(pb):
+        return {"coinciden": False, "bloqueante": True, "discrepancias": [],
+                "categorias": ["alguna lectura no trae texto legible"], "inocuas": []}
+
+    discrepancias, categorias, inocuas = [], [], []
+
+    def comparar(nombre, ta, tb):
+        fa, fb = _firma_matematica(ta), _firma_matematica(tb)
+        if fa != fb or _sentido_distinto(ta, tb):
+            if fa[0] != fb[0]:
+                categorias.append(f"números del {nombre}")
+            if fa[1] != fb[1]:
+                categorias.append(f"operaciones del {nombre}")
+            if fa == fb:
+                categorias.append(f"sentido del {nombre}")
+            discrepancias.append(
+                f"{nombre[0].upper()}{nombre[1:]}: una lectura dice «{ta}» y la otra «{tb}».")
+        elif palabras_de(ta) != palabras_de(tb):
+            inocuas.append(f"redacción del {nombre}")
+
+    comparar("enunciado", pa[0], pb[0])
+    for i in range(max(len(pa[1]), len(pb[1]))):
+        if i < len(pa[1]) and i < len(pb[1]):
+            comparar(f"paso {i + 1}", pa[1][i], pb[1][i])
+        else:
+            solo = pa[1][i] if i < len(pa[1]) else pb[1][i]
+            categorias.append("cantidad de pasos")
+            discrepancias.append(f"Paso {i + 1}: solo una de las dos lecturas lo "
+                                 f"encontró: «{solo}».")
+    return {"coinciden": not discrepancias, "bloqueante": False,
+            "discrepancias": discrepancias, "categorias": categorias,
+            "inocuas": inocuas}
 
 
 def lecturas_consistentes(a, b) -> bool:
-    """¿Dos lecturas de la misma foto dicen lo mismo?
+    """¿Dos lecturas de la misma foto dicen lo mismo en lo material?
+
+    Desde la ronda del 2026-11-05 la delega en `comparar_lecturas`: números,
+    operaciones y palabras que cambian el sentido. La redacción no cuenta.
 
     **Necesaria pero NO suficiente, y hay prueba.** En la corrida del 24-10 esta
     señal falló exactamente donde tenía que servir: ante la foto desenfocada de
@@ -303,10 +412,10 @@ def lecturas_consistentes(a, b) -> bool:
     y por eso es estable.
 
     Se conserva porque es barata y sí caza las lecturas inestables, pero ya no se
-    usa como única defensa. La huella exige coincidencia de estructura, pasos y
-    números; no concede fiabilidad por una coincidencia parcial.
+    usa como única defensa. Exige coincidencia de pasos, números, operaciones y
+    sentido; no concede fiabilidad por una coincidencia parcial.
     """
-    return huella_lectura(a) == huella_lectura(b)
+    return comparar_lecturas(a, b)["coinciden"]
 
 
 def atipicos_por_mad(valores: dict, k: float = 3.0) -> set:
@@ -487,7 +596,8 @@ def diagnostico_valido(conclusion) -> bool:
     return conclusion.startswith("paso ") or conclusion in ("sin error",) + ABSTENCIONES
 
 
-def decidir_diagnostico(conclusion_modelo, hallazgo, comprobados) -> dict:
+def decidir_diagnostico(conclusion_modelo, hallazgo, comprobados,
+                        planteamiento=None, dato=None) -> dict:
     """La conclusión final de una revisión, a partir de dos señales.
 
     `conclusion_modelo`: lo que dice la línea «Diagnóstico:» del tutor, ya
@@ -511,6 +621,22 @@ def decidir_diagnostico(conclusion_modelo, hallazgo, comprobados) -> dict:
 
     Nunca se fabrica certeza: el resultado lleva las dos señales y si
     discrepan, y la interfaz las enseña.
+
+    Ronda del 2026-11-05 · dos señales más, ambas deterministas:
+
+      · `dato` ({tipo: "dato_ausente", detalle}): el enunciado no trae ningún
+        dato y los pasos usan números. Gana a todo: sin datos no hay error que
+        localizar (m5v-12).
+      · `planteamiento`: el resultado de la hoja comparado con el del enunciado
+        resuelto aparte (`verificador_aritmetico.revisar_planteamiento`).
+        «coincide» -> sin error (m5v-07, m5v-08: el tutor inventaba un paso).
+        «planteamiento» en el paso p -> paso p, antes que un error de cálculo
+        posterior (m5v-02: suma donde había que restar). «discrepa» -> no se
+        localiza y se dice, sin elegir un paso.
+      · Sin esa referencia, la línea del tutor ya NO impone un paso que el
+        verificador no pudo comprobar cuando todas las cuentas cuadran: sería
+        un diagnóstico sin evidencia. Se dice «sin error en las cuentas» y que
+        el planteamiento no se pudo comprobar.
     """
     import re as _re
 
@@ -518,24 +644,48 @@ def decidir_diagnostico(conclusion_modelo, hallazgo, comprobados) -> dict:
     m = _re.match(r"paso (\d+)", conclusion_modelo or "")
     j = int(m.group(1)) if m else None
     sin_error_modelo = conclusion_modelo == "sin error"
+    tipo_p = (planteamiento or {}).get("tipo")
+    p = (planteamiento or {}).get("paso") if tipo_p == "planteamiento" else None
+    motivo = ""
 
-    if k is not None:
-        if j is not None and j < k and j not in comprobados:
-            final, fuente = f"paso {j}", "modelo"
+    if dato:
+        final, fuente, motivo = "dato no disponible", "verificador", dato.get("detalle", "")
+    elif k is not None:
+        if p is not None and p < k:
+            final, fuente = f"paso {p}", ("ambos" if j == p else "referencia")
+            motivo = planteamiento.get("detalle", "")
         else:
             final, fuente = f"paso {k}", ("ambos" if j == k else "verificador")
+            motivo = (hallazgo or {}).get("detalle", "")
+    elif p is not None:
+        final, fuente = f"paso {p}", ("ambos" if j == p else "referencia")
+        motivo = planteamiento.get("detalle", "")
+    elif tipo_p == "coincide":
+        final, fuente = "sin error", ("ambos" if sin_error_modelo else "referencia")
+        motivo = ("todas las cuentas que se pueden comprobar cuadran y "
+                  + planteamiento.get("detalle", ""))
+    elif tipo_p == "discrepa":
+        final, fuente = "sin conclusión", "referencia"
+        motivo = planteamiento.get("detalle", "")
+    elif conclusion_modelo in ABSTENCIONES:
+        final, fuente = conclusion_modelo, "modelo"
+    elif (hallazgo or {}).get("tipo") == "ninguno":
+        final, fuente = "sin error", ("ambos" if sin_error_modelo else "verificador")
+        motivo = ("todas las cuentas que se pueden comprobar cuadran; el "
+                  "planteamiento no se pudo comprobar por separado")
+    elif j is not None and j not in comprobados:
+        final, fuente = f"paso {j}", "modelo"
+        motivo = ("lo señala el tutor; en esa hoja no hay cuentas que el "
+                  "verificador pueda comprobar, así que no está verificado")
     elif j is not None:
-        if j in comprobados:
-            final, fuente = "sin error", "verificador"
-        else:
-            final, fuente = f"paso {j}", "modelo"
+        final, fuente = "sin error", "verificador"
     elif sin_error_modelo:
-        final, fuente = "sin error", ("ambos" if (hallazgo or {}).get("tipo") == "ninguno"
-                                       else "modelo")
+        final, fuente = "sin error", "modelo"
     else:
         final, fuente = conclusion_modelo, "modelo"
     return {"conclusion": final, "fuente": fuente, "modelo": conclusion_modelo,
-            "verificador_paso": k, "comprobados": sorted(comprobados),
+            "verificador_paso": k, "planteamiento_paso": p,
+            "comprobados": sorted(comprobados), "motivo": motivo,
             "desacuerdo": (conclusion_modelo or "") != (final or "")}
 
 
