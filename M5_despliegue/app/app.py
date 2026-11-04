@@ -148,6 +148,9 @@ def presentar_revision(r: dict) -> str:
     Esto es presentación. `pipeline.revisar_pasos` sigue devolviendo el texto
     crudo, que es lo que mide el evaluador.
     """
+    if r.get("diagnostico_final"):
+        # `pipeline` ya combinó tutor y verificador y escribió las dos señales.
+        return presentar(r.get("respuesta") or "")
     texto = presentar(r.get("respuesta") or "")
     h = r.get("verificador_aritmetico") or {}
     tipo = h.get("tipo")

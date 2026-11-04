@@ -209,23 +209,34 @@ def huella_lectura(lectura) -> tuple:
     if js.get("ilegible"):
         return ("ilegible",)
     if isinstance(js.get("lineas"), list):
-        # Lectura por líneas (M5). Se compara el ESQUELETO MATEMÁTICO, estricto
-        # y en orden: cada número, cada operación entre números, cuántos pasos
-        # numerados hay y si hay respuesta final. Un 306 frente a un 312, un +
-        # frente a un −, un paso de más o de menos: se para la hoja.
+        # Lectura por líneas (M5). Se compara TODO lo que el estudiante va a
+        # confirmar, por separado para enunciado y pasos: palabras, números,
+        # operaciones, cuántos pasos hay y la respuesta final.
         #
-        # Las palabras no se comparan, y es una decisión, no un descuido. En la
-        # corrida del 2026-11-04 dos copias de m5v-03 idénticas en todos los
-        # números discreparon solo en «¿Cuánto» / «Cuantos», y eso paraba la
-        # hoja. Lo que el verificador y el tutor usan son los números y las
-        # operaciones; las palabras las ve y las corrige el estudiante antes de
-        # confirmar. Que una copia parta una línea en dos tampoco cuenta.
-        texto = " ".join(_norm(str(x)).replace("×", "x")
-                         for x in js["lineas"] if any(c.isalnum() for c in str(x)))
-        texto = _PAT_DECIMAL.sub(r"\1.\2", texto)
-        return ("lineas", bool(texto.strip()), tuple(numeros_de(_sin_marcas(texto))),
-                operaciones_de(texto), len(_PAT_MARCA_PASO.findall(texto)),
-                bool(_MENCIONA_FINAL.search(texto)))
+        # Antes de comparar se normaliza solo lo que no cambia el sentido:
+        # mayúsculas, tildes, puntuación, espacios, «×» frente a «x», coma o
+        # punto decimal, y si una copia partió una línea en dos. Una palabra
+        # distinta («quedan» / «sobran»), un número distinto o una operación
+        # distinta sí paran la hoja: la discrepancia es material mientras nadie
+        # demuestre lo contrario, y quien decide es el estudiante con otra foto
+        # o corrigiendo a mano, no esta función.
+        #
+        # Historia: entre 1bab37e y esta versión las palabras NO se comparaban
+        # (m5v-03 se paraba por «¿Cuánto» / «Cuantos»). Se volvió a exigirlas
+        # por decisión del responsable del proyecto: una lectura en la que
+        # cambia una palabra no es la misma lectura. El coste —hojas legibles
+        # rechazadas— se mide en el scorecard, no se esconde.
+        if "enunciado" not in js and "pasos" not in js:
+            js = estructurar_lineas(js["lineas"])
+        enunciado = str(js.get("enunciado") or "")
+        pasos = [str(x) for x in (js.get("pasos") or [])]
+        texto_pasos = " ".join(pasos)
+        return ("lineas", bool((enunciado + texto_pasos).strip()),
+                palabras_de(enunciado), palabras_de(texto_pasos),
+                tuple(numeros_de(_decimal(enunciado))),
+                tuple(numeros_de(_sin_marcas(_decimal(texto_pasos)))),
+                operaciones_de(enunciado + " | " + texto_pasos),
+                len(pasos), _final_normalizado(js.get("respuesta_final")))
     pasos = js.get("pasos")
     if not isinstance(pasos, list):
         return ("estructura_invalida", tuple(sorted(map(str, js))))
@@ -273,8 +284,10 @@ def diferencias_de_lectura(a, b) -> list:
         "procedimiento": ("tipo", "estructura", "pasos", "respuesta final", "números"),
         "enunciado": ("tipo", "estructura", "respuesta final",
                       "números del enunciado", "operaciones del enunciado"),
-        "lineas": ("tipo", "hay texto", "números", "operaciones",
-                   "cantidad de pasos", "respuesta final"),
+        "lineas": ("tipo", "hay texto", "palabras del enunciado",
+                   "palabras de los pasos", "números del enunciado",
+                   "números de los pasos", "operaciones", "cantidad de pasos",
+                   "respuesta final"),
     }.get(ha[0], tuple(f"campo {i}" for i in range(len(ha))))
     return [n for n, x, y in zip(nombres, ha, hb) if x != y]
 
@@ -472,6 +485,58 @@ def diagnostico_valido(conclusion) -> bool:
     if not conclusion:
         return False
     return conclusion.startswith("paso ") or conclusion in ("sin error",) + ABSTENCIONES
+
+
+def decidir_diagnostico(conclusion_modelo, hallazgo, comprobados) -> dict:
+    """La conclusión final de una revisión, a partir de dos señales.
+
+    `conclusion_modelo`: lo que dice la línea «Diagnóstico:» del tutor, ya
+    normalizado («paso 2», «sin error», una abstención) o None.
+    `hallazgo`: el dict del verificador ({paso, tipo, detalle}) o None.
+    `comprobados`: los pasos cuya aritmética el verificador comprobó y cuadra.
+
+    La regla, escrita ANTES de ver cómo puntúa, y por qué:
+
+      1. El verificador manda sobre la aritmética. Si encuentra el primer paso
+         cuya cuenta no cuadra (k), ese es el diagnóstico, salvo que el tutor
+         señale un paso ANTERIOR (j < k) que el verificador no pudo comprobar:
+         un error de planteamiento en una línea sin cuentas puede ir antes que
+         el primer error de cálculo, y eso solo lo puede ver el tutor.
+      2. Si el verificador no encuentra errores, el tutor solo puede imponer un
+         «paso j» si ese paso NO fue comprobado. Señalar un paso cuya cuenta el
+         verificador acaba de comprobar es inventar un error, y en una hoja sin
+         errores es el fallo más dañino posible.
+      3. Si el tutor se abstiene («fuera de dominio», «dato no disponible»…), se
+         respeta: el verificador no sabe nada de eso.
+
+    Nunca se fabrica certeza: el resultado lleva las dos señales y si
+    discrepan, y la interfaz las enseña.
+    """
+    import re as _re
+
+    k = (hallazgo or {}).get("paso") if (hallazgo or {}).get("tipo") in ("calculo", "traslado") else None
+    m = _re.match(r"paso (\d+)", conclusion_modelo or "")
+    j = int(m.group(1)) if m else None
+    sin_error_modelo = conclusion_modelo == "sin error"
+
+    if k is not None:
+        if j is not None and j < k and j not in comprobados:
+            final, fuente = f"paso {j}", "modelo"
+        else:
+            final, fuente = f"paso {k}", ("ambos" if j == k else "verificador")
+    elif j is not None:
+        if j in comprobados:
+            final, fuente = "sin error", "verificador"
+        else:
+            final, fuente = f"paso {j}", "modelo"
+    elif sin_error_modelo:
+        final, fuente = "sin error", ("ambos" if (hallazgo or {}).get("tipo") == "ninguno"
+                                       else "modelo")
+    else:
+        final, fuente = conclusion_modelo, "modelo"
+    return {"conclusion": final, "fuente": fuente, "modelo": conclusion_modelo,
+            "verificador_paso": k, "comprobados": sorted(comprobados),
+            "desacuerdo": (conclusion_modelo or "") != (final or "")}
 
 
 def pasos_mencionados(texto: str) -> set:
@@ -723,6 +788,21 @@ INSTRUCCION_COPIAR_INDEPENDIENTE = (
     'Devuelve SOLO un JSON: {"lineas": ["...", "..."]}'
 )
 
+def _decimal(texto: str) -> str:
+    return _PAT_DECIMAL.sub(r"\1.\2", _norm(texto).replace("×", "x"))
+
+
+def palabras_de(texto: str) -> tuple:
+    """Las palabras de un texto, normalizadas: sin tildes, sin mayúsculas, sin
+    puntuación ni números, y sin la «x» de multiplicar."""
+    return tuple(w for w in re.findall(r"[a-zñ]+", _norm(texto)) if w != "x")
+
+
+def _final_normalizado(final) -> tuple:
+    texto = str(final or "")
+    return (palabras_de(texto), tuple(numeros_de(_decimal(texto))))
+
+
 _PAT_MARCA_PASO = re.compile(r"\bpaso\s*\d+", re.IGNORECASE)
 
 
@@ -781,6 +861,13 @@ def estructurar_lineas(lineas) -> dict:
     # el VLM la usa de relleno. Se descarta antes de separar.
     lineas = [str(l).strip() for l in (lineas or [])
               if any(c.isalnum() for c in str(l))]
+    # Una copia a veces junta toda la hoja en una sola línea («… ¿Cuántos…?
+    # Paso 1: … Paso 2: …»). Se parte delante de cada «Paso N» para que las dos
+    # copias de la misma hoja tengan la misma estructura aunque una no respete
+    # los saltos de línea.
+    lineas = [trozo.strip() for l in lineas
+              for trozo in re.split(r"(?=\bpaso\s*\d+\s*[:.\-])", l, flags=re.IGNORECASE)
+              if trozo.strip()]
     corte = next((i for i, l in enumerate(lineas) if _LINEA_DE_PASO.search(l)),
                  len(lineas))
     enunciado = lineas[:corte]

@@ -1245,6 +1245,8 @@ class Tutor:
         hallazgo, evidencia = self._comprobar_aritmetica(pasos)
         r = self.responder(prompt_revision_confirmada(
             pregunta or self.PREGUNTA_REVISION, enunciado, pasos, evidencia))
+        if r.get("ok"):
+            r.update(self._combinar_diagnostico(r.get("respuesta") or "", pasos, hallazgo))
         r["etapa"] = "diagnostico"
         r["pasos_confirmados"] = list(pasos)
         r["transcripcion"] = "\n".join(f"Paso {i}: {p}"
@@ -1343,6 +1345,45 @@ class Tutor:
                     "visual. Use TUTOR_CONFIG=revision_foto para habilitarla, "
                     "teniendo en cuenta que esa configuración NO está medida.")
         return ""
+
+    @staticmethod
+    def _combinar_diagnostico(respuesta_modelo: str, pasos, hallazgo) -> dict:
+        """Junta tutor y verificador con `vision.decidir_diagnostico`.
+
+        -> {respuesta, respuesta_modelo, diagnostico_final}. `respuesta` es lo
+        que ve el estudiante y empieza por la conclusión final; la del tutor se
+        conserva aparte, para poder medir cada señal por separado.
+        """
+        try:
+            from verificador_aritmetico import pasos_comprobados
+            from vision import (_sin_la_linea_de_diagnostico, decidir_diagnostico,
+                                extraer_diagnostico)
+        except Exception:  # noqa: BLE001
+            return {}
+        d = decidir_diagnostico(extraer_diagnostico(respuesta_modelo), hallazgo,
+                                pasos_comprobados(list(pasos)))
+        final = d["conclusion"] or "sin conclusión"
+        lineas = [f"Diagnóstico: {final[0].upper() + final[1:]}"]
+        if d["fuente"] in ("verificador", "ambos") and (hallazgo or {}).get("tipo") in (
+                "calculo", "traslado"):
+            lineas.append(f"Comprobación de las cuentas: {hallazgo['detalle']}.")
+        elif final == "sin error" and (hallazgo or {}).get("tipo") == "ninguno":
+            lineas.append("Comprobación de las cuentas: todas las igualdades que se "
+                          "pueden comprobar cuadran.")
+        elif d["fuente"] == "modelo" and final.startswith("paso"):
+            lineas.append("El tutor señala un error de planteamiento; en ese paso no "
+                          "hay una cuenta que el verificador pueda comprobar, así que "
+                          "esta conclusión no está verificada.")
+        if d["desacuerdo"]:
+            lineas.append(
+                f"Ojo: las dos señales no coinciden. El tutor concluyó «{d['modelo'] or 'nada'}»"
+                f" y la comprobación determinista lleva a «{final}». Muestro las dos: "
+                "revisa ambos pasos antes de darlo por bueno.")
+        explicacion = _sin_la_linea_de_diagnostico(respuesta_modelo).strip()
+        if explicacion:
+            lineas.append("Lo que explica el tutor:\n" + explicacion)
+        return {"respuesta": "\n\n".join(lineas), "respuesta_modelo": respuesta_modelo,
+                "diagnostico_final": d}
 
     def _comprobar_aritmetica(self, pasos) -> tuple:
         """-> (hallazgo serializable | None, texto de evidencia | None).

@@ -59,21 +59,14 @@ LADO_MAYOR = 1024          # el mismo tope de M4: la latencia por caso no debe
 # no es la que hay. Resolverlos es una decisión de diseño: o se repite la
 # foto, o se corrige el JSONL. No se hace ninguna de las dos aquí.
 CONFLICTOS = {
-    "m5v-01": "la hoja escribe «Respuesta final: 642 km»; el JSONL espera 942 "
-              "(valor_final_escrito). El paso con error sigue siendo el 2, pero el "
-              "número final ya no es el del eval set.",
-    "m5v-05": "la hoja escribe «2 × 15000 = 3000»; el JSONL dice «2 × 1500 = 3000» "
-              "y el enunciado de la propia hoja dice «lapiceros de 1500». Con un "
-              "cero de más el paso 2 también queda mal, y el caso es de tipo "
-              "`compensado`: esperaba que el ÚNICO primer error fuera el paso 1 y "
-              "prohíbe nombrar el paso 2. Además la hoja tiene 3 pasos y el JSONL 4.",
-    "m5v-09": "la hoja escribe «Respuesta final: 19 estudiantes»; su propio paso 2 "
-              "dice «40 × 0.35 = 14» y el JSONL espera 14. El caso está declarado "
-              "`sin_error`, y con un 19 al final sí hay un error en el paso 3.",
-    "m5v-10": "la foto es LEGIBLE. El caso existe para medir la salvaguarda de "
-              "ilegibles y el JSONL pide explícitamente que esta hoja se fotografíe "
-              "movida. Con una foto nítida no se puede afirmar que la válvula quedó "
-              "probada, en ningún sentido.",
+    # Las referencias de m5v-01, m5v-05 y m5v-09 se corrigieron en el JSONL
+    # para que describan las hojas fotografiadas (642 km; 2 × 15000; 19
+    # estudiantes, ahora `localizacion` con error en el paso 3). Ya no están en
+    # conflicto y se puntúan.
+    "m5v-10": "NO VÁLIDO para medir la salvaguarda de ilegibles: la foto es "
+              "LEGIBLE y el caso exige una toma movida. Se lee y se registra, pero "
+              "no cuenta ni como acierto ni como fallo de la válvula hasta que haya "
+              "una foto borrosa de verdad.",
 }
 
 
@@ -252,6 +245,21 @@ def calificar(caso: dict, respuesta: str) -> dict:
     }
 
 
+def texto_a_calificar(dia: dict) -> str:
+    """Lo que se puntúa: la conclusión FINAL (tutor + verificador), no la prosa.
+
+    La respuesta que ve el estudiante cita a veces las dos señales cuando
+    discrepan («el tutor dijo paso 2; las cuentas, paso 3»), y el contrato
+    `contiene_alguna` castigaría haber mencionado el paso descartado. Para las
+    abstenciones (fuera de dominio, dato no disponible) se puntúa el texto del
+    tutor, porque esas categorías no las decide el verificador.
+    """
+    final = (dia.get("diagnostico_final") or {}).get("conclusion")
+    if final and (final.startswith("paso") or final == "sin error"):
+        return f"Diagnóstico: el {final}" if final.startswith("paso") else "Diagnóstico: sin error"
+    return dia.get("respuesta_modelo") or dia.get("respuesta") or ""
+
+
 def etapa_diagnostico(tutor, caso: dict, pasos: list, proposito: str = "revisar",
                       enunciado_leido: str = "") -> dict:
     """Lo confirmado -> respuesta del tutor. La lectura ya terminó.
@@ -274,6 +282,8 @@ def etapa_diagnostico(tutor, caso: dict, pasos: list, proposito: str = "revisar"
         "verificador_aritmetico": r.get("verificador_aritmetico"),
         "pasos_llm": r.get("pasos_llm"),
         "herramientas": r.get("herramientas") or [],
+        "respuesta_modelo": r.get("respuesta_modelo"),
+        "diagnostico_final": r.get("diagnostico_final"),
         "modo": proposito,
         "error": None if r.get("ok") else r.get("respuesta"),
     }
@@ -417,17 +427,42 @@ def main() -> int:
             print(f"      {CONFLICTOS[caso['id']]}")
             filas.append(fila)
             continue
-        cal = calificar(caso, dia["respuesta"] or "")
+        cal = calificar(caso, texto_a_calificar(dia))
+        cal_modelo = calificar(caso, dia.get("respuesta_modelo") or dia["respuesta"] or "")
+        cal["acierto_solo_tutor"] = cal_modelo["acierto"]
+        conclusion = (dia.get("diagnostico_final") or {}).get("conclusion") or ""
+        # Inventar un error en una hoja sin errores es el fallo más dañino.
+        cal["fallo_grave"] = caso["bloque"] == "sin_error" and conclusion.startswith("paso")
         from vision import fuente_del_fallo
         fila["calificacion"] = cal
         fila["fuente_del_fallo"] = fuente_del_fallo(cal["acierto"], lec["lectura_fiel"])
+        print(f"      final={(dia.get('diagnostico_final') or {}).get('conclusion')} "
+              f"(fuente {(dia.get('diagnostico_final') or {}).get('fuente')}) · "
+              f"tutor={(dia.get('diagnostico_final') or {}).get('modelo')} · "
+              f"verificador={(dia.get('verificador_aritmetico') or {}).get('tipo')}/"
+              f"{(dia.get('verificador_aritmetico') or {}).get('paso')} · "
+              f"esperado={caso.get('paso_error') or caso['bloque']}")
         print(f"      diagnóstico {dia['segundos']}s · acierto={cal['acierto']}"
+              f" · solo_tutor={cal['acierto_solo_tutor']} · grave={cal['fallo_grave']}"
               f" · fuente_del_fallo={fila['fuente_del_fallo']}")
         filas.append(fila)
 
     parcial = bool(solo) or not inv["completo"]
+    import datetime
+    import subprocess
+    try:
+        commit = subprocess.run(["git", "-C", str(RAIZ), "rev-parse", "--short", "HEAD"],
+                                capture_output=True, text=True).stdout.strip()
+    except Exception:  # noqa: BLE001
+        commit = ""
     informe = {
         "tipo": "evaluación de la vía visual de M5",
+        "commit": commit,
+        "fecha": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"),
+        "naturaleza": ("evaluación de DESARROLLO: estas 12 hojas se han usado para "
+                       "depurar la lectura, el verificador y la regla de diagnóstico. "
+                       "No es evidencia de generalización."),
+        "excluidos_de_la_puntuacion": CONFLICTOS,
         "parcial": parcial,
         "eval_set": str(JSONL.relative_to(RAIZ)),
         "inventario": inv,
@@ -465,6 +500,16 @@ def main() -> int:
             "pidio_otra_foto": sum(1 for f in filas
                                    if f.get("lectura", {}).get("pide_otra_foto")),
             "aciertos": sum(1 for f in juzgadas if f["calificacion"]["acierto"]),
+            "aciertos_solo_tutor": sum(1 for f in juzgadas
+                                       if f["calificacion"].get("acierto_solo_tutor")),
+            "fallos_graves_error_inventado": sum(1 for f in juzgadas
+                                                 if f["calificacion"].get("fallo_grave")),
+            # Coste de seguridad de la doble lectura estricta: TODAS las fotos
+            # del conjunto son legibles (m5v-10 incluida, ver CONFLICTOS), así
+            # que cada rechazo aquí es una hoja legible que no pasó.
+            "legibles_rechazadas_por_doble_lectura": sorted(
+                f["caso"] for f in filas
+                if f.get("lectura", {}).get("pide_otra_foto")),
             "fallos_de_lectura": sum(1 for f in juzgadas
                                      if f["fuente_del_fallo"] == "lectura"),
             "fallos_de_diagnostico": sum(1 for f in juzgadas
@@ -473,18 +518,13 @@ def main() -> int:
 
     informe["conflictos"] = CONFLICTOS
     informe["decision_pendiente"] = (
-        "Cuatro de las doce hojas no coinciden con lo que el JSONL declara "
-        "(m5v-01, m5v-05, m5v-09) o no son la toma que el caso pide (m5v-10, "
-        "fotografiada legible cuando el caso existe para medir la salvaguarda de "
-        "ilegibles). Se leen y se guarda lo que contestó el tutor, pero no se "
-        "puntúan: su respuesta esperada describe una hoja distinta. Resolverlo "
-        "es una decisión de diseño —repetir la foto o corregir el JSONL— y no se "
-        "toma aquí. Mientras siga abierta, cualquier tasa sobre este conjunto es "
-        "sobre 8 casos, no sobre 12, y así se informa.")
+        "m5v-10 necesita una foto movida de verdad. Hasta entonces la "
+        "salvaguarda de ilegibles no tiene ninguna medición en este conjunto.")
     informe["limites_de_la_muestra"] = (
-        "8 casos puntuables. Con ese tamaño un acierto más o menos mueve la tasa "
-        "12,5 puntos: no sirve para afirmar una mejora frente a ninguna otra "
-        "configuración, solo para ver si el recorrido completo funciona.")
+        "11 casos puntuables como máximo, menos los que pare la doble lectura. "
+        "Un acierto mueve la tasa unos 9 puntos o más. Las hojas se reutilizaron "
+        "para depurar el sistema: sirve para ver si el recorrido funciona, no "
+        "para comparar configuraciones ni afirmar mejoras.")
 
     SALIDA.parent.mkdir(parents=True, exist_ok=True)
     SALIDA.write_text(json.dumps(informe, ensure_ascii=False, indent=2) + "\n",

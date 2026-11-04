@@ -1494,14 +1494,16 @@ def test_recupera_lineas_envueltas_en_objetos_mal_formados():
 
 
 
-def test_una_palabra_distinta_no_para_la_hoja_un_numero_si():
-    """Decisión documentada en `huella_lectura`: m5v-03 se paraba por
-    «¿Cuánto» / «Cuantos» con todos los números iguales. Las palabras las
-    corrige el estudiante; los números y las operaciones, no se negocian."""
+def test_una_palabra_distinta_para_la_hoja_igual_que_un_numero():
+    """Antes (1bab37e) las palabras no se comparaban. Ahora sí, por decisión del
+    responsable del proyecto: una lectura en la que cambia una palabra no es la
+    misma lectura. Números, operaciones y cantidad de pasos, igual que antes."""
     from vision import lecturas_consistentes
     L = lambda *x: {"json": {"lineas": list(x)}}
+    assert not lecturas_consistentes(L("¿Cuánto se paga?", "Paso 1: 52000 x 0.25 = 13000"),
+                                     L("Cuantos se paga?", "Paso 1: 52000 x 0.25 = 13000"))
     assert lecturas_consistentes(L("¿Cuánto se paga?", "Paso 1: 52000 x 0.25 = 13000"),
-                                 L("Cuantos se paga?", "Paso 1: 52000 x 0.25 = 13000"))
+                                 L("cuanto se paga", "Paso 1: 52000 × 0,25 = 13000."))
     assert not lecturas_consistentes(L("Paso 1: 52000 x 0.25 = 13000"),
                                      L("Paso 1: 52000 x 0.35 = 13000"))
     assert not lecturas_consistentes(L("Paso 1: 3 + 4 = 7"), L("Paso 1: 3 - 4 = 7"))
@@ -1515,3 +1517,121 @@ def test_sin_ningun_numero_no_se_resuelve_nada():
         "Pan Queso Dos litros de leche Jabón", confirmado=True)
     assert r["ok"] and r["camino"] == "ninguno" and r["pasos_llm"] == 0
     assert "no es" in r["respuesta"].lower() or "no veo" in r["respuesta"].lower()
+
+
+# --------------------------------------------------------------------------
+# Doble lectura estricta: palabras Y contenido matemático
+# --------------------------------------------------------------------------
+
+def _lectura_lineas(*lineas):
+    from vision import estructurar_lineas
+    return {"json": estructurar_lineas(list(lineas)) | {"lineas": list(lineas)}}
+
+
+_HOJA = ("Una camiseta cuesta 52000 pesos y tiene 25% de descuento. ¿Cuánto se paga?",
+         "Paso 1: El descuento es 52000 x 0.25 = 13000",
+         "Paso 2: Resto el descuento 52000 - 13000 = 39000",
+         "Paso 3: Respuesta Final: 38000 pesos")
+
+
+def test_doble_lectura_identicas_coinciden():
+    from vision import diferencias_de_lectura
+    assert diferencias_de_lectura(_lectura_lineas(*_HOJA), _lectura_lineas(*_HOJA)) == []
+
+
+def test_doble_lectura_puntuacion_acentos_y_saltos_no_cuentan():
+    from vision import diferencias_de_lectura
+    otra = ("una camiseta cuesta 52000 pesos y tiene 25 % de descuento cuanto se paga",
+            "Paso 1: el descuento es 52000 × 0,25 = 13000.",
+            "Paso 2: resto el descuento 52000 - 13000 = 39000",
+            "Paso 3: respuesta final: 38000 pesos")
+    assert diferencias_de_lectura(_lectura_lineas(*_HOJA), _lectura_lineas(*otra)) == []
+    # Toda la hoja en una sola línea es la misma lectura.
+    assert diferencias_de_lectura(_lectura_lineas(*_HOJA),
+                                  _lectura_lineas(" ".join(_HOJA))) == []
+
+
+def test_doble_lectura_una_palabra_distinta_para_la_hoja():
+    from vision import diferencias_de_lectura
+    otra = (_HOJA[0].replace("¿Cuánto", "Cuantos"),) + _HOJA[1:]
+    assert diferencias_de_lectura(_lectura_lineas(*_HOJA),
+                                  _lectura_lineas(*otra)) == ["palabras del enunciado"]
+
+
+def test_doble_lectura_un_numero_distinto_para_la_hoja():
+    from vision import diferencias_de_lectura
+    otra = (_HOJA[0], _HOJA[1].replace("0.25", "0.35")) + _HOJA[2:]
+    assert diferencias_de_lectura(_lectura_lineas(*_HOJA),
+                                  _lectura_lineas(*otra)) == ["números de los pasos"]
+
+
+# --------------------------------------------------------------------------
+# Verificador: igualdades encadenadas, cada una por separado
+# --------------------------------------------------------------------------
+
+def test_verificador_cadena_de_fracciones_correcta():
+    pytest.importorskip("sympy")
+    from verificador_aritmetico import igualdades_de, revisar_hoja
+    paso = "Dividimos: 7/8 ÷ 3/8 = 7/8 × 8/3 = 56/24"
+    assert igualdades_de(paso) == [("7/8 ÷ 3/8", "7/8 × 8/3"), ("7/8 × 8/3", "56/24")]
+    assert revisar_hoja([paso]).tipo == "ninguno"
+    assert revisar_hoja(["7/8 ÷ 3/8 = 7/3"]).tipo == "ninguno"
+
+
+def test_verificador_cadena_con_una_igualdad_falsa_dice_cual():
+    pytest.importorskip("sympy")
+    from verificador_aritmetico import revisar_hoja
+    h = revisar_hoja(["3/4 + 1/8 = 6/8 + 1/8 = 8/8"])
+    assert h.tipo == "calculo" and h.paso == 1
+    assert "6/8 + 1/8" in h.detalle and "7/8" in h.detalle and "8/8" in h.detalle
+
+
+def test_verificador_cadena_equivalente_de_otra_forma():
+    pytest.importorskip("sympy")
+    from verificador_aritmetico import revisar_hoja
+    assert revisar_hoja(["3/4 + 1/8 = 0.75 + 0.125 = 0,875 = 7/8"]).tipo == "ninguno"
+
+
+def test_verificador_no_marca_un_paso_correcto():
+    pytest.importorskip("sympy")
+    from verificador_aritmetico import revisar_hoja
+    for paso in ["Paso 2: 18 × 15 = 270 galletas", "El descuento es 52000 x 0.25 = 13000.",
+                 "40 × 0,35 = 14", "Llevamos a octavos: 3/4 = 6/8"]:
+        assert revisar_hoja([paso]).tipo == "ninguno", paso
+
+
+# --------------------------------------------------------------------------
+# Diagnóstico combinado: tutor + verificador
+# --------------------------------------------------------------------------
+
+def _decidir(pasos, conclusion_modelo):
+    pytest.importorskip("sympy")
+    from verificador_aritmetico import pasos_comprobados, revisar_hoja
+    from vision import decidir_diagnostico
+    h = revisar_hoja(pasos)
+    return decidir_diagnostico(conclusion_modelo, {"paso": h.paso, "tipo": h.tipo,
+                                                   "detalle": h.detalle},
+                               pasos_comprobados(pasos))
+
+
+def test_el_verificador_manda_sobre_la_aritmetica():
+    d = _decidir(["52000 × 0.25 = 13000", "52000 − 13000 = 39000",
+                  "Respuesta final: 38000 pesos"], "paso 2")
+    assert d["conclusion"] == "paso 3" and d["desacuerdo"] and d["fuente"] == "verificador"
+
+
+def test_un_planteamiento_anterior_sin_cuentas_lo_decide_el_tutor():
+    d = _decidir(["Para saber lo que queda, sumo: 1240 + 365", "1240 + 365 = 1605",
+                  "Respuesta final: 1605 sillas"], "paso 1")
+    assert d["conclusion"] == "paso 1" and d["fuente"] == "modelo"
+
+
+def test_no_se_inventa_un_error_en_un_paso_comprobado():
+    d = _decidir(["Multiplico 18 × 15", "18 × 15 = 270", "Respuesta final: 270"], "paso 2")
+    assert d["conclusion"] == "sin error" and d["desacuerdo"]
+
+
+def test_las_abstenciones_del_tutor_se_respetan():
+    d = _decidir(["8500 + 12300 = 20800", "Respuesta final: 20800 pesos"],
+                 "dato no disponible")
+    assert d["conclusion"] == "dato no disponible"

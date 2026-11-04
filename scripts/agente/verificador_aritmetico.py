@@ -89,10 +89,42 @@ def _valor(texto: str) -> Fraction | None:
         return None
 
 
+# Los caracteres de una expresión aritmética escrita. Sin `:` —en «Paso 2: 24 ×
+# 13» se leería como división— y sin `%`.
+_EXPR = r"[\d\s.,/+\-−×xX*÷()]"
+_COLA = re.compile(rf"(-?\(?\d{_EXPR}*?)[\s.,]*$")
+_CABEZA = re.compile(rf"^\s*(-?\(?\d{_EXPR}*)")
+
+
+def _recortar(expr: str) -> str:
+    """Quita lo que no es expresión al final: puntos, comas, operadores sueltos."""
+    return re.sub(r"[\s.,+\-−×xX*÷/(]+$", "", expr).strip()
+
+
 def igualdades_de(paso: str) -> list:
-    """[(izquierda, derecha)] de las igualdades escritas en un paso."""
+    """[(izquierda, derecha)] de CADA igualdad adyacente escrita en un paso.
+
+    «7/8 ÷ 3/8 = 7/8 × 8/3 = 56/24» son DOS igualdades —(7/8 ÷ 3/8, 7/8 × 8/3) y
+    (7/8 × 8/3, 56/24)—, y cada una se comprueba por separado. La versión
+    anterior, con una sola expresión regular, partía la cadena por el medio:
+    leía «7/8 ÷ 3/8 = 7/8» y marcaba como error un paso correcto.
+
+    Se parte el texto por «=»; de cada trozo se toma la expresión pegada al
+    signo —la cola del trozo de la izquierda, la cabeza del de la derecha—. Un
+    trozo intermedio es a la vez la derecha de una igualdad y la izquierda de la
+    siguiente.
+    """
     limpio = _PREFIJO_PASO.sub("", paso or "")
-    return [(m.group(1), m.group(2)) for m in _IGUALDAD.finditer(limpio)]
+    trozos = limpio.split("=")
+    pares = []
+    for izq_txt, der_txt in zip(trozos, trozos[1:]):
+        cola, cabeza = _COLA.search(izq_txt), _CABEZA.match(der_txt)
+        if not cola or not cabeza:
+            continue
+        izq, der = _recortar(cola.group(1)), _recortar(cabeza.group(1))
+        if izq and der and any(c.isdigit() for c in izq) and any(c.isdigit() for c in der):
+            pares.append((izq, der))
+    return pares
 
 
 def revisar_hoja(pasos) -> Hallazgo:
@@ -137,6 +169,33 @@ def revisar_hoja(pasos) -> Hallazgo:
         return Hallazgo(None, "no_evaluable",
                         "no hay ninguna igualdad aritmética que comprobar")
     return Hallazgo(None, "ninguno", "todas las cuentas escritas cuadran")
+
+
+def pasos_comprobados(pasos) -> set:
+    """Los pasos (1-based) cuya aritmética el verificador COMPROBÓ y cuadra.
+
+    Un paso entra si tiene al menos una igualdad interpretable y todas se
+    cumplen, o si es la línea de respuesta final y coincide con lo último
+    calculado. Un paso sin nada que comprobar —«Sumo los dos tramos»— no entra:
+    de él el verificador no sabe nada, ni bueno ni malo.
+    """
+    pasos = [_PREFIJO_PASO.sub("", str(p)) for p in (pasos or [])]
+    ok, ultimo = set(), None
+    for i, paso in enumerate(pasos, 1):
+        pares = [(_valor(a), _valor(b)) for a, b in igualdades_de(paso)]
+        pares = [(a, b) for a, b in pares if a is not None and b is not None]
+        if pares:
+            if all(a == b for a, b in pares):
+                ok.add(i)
+                ultimo = pares[-1][0]
+            else:
+                break
+        elif _MENCIONA_FINAL.search(paso) and ultimo is not None:
+            if _primer_numero(paso) == ultimo:
+                ok.add(i)
+            else:
+                break
+    return ok
 
 
 def _primer_numero(texto: str) -> Fraction | None:
